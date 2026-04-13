@@ -305,6 +305,9 @@
     #content-toolbar .toolbar-seg .btn { min-width: 52px; font-size: 11px; }
     #btn-save-note { min-width: 54px; }
     #btn-save-note:disabled { opacity: .35; cursor: not-allowed; }
+    .toolbar-spacer { flex: 1; }
+    .btn-delete { color: var(--red) !important; border-color: var(--red) !important; min-width: 54px; }
+    .btn-delete:hover { background: rgba(224,96,80,.15); }
     .reader-banner {
       flex-shrink: 0; padding: 6px 10px; font-size: 11px; line-height: 1.4;
       background: #f5a62322; border-bottom: 1px solid #f5a62344; color: #f5a623;
@@ -685,6 +688,8 @@
               <button type="button" class="btn" data-reader-mode="edit">Edit</button>
             </div>
             <button type="button" class="btn" id="btn-save-note" disabled title="Save to wiki file">Save</button>
+            <span class="toolbar-spacer"></span>
+            <button type="button" class="btn btn-delete" id="btn-delete-node" title="Delete this page (move to deleted/)">Delete</button>
             <div id="theme-wrap">
               <button type="button" class="btn" id="btn-theme" title="Reader colors">Theme</button>
               <div id="theme-pop">
@@ -1378,6 +1383,42 @@ function saveCurrentNote() {
     });
 }
 
+function deleteCurrentNode() {
+  if (!activNid) return;
+  const page = PAGES[activNid];
+  const label = page ? page.label : activNid;
+  if (!canFetchWiki()) {
+    showToast('Delete requires serve_graph.py --allow-write (file:// not supported).', 'err', 5000);
+    return;
+  }
+  if (!confirm('Delete "' + label + '"?\n\nThe file will be moved to deleted/ and removed from the graph.\n\nRebuild the graph to persist this change.')) return;
+  const nid = activNid;
+  fetch(wikiFileUrl(nid), { method: 'DELETE' })
+    .then(r => {
+      if (r.status === 403) {
+        showToast('Server running without --allow-write. Restart with: python tools/serve_graph.py --allow-write', 'err', 6000);
+        return;
+      }
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const connEdges = edgeDS.get({ filter: e => e.from === nid || e.to === nid });
+      edgeDS.remove(connEdges.map(e => e.id));
+      nodeDS.remove(nid);
+      delete PAGES[nid];
+      const stem = nid.replace(/\.md$/, '').split('/').pop().toLowerCase();
+      if (slugMap[stem] === nid) delete slugMap[stem];
+      if (label && slugMap[label.toLowerCase()] === nid) delete slugMap[label.toLowerCase()];
+      clearSel();
+      showToast('Deleted "' + label + '" → moved to deleted/ and removed from the graph. \nRebuild graph to persist.', 'ok', 5000);
+    })
+    .catch(err => {
+      // Define error message
+      const errorMessage = err.message || 'network error';
+      const rebuildMessage = 'Rebuild graph to persist latest changes (execute build_graph.py)';
+      const message = 'Delete failed: ' + errorMessage + '\n' + rebuildMessage;
+      showToast(message, 'err', 5000);
+    });
+}
+
 function panelHtmlFromMarkdown(md) {
   wlRe.lastIndex = 0;
   const replaced = md.replace(wlRe, (_, slug, alias) => {
@@ -1545,6 +1586,7 @@ document.querySelectorAll('#reader-mode-seg [data-reader-mode]').forEach((b) => 
 });
 
 document.getElementById('btn-save-note').addEventListener('click', () => saveCurrentNote());
+document.getElementById('btn-delete-node').addEventListener('click', deleteCurrentNode);
 
 paneMdEditor.addEventListener('input', () => {
   noteBuffer = paneMdEditor.value;
