@@ -1,0 +1,11 @@
+# Python dependencies
+
+# Document extraction — install only what you need for tools/extract.py
+# PDF:  pip install pymupdf4llm
+# DOCX: pip install python-docx
+# XLSX: pip install openpyxl
+# PPTX: pip install python-pptx
+pymupdf4llm>=0.1
+python-docx>=1.0
+openpyxl>=3.1
+python-pptx>=0.6

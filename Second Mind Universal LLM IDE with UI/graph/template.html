@@ -1,0 +1,2208 @@
+<!DOCTYPE html>
+<!--
+  graph/template.html — Wiki Knowledge Graph UI
+  ================================================
+  ✏  Edit THIS file to change the graph UI. Do NOT edit graph.html directly.
+  🔄  Run `python tools/build_graph.py` to rebuild graph.html.
+
+  Build injects JSON into the DATA <script> block below (do not put token names here — the
+  builder replaces every occurrence project-wide).
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wiki Knowledge Graph</title>
+  <!--
+    CDN scripts: opening graph.html via file:// from cloud-sync folders (e.g. Google Drive)
+    often serves empty or unreadable local .js files, so vis never loads and the app script aborts
+    before category filters run. Standalone vis bundle includes peer deps.
+    Offline: run `python tools/serve_graph.py` and use http://127.0.0.1:8765/graph/graph.html
+    or temporarily switch src below to ./vis-network.min.js etc.
+  -->
+  <link rel="stylesheet" href="https://unpkg.com/vis-network@9.1.9/styles/vis-network.min.css" crossorigin="anonymous">
+  <script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js" crossorigin="anonymous"></script>
+  <style>
+    /* ── Reset & tokens ───────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg0:    #0d1117;
+      --bg1:    #161b22;
+      --bg2:    #21262d;
+      --border: #30363d;
+      --t1:     #e6edf3;
+      --t2:     #c9d1d9;
+      --t3:     #8b949e;
+      --t4:     #484f58;
+      --accent: #388bfd;
+      --link:   #58a6ff;
+      --red:    #e06050;
+      --panel-w: 420px;
+      --left-panel-w: 240px;
+    }
+    html { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg0); color: var(--t1);
+      height: 100%;
+      min-height: 100vh;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    ::-webkit-scrollbar       { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--t4); }
+
+    /* ── Toolbar ──────────────────────────────────────────────────── */
+    #toolbar {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 12px; background: var(--bg1);
+      border-bottom: 1px solid var(--border); flex-shrink: 0; z-index: 20;
+      flex-wrap: wrap;
+    }
+    #toolbar-brand { font-size: 14px; font-weight: 600; color: var(--t2); white-space: nowrap; }
+    .sep { width: 1px; height: 22px; background: var(--border); margin: 0 2px; flex-shrink: 0; }
+
+    /* search */
+    #search-wrap { position: relative; flex-shrink: 0; }
+    #search {
+      width: 200px; padding: 4px 10px 4px 28px; border-radius: 6px;
+      border: 1px solid var(--border); background: var(--bg0);
+      color: var(--t1); font-size: 13px; outline: none;
+      transition: border-color .15s, width .2s;
+    }
+    #search-icon {
+      position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
+      color: var(--t4); font-size: 12px; pointer-events: none;
+    }
+    #search::placeholder { color: var(--t4); }
+    #search:focus { border-color: var(--accent); width: 240px; }
+    #search-dropdown {
+      display: none; position: absolute; top: calc(100% + 4px); left: 0;
+      min-width: 300px; max-height: 260px; overflow-y: auto;
+      background: var(--bg1); border: 1px solid var(--border); border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.6); z-index: 300;
+    }
+    #search-dropdown.show { display: block; }
+    .sr-item {
+      display: flex; align-items: center; gap: 8px; padding: 7px 12px;
+      cursor: pointer; border-bottom: 1px solid var(--bg2);
+    }
+    .sr-item:last-child { border-bottom: none; }
+    .sr-item:hover, .sr-item.active { background: var(--bg2); }
+    .sr-dot   { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .sr-label { flex: 1; font-size: 13px; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sr-type  { font-size: 10px; color: var(--t3); flex-shrink: 0; }
+
+    /* icon buttons */
+    .btn {
+      min-width: 28px; height: 28px; padding: 0 6px; border-radius: 6px;
+      border: 1px solid var(--border); background: var(--bg2);
+      color: var(--t2); cursor: pointer; font-size: 14px;
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 4px; flex-shrink: 0; user-select: none;
+      transition: background .12s, color .12s, border-color .12s;
+    }
+    .btn:hover  { background: var(--border); color: var(--t1); }
+    .btn.active { background: #1f6feb44; border-color: var(--accent); color: var(--link); }
+    .toolbar-seg {
+      display: inline-flex; border-radius: 6px; overflow: hidden;
+      border: 1px solid var(--border); flex-shrink: 0;
+    }
+    .toolbar-seg .btn {
+      border-radius: 0; border: none; border-right: 1px solid var(--border);
+      min-width: 26px; font-size: 11px; font-weight: 600;
+    }
+    .toolbar-seg .btn:last-child { border-right: none; }
+    .toolbar-seg .btn.on {
+      background: #1f6feb44;
+      color: var(--link);
+    }
+    #rot-badge  { font-size: 11px; color: var(--t4); min-width: 30px; text-align: center; flex-shrink: 0; }
+
+    #stats { font-size: 11px; color: var(--t4); white-space: nowrap; flex-shrink: 0; }
+
+    /* ── Main area ────────────────────────────────────────────────── */
+    /* min-height:0 so flex children can shrink; #network fills via absolute inset (avoids 0px %-height bug) */
+    #main { flex: 1; display: flex; position: relative; overflow: hidden; min-height: 0; }
+    #network-wrap { flex: 1; min-width: 0; min-height: 0; position: relative; }
+    #network {
+      position: absolute; inset: 0;
+      width: auto; height: auto;
+    }
+
+    /* ── Overlays ─────────────────────────────────────────────────── */
+    #overlays {
+      position: absolute; top: 10px; left: 10px;
+      display: flex; flex-direction: column; gap: 6px;
+      z-index: 20; pointer-events: none;
+    }
+    .qcard {
+      background: rgba(22,27,34,.9); backdrop-filter: blur(6px);
+      border: 1px solid var(--border); border-radius: 8px;
+      font-size: 11px; overflow: hidden; min-width: 170px; max-width: 210px;
+      pointer-events: all;
+    }
+    .qcard-hdr {
+      padding: 5px 10px; color: var(--t3); background: var(--bg2);
+      font-weight: 600; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      user-select: none;
+    }
+    .qcard-hdr:hover { color: var(--t1); }
+    .qcard-chevron { font-size: 9px; display: inline-block; transition: transform .2s; }
+    .qcard.collapsed .qcard-chevron { transform: rotate(-90deg); }
+    .qcard-body { max-height: 150px; overflow-y: auto; }
+    .qcard.collapsed .qcard-body { display: none; }
+    .qcard-item {
+      padding: 4px 10px; cursor: pointer; color: var(--t2);
+      border-top: 1px solid var(--bg2);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .qcard-item:hover { background: var(--bg2); color: var(--t1); }
+    .qcard-badge { color: var(--t4); font-size: 10px; margin-left: auto; flex-shrink: 0; }
+    .qili-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* empty state */
+    #empty-state {
+      display: none; position: absolute; bottom: 14px; left: 50%;
+      transform: translateX(-50%); white-space: nowrap;
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 14px; font-size: 12px; color: var(--t3); z-index: 30;
+    }
+    #empty-state.show { display: flex; align-items: center; gap: 8px; }
+    #empty-state .reset-link { color: var(--link); cursor: pointer; }
+    #empty-state .reset-link:hover { text-decoration: underline; }
+
+    /* ── Help modal ───────────────────────────────────────────────── */
+    #help-backdrop {
+      display: none; position: absolute; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 90; backdrop-filter: blur(2px);
+    }
+    #help-backdrop.show { display: block; }
+    #help-modal {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      background: var(--bg1); border: 1px solid var(--border); border-radius: 10px;
+      padding: 18px 22px; min-width: 300px; box-shadow: 0 12px 40px rgba(0,0,0,.7);
+    }
+    #help-modal h3 { font-size: 13px; font-weight: 600; margin-bottom: 12px; color: var(--t2); }
+    #help-modal table { border-collapse: collapse; width: 100%; font-size: 12px; }
+    #help-modal td { padding: 3px 6px; color: var(--t1); vertical-align: middle; }
+    #help-modal td:first-child { color: var(--t3); text-align: right; padding-right: 14px; white-space: nowrap; }
+    .hdr-row td { padding-top: 10px !important; color: var(--t4) !important; font-size: 10px; }
+    #help-close { position: absolute; top: 10px; right: 12px; cursor: pointer; color: var(--t4); font-size: 17px; line-height: 1; }
+    #help-close:hover { color: var(--t1); }
+    kbd {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 3px;
+      padding: 1px 5px; font-size: 11px; font-family: monospace; color: var(--t2);
+    }
+
+    /* ── Side panel ───────────────────────────────────────────────── */
+    #panel {
+      width: 0; flex-shrink: 0; overflow: hidden;
+      background: var(--bg1); border-left: 1px solid transparent;
+      display: flex; position: relative;
+      transition: width .22s cubic-bezier(.4,0,.2,1),
+                  border-color .22s;
+    }
+    #panel.open { width: var(--panel-w); border-color: var(--border); }
+    #panel-inner {
+      display: flex; flex-direction: column;
+      height: 100%; min-width: var(--panel-w);
+      position: relative;
+    }
+    /* resize handle — sits at left edge of panel-inner */
+    #panel-resize {
+      position: absolute; top: 0; left: 0; bottom: 0; width: 5px;
+      cursor: col-resize; z-index: 10; background: transparent;
+      transition: background .15s;
+    }
+    #panel-resize:hover, #panel-resize.dragging { background: rgba(56,139,253,.35); }
+
+    /* header */
+    #panel-hdr {
+      display: flex; align-items: center; gap: 5px;
+      padding: 8px 10px 8px 14px; border-bottom: 1px solid var(--border);
+      flex-shrink: 0; min-height: 42px;
+    }
+    .pnav-btn {
+      width: 24px; height: 24px; border-radius: 5px;
+      border: 1px solid var(--border); background: var(--bg2);
+      color: var(--t3); cursor: pointer; font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .12s, color .12s; flex-shrink: 0;
+    }
+    .pnav-btn:hover:not(:disabled) { background: var(--border); color: var(--t1); }
+    .pnav-btn:disabled { opacity: .3; cursor: default; }
+    #panel-title {
+      flex: 1; font-size: 13px; font-weight: 600; color: var(--t1);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0 4px;
+    }
+    .p-btn {
+      width: 24px; height: 24px; border-radius: 5px;
+      border: 1px solid var(--border); background: var(--bg2);
+      color: var(--t3); cursor: pointer; font-size: 12px;
+      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+      text-decoration: none; user-select: none;
+      transition: background .12s, color .12s;
+    }
+    .p-btn:hover { background: var(--border); color: var(--t1); }
+
+    /* meta chips */
+    #panel-meta {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 4px;
+      padding: 5px 12px; border-bottom: 1px solid var(--bg2);
+      flex-shrink: 0;
+    }
+    #panel-meta:empty { display: none; height: 0; padding: 0; }
+    .chip {
+      font-size: 10px; padding: 1px 7px; border-radius: 9px;
+      background: var(--bg2); color: var(--t3); border: 1px solid var(--border);
+    }
+    .chip.high   { border-color: var(--red);    color: var(--red); }
+    .chip.medium { border-color: #f5a623;        color: #f5a623; }
+    .chip.date   { margin-left: auto; color: var(--t4); background: none; border: none; }
+
+    /* tabs */
+    #panel-tabs { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .ptab {
+      padding: 6px 14px; font-size: 12px; color: var(--t3); cursor: pointer;
+      border-bottom: 2px solid transparent; user-select: none;
+      transition: color .12s, border-color .12s;
+    }
+    .ptab:hover { color: var(--t2); }
+    .ptab.on    { color: var(--t1); border-bottom-color: var(--accent); }
+    .tbadge {
+      margin-left: 3px; background: #e0605033; color: var(--red);
+      border-radius: 8px; padding: 0 4px; font-size: 10px;
+    }
+
+    /* panes */
+    #panel-panes { flex: 1; position: relative; overflow: hidden; }
+    .pane { position: absolute; inset: 0; overflow-y: auto; padding: 14px 14px 24px; display: none; }
+    .pane.on { display: block; }
+
+    .wl {
+      color: var(--link); cursor: pointer;
+      border-bottom: 1px dashed rgba(88,166,255,.35);
+      transition: border-color .12s;
+    }
+    .wl:hover          { border-bottom-color: var(--link); }
+    .wl-broken         { color: var(--red); cursor: default; border-bottom: 1px dashed rgba(224,96,80,.35); }
+
+    /* ── Content tab: toolbar + reader / editor ───────────────────── */
+    #pane-content.pane.on {
+      display: flex; flex-direction: column; padding: 0; overflow: hidden;
+    }
+    #content-toolbar {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+      padding: 7px 10px; border-bottom: 1px solid var(--border);
+      flex-shrink: 0; background: var(--bg2);
+    }
+    #content-toolbar .toolbar-seg .btn { min-width: 52px; font-size: 11px; }
+    #btn-save-note { min-width: 54px; }
+    #btn-save-note:disabled { opacity: .35; cursor: not-allowed; }
+    .reader-banner {
+      flex-shrink: 0; padding: 6px 10px; font-size: 11px; line-height: 1.4;
+      background: #f5a62322; border-bottom: 1px solid #f5a62344; color: #f5a623;
+    }
+    .reader-banner.hidden { display: none; }
+    .reader-banner.warn-server { background: #388bfd22; border-color: #388bfd44; color: var(--link); }
+    .reader-body {
+      flex: 1; min-height: 0; display: flex; flex-direction: column; position: relative;
+    }
+    #pane-md-preview {
+      flex: 1; min-height: 0; overflow-y: auto; padding: 14px 14px 24px;
+      font-size: 13px; line-height: 1.72;
+      color: var(--reader-fg, var(--t2));
+      background: var(--reader-bg, transparent);
+    }
+    #pane-md-preview.hidden { display: none !important; }
+    #pane-md-editor {
+      flex: 1; min-height: 120px; width: 100%; resize: none; border: none;
+      padding: 14px; font-size: 12px; line-height: 1.55; font-family: ui-monospace, monospace;
+      color: var(--reader-fg, var(--t2));
+      background: var(--reader-bg, var(--bg0));
+      outline: none; display: block;
+    }
+    #pane-md-editor.hidden { display: none !important; }
+    #pane-md-preview h1 { font-size: 17px; margin: 14px 0 7px; color: var(--reader-fg, var(--t1)); }
+    #pane-md-preview h2 { font-size: 14px; margin: 12px 0 5px; color: var(--reader-fg, var(--t1)); font-weight: 600; }
+    #pane-md-preview h3 { font-size: 13px; margin: 10px 0 4px; color: var(--reader-fg, var(--t1)); font-weight: 600; }
+    #pane-md-preview p  { margin: 5px 0; }
+    #pane-md-preview ul, #pane-md-preview ol { margin: 5px 0; padding-left: 18px; }
+    #pane-md-preview li { margin: 2px 0; }
+    #pane-md-preview code {
+      background: var(--reader-code-bg, var(--bg2)); padding: 1px 5px; border-radius: 4px;
+      font-size: 11.5px; color: #f0883e; font-family: 'SF Mono','Fira Code',monospace;
+    }
+    #pane-md-preview pre {
+      background: var(--reader-code-bg, var(--bg0)); border: 1px solid var(--border); border-radius: 6px;
+      padding: 10px; overflow-x: auto; margin: 7px 0;
+    }
+    #pane-md-preview pre code { background: none; padding: 0; color: var(--reader-fg, var(--t2)); font-size: 12px; }
+    #pane-md-preview blockquote {
+      border-left: 3px solid var(--border); padding-left: 12px; margin: 7px 0; color: var(--reader-fg, var(--t3));
+    }
+    #pane-md-preview a { color: var(--link); text-decoration: none; }
+    #pane-md-preview a:hover { text-decoration: underline; }
+    #pane-md-preview table { border-collapse: collapse; width: 100%; margin: 7px 0; }
+    #pane-md-preview th, #pane-md-preview td {
+      border: 1px solid var(--border); padding: 5px 9px; font-size: 11.5px; text-align: left;
+    }
+    #pane-md-preview th { background: var(--reader-code-bg, var(--bg2)); color: var(--reader-fg, var(--t1)); }
+    #pane-md-preview img { max-width: 100%; height: auto; border-radius: 6px; margin: 6px 0; display: block; }
+    #pane-md-preview iframe, #pane-md-preview video {
+      max-width: 100%; border: 1px solid var(--border); border-radius: 6px; margin: 8px 0; background: var(--bg0);
+    }
+    #pane-md-preview .mermaid { margin: 10px 0; overflow-x: auto; text-align: center; }
+    #pane-md-preview .mermaid svg { max-width: 100%; height: auto; }
+    #theme-pop {
+      display: none; position: absolute; top: 100%; right: 0; margin-top: 4px;
+      min-width: 220px; padding: 10px 12px; background: var(--bg1); border: 1px solid var(--border);
+      border-radius: 8px; box-shadow: 0 10px 28px rgba(0,0,0,.5); z-index: 400;
+    }
+    #theme-pop.show { display: block; }
+    #theme-pop label { display: block; font-size: 10px; color: var(--t4); margin-top: 8px; }
+    #theme-pop label:first-child { margin-top: 0; }
+    #theme-pop .preset-row { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+    #theme-pop .preset-btn {
+      font-size: 10px; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--bg2); color: var(--t2); cursor: pointer;
+    }
+    #theme-pop .preset-btn:hover { background: var(--border); color: var(--t1); }
+    #theme-pop input[type="color"] {
+      width: 100%; height: 28px; border: 1px solid var(--border); border-radius: 4px;
+      background: var(--bg0); cursor: pointer; padding: 0;
+    }
+    #theme-wrap { position: relative; margin-left: auto; }
+    #wg-toast {
+      position: fixed; bottom: 20px; right: 20px; z-index: 500;
+      max-width: 440px; padding: 10px 14px; border-radius: 8px; font-size: 12px; line-height: 1.55;
+      background: var(--bg1); border: 1px solid var(--border); color: var(--t2);
+      box-shadow: 0 8px 24px rgba(0,0,0,.45); display: none; word-break: break-word;
+    }
+    #wg-toast.show { display: block; }
+    #wg-toast.ok { border-color: #56c080; color: #a8e6c0; }
+    #wg-toast.err { border-color: var(--red); color: #f0b0a8; }
+    .phys-row { display: flex; align-items: center; gap: 8px; padding: 4px 10px; font-size: 11px; color: var(--t3); }
+    .phys-row input[type="range"] { flex: 1; min-width: 60px; }
+    .phys-val { width: 36px; text-align: right; color: var(--t4); font-variant-numeric: tabular-nums; }
+
+    /* ── Links pane ───────────────────────────────────────────────── */
+    #pane-links { font-size: 12px; }
+    .lsec       { margin-bottom: 16px; }
+    .lsec-title {
+      font-size: 10px; font-weight: 600; color: var(--t4);
+      text-transform: uppercase; letter-spacing: .06em; margin-bottom: 5px;
+    }
+    .litem {
+      display: flex; align-items: center; gap: 7px; padding: 5px 8px;
+      border-radius: 6px; cursor: pointer; color: var(--t2);
+      transition: background .1s;
+    }
+    .litem:hover { background: var(--bg2); color: var(--t1); }
+    .litem-dot   { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .litem-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .litem-type  { font-size: 10px; color: var(--t4); flex-shrink: 0; }
+    .litem-deg   { font-size: 10px; color: var(--t4); flex-shrink: 0; margin-left: 2px; }
+    .no-links    { color: var(--t4); font-size: 12px; padding: 4px 0; }
+
+    /* ── Broken pane ──────────────────────────────────────────────── */
+    #pane-broken { font-size: 12px; }
+    .b-item {
+      padding: 6px 10px; border-radius: 5px; margin-bottom: 5px;
+      background: var(--bg2); border-left: 3px solid var(--red);
+    }
+    .b-slug { color: var(--red); font-family: monospace; font-size: 12px; }
+    .b-from { font-size: 10px; color: var(--t3); margin-top: 2px; }
+    .ok-msg { color: var(--t4); font-size: 12px; }
+
+    /* ── Left filter panel ─────────────────────────────────────── */
+    #left-panel {
+      width: 0; flex-shrink: 0; overflow: hidden;
+      background: var(--bg1); border-right: 1px solid transparent;
+      display: flex; position: relative;
+      transition: width .22s cubic-bezier(.4,0,.2,1),
+                  border-color .22s;
+    }
+    #left-panel.open { width: var(--left-panel-w); border-color: var(--border); }
+    #left-panel-inner {
+      display: flex; flex-direction: column;
+      height: 100%; min-width: var(--left-panel-w);
+      position: relative;
+    }
+    #left-panel-resize {
+      position: absolute; top: 0; right: 0; bottom: 0; width: 5px;
+      cursor: col-resize; z-index: 10; background: transparent;
+      transition: background .15s;
+    }
+    #left-panel-resize:hover, #left-panel-resize.dragging { background: rgba(56,139,253,.35); }
+    #left-panel-hdr {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+      flex-shrink: 0; min-height: 38px;
+    }
+    #left-panel-title {
+      flex: 1; font-size: 13px; font-weight: 600; color: var(--t2);
+    }
+    #left-panel-body {
+      flex: 1; overflow-y: auto; padding: 6px 0;
+    }
+    .lp-section { border-bottom: 1px solid var(--bg2); }
+    .lp-section:last-child { border-bottom: none; }
+    .lp-section-hdr {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 7px 12px; font-size: 11px; font-weight: 600; color: var(--t3);
+      cursor: pointer; user-select: none; text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .lp-section-hdr:hover { color: var(--t1); }
+    .lp-section.collapsed .lp-section-body { display: none; }
+    .lp-section.collapsed .qcard-chevron { transform: rotate(-90deg); }
+    .lp-section-body { padding: 4px 10px 8px; }
+    .lp-color-select {
+      width: 100%; font-size: 11px; padding: 4px 8px; border-radius: 6px;
+      border: 1px solid var(--border); background: var(--bg0); color: var(--t2);
+    }
+    .lp-filter-list { display: flex; flex-wrap: wrap; gap: 4px; }
+    .lp-pill {
+      display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px;
+      border-radius: 10px; border: 1px solid; cursor: pointer;
+      font-size: 11px; user-select: none; color: var(--t2);
+      transition: opacity .2s;
+    }
+    .lp-pill:hover { opacity: .85; }
+    .lp-pill.off { opacity: .3; }
+    .lp-pill-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .lp-pill-count { font-size: 9px; color: var(--t4); margin-left: 2px; }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════
+     TOOLBAR
+════════════════════════════════════════════════════════════════ -->
+<div id="toolbar">
+  <span id="toolbar-brand">🗺 Wiki Graph</span>
+  <button class="btn" id="btn-sidebar" title="Toggle filter panel  [\]">☰</button>
+  <div class="sep"></div>
+
+  <div id="search-wrap">
+    <span id="search-icon">⌕</span>
+    <input id="search" type="text" placeholder="/ — search notes…" autocomplete="off" spellcheck="false">
+    <div id="search-dropdown"></div>
+  </div>
+  <div class="sep"></div>
+
+  <button class="btn" id="btn-zi"     title="Zoom in  [+]">+</button>
+  <button class="btn" id="btn-zo"     title="Zoom out  [−]">−</button>
+  <button class="btn" id="btn-fit"    title="Fit graph  [F]">⊡</button>
+  <div class="sep"></div>
+  <button class="btn" id="btn-rccw"   title="Rotate CCW  [Shift+R]">↺</button>
+  <button class="btn" id="btn-rcw"    title="Rotate CW  [R]">↻</button>
+  <span id="rot-badge">0°</span>
+  <div class="sep"></div>
+  <button class="btn" id="btn-freeze" title="Freeze layout  [Space]">❄</button>
+  <button class="btn" id="btn-hop2"   title="2-hop mode  [N]">⬡</button>
+  <div class="sep"></div>
+  <button class="btn" id="btn-labels" title="Show/hide node labels  [L]">Aa</button>
+  <div class="toolbar-seg" id="label-size-seg" title="Label size">
+    <button type="button" class="btn" data-font-idx="0">S</button>
+    <button type="button" class="btn on" data-font-idx="1">M</button>
+    <button type="button" class="btn" data-font-idx="2">L</button>
+  </div>
+  <button class="btn" id="btn-label-hover" title="Show labels on hover / selected only">⌖</button>
+  <button class="btn" id="btn-overview" title="Overview: clear selection, exit 2-hop, fit graph  [Home]">⌂</button>
+  <button class="btn" id="btn-help"   title="Shortcuts  [?]">?</button>
+  <button class="btn" id="btn-reset"  title="Reset all settings to default">⟲</button>
+
+  <span id="stats" style="margin-left:auto">__N_NODES__ nodes · __N_EDGES__ edges · __BUILT__</span>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     MAIN
+════════════════════════════════════════════════════════════════ -->
+<div id="main">
+
+  <!-- ── Left filter panel ──────────────────────────────────────── -->
+  <div id="left-panel">
+    <div id="left-panel-inner">
+      <div id="left-panel-resize"></div>
+      <div id="left-panel-hdr">
+        <span id="left-panel-title">Filters</span>
+        <button id="left-panel-close" class="p-btn" title="Close">✕</button>
+      </div>
+      <div id="left-panel-body">
+        <div class="lp-section" id="lp-sec-color">
+          <div class="lp-section-hdr" data-lp-section="lp-sec-color">
+            <span>Color by</span><span class="qcard-chevron">▾</span>
+          </div>
+          <div class="lp-section-body">
+            <select id="color-by" class="lp-color-select" title="Node color">
+              <option value="type">By type</option>
+              <option value="folder">By folder</option>
+              <option value="tag">By first tag</option>
+            </select>
+          </div>
+        </div>
+        <div class="lp-section" id="lp-sec-types">
+          <div class="lp-section-hdr" data-lp-section="lp-sec-types">
+            <span>By Type</span><span class="qcard-chevron">▾</span>
+          </div>
+          <div class="lp-section-body"><div class="lp-filter-list" id="lp-types-body"></div></div>
+        </div>
+        <div class="lp-section" id="lp-sec-folders">
+          <div class="lp-section-hdr" data-lp-section="lp-sec-folders">
+            <span>By Folder</span><span class="qcard-chevron">▾</span>
+          </div>
+          <div class="lp-section-body"><div class="lp-filter-list" id="lp-folders-body"></div></div>
+        </div>
+        <div class="lp-section" id="lp-sec-tags">
+          <div class="lp-section-hdr" data-lp-section="lp-sec-tags">
+            <span>By Tag</span><span class="qcard-chevron">▾</span>
+          </div>
+          <div class="lp-section-body"><div class="lp-filter-list" id="lp-tags-body"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- graph canvas -->
+  <div id="network-wrap">
+    <div id="network"></div>
+
+    <!-- quick lists overlay -->
+    <div id="overlays">
+      <div class="qcard" id="qc-hubs">
+        <div class="qcard-hdr" data-card="qc-hubs">
+          <span>💡 Top connected</span>
+          <span class="qcard-chevron">▾</span>
+        </div>
+        <div class="qcard-body" id="qc-hubs-body"></div>
+      </div>
+      <div class="qcard collapsed" id="qc-orphans">
+        <div class="qcard-hdr" data-card="qc-orphans">
+          <span>⛔ Orphan notes</span>
+          <span class="qcard-chevron">▾</span>
+        </div>
+        <div class="qcard-body" id="qc-orphans-body"></div>
+      </div>
+      <div class="qcard collapsed" id="qc-forces">
+        <div class="qcard-hdr" data-card="qc-forces">
+          <span>⚙ Graph forces</span>
+          <span class="qcard-chevron">▾</span>
+        </div>
+        <div class="qcard-body" id="qc-forces-body">
+          <div class="phys-row"><span>Links</span><input type="range" id="phys-spring-len" min="80" max="400" step="5" value="220"><span class="phys-val" id="phys-spring-len-v">220</span></div>
+          <div class="phys-row"><span>Stiff</span><input type="range" id="phys-spring-k" min="15" max="120" step="1" value="55"><span class="phys-val" id="phys-spring-k-v">0.055</span></div>
+          <div class="phys-row"><span>Repel</span><input type="range" id="phys-grav" min="-120" max="-8" step="1" value="-38"><span class="phys-val" id="phys-grav-v">-38</span></div>
+          <div class="phys-row"><span>Center</span><input type="range" id="phys-central" min="5" max="80" step="1" value="15"><span class="phys-val" id="phys-central-v">0.015</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- empty state -->
+    <div id="empty-state">
+      All nodes hidden.
+      <span class="reset-link" id="reset-btn">Reset filters</span>
+    </div>
+  </div><!-- #network-wrap -->
+
+  <!-- help -->
+  <div id="help-backdrop">
+    <div id="help-modal">
+      <span id="help-close">✕</span>
+      <h3>Keyboard shortcuts</h3>
+      <table>
+        <tr><td><kbd>+</kbd> / <kbd>=</kbd></td><td>Zoom in</td></tr>
+        <tr><td><kbd>−</kbd></td><td>Zoom out</td></tr>
+        <tr><td><kbd>F</kbd> / <kbd>0</kbd></td><td>Fit graph</td></tr>
+        <tr><td><kbd>↑↓←→</kbd></td><td>Pan</td></tr>
+        <tr><td><kbd>R</kbd></td><td>Rotate CW 15°</td></tr>
+        <tr><td><kbd>Shift+R</kbd></td><td>Rotate CCW 15°</td></tr>
+        <tr><td><kbd>Space</kbd></td><td>Freeze / unfreeze physics</td></tr>
+        <tr><td><kbd>N</kbd></td><td>2-hop neighbourhood mode</td></tr>
+        <tr><td><kbd>L</kbd></td><td>Toggle node labels on canvas</td></tr>
+        <tr><td><kbd>Home</kbd></td><td>Overview: clear selection, exit 2-hop, reset rotation, fit</td></tr>
+        <tr><td><kbd>/</kbd></td><td>Focus search</td></tr>
+        <tr><td><kbd>Alt+←</kbd></td><td>Panel back</td></tr>
+        <tr><td><kbd>Alt+→</kbd></td><td>Panel forward</td></tr>
+        <tr><td><kbd>\</kbd></td><td>Toggle filter sidebar</td></tr>
+        <tr><td><kbd>Esc</kbd></td><td>Clear selection / close panel</td></tr>
+        <tr><td><kbd>?</kbd></td><td>Toggle this panel</td></tr>
+        <tr class="hdr-row"><td colspan="2">Toolbar</td></tr>
+        <tr><td><strong>Aa</strong></td><td>Show or hide labels. <strong>S / M / L</strong> adjusts label size. <strong>⌖</strong> shows labels on hover and on the selected node only.</td></tr>
+        <tr class="hdr-row"><td colspan="2">Mouse / Trackpad</td></tr>
+        <tr><td>Click node</td><td>Select + open panel</td></tr>
+        <tr><td>Click canvas</td><td>Deselect</td></tr>
+        <tr><td>Drag node</td><td>Reposition</td></tr>
+        <tr><td>Scroll / pinch</td><td>Zoom</td></tr>
+        <tr class="hdr-row"><td colspan="2">Reader pane</td></tr>
+        <tr><td>Preview / Raw / Edit</td><td>Content tab: rendered view, read-only source, or editable source</td></tr>
+        <tr><td><kbd>Ctrl/⌘</kbd>+<kbd>S</kbd></td><td>Save note (Edit mode; needs <code>serve_graph.py --allow-write</code> or download fallback)</td></tr>
+        <tr><td>Theme</td><td>Reader colors + presets; rebuild graph after save to refresh embedded data</td></tr>
+      </table>
+    </div>
+  </div>
+  <div id="wg-toast" role="status" aria-live="polite"></div>
+
+  <!-- ── Side panel ────────────────────────────────────────────── -->
+  <div id="panel">
+    <div id="panel-inner">
+      <!-- resize handle at left edge -->
+      <div id="panel-resize"></div>
+
+      <!-- header -->
+      <div id="panel-hdr">
+        <button class="pnav-btn" id="pnav-back" disabled title="Back [Alt+←]">←</button>
+        <button class="pnav-btn" id="pnav-fwd"  disabled title="Forward [Alt+→]">→</button>
+        <span id="panel-title">—</span>
+        <button id="p-copy"  class="p-btn" title="Copy wiki path">📋</button>
+        <button id="p-close" class="p-btn" title="Close [Esc]">✕</button>
+      </div>
+
+      <!-- meta chips -->
+      <div id="panel-meta"></div>
+
+      <!-- tabs -->
+      <div id="panel-tabs">
+        <div class="ptab on"  data-pane="content">Content</div>
+        <div class="ptab"     data-pane="links">Links</div>
+        <div class="ptab"     data-pane="broken">Broken<span class="tbadge" id="b-badge"></span></div>
+      </div>
+
+      <!-- pane content -->
+      <div id="panel-panes">
+        <div class="pane on" id="pane-content">
+          <div id="content-toolbar">
+            <div class="toolbar-seg" id="reader-mode-seg" title="View mode">
+              <button type="button" class="btn on" data-reader-mode="preview">Preview</button>
+              <button type="button" class="btn" data-reader-mode="raw">Raw</button>
+              <button type="button" class="btn" data-reader-mode="edit">Edit</button>
+            </div>
+            <button type="button" class="btn" id="btn-save-note" disabled title="Save to wiki file">Save</button>
+            <div id="theme-wrap">
+              <button type="button" class="btn" id="btn-theme" title="Reader colors">Theme</button>
+              <div id="theme-pop">
+                <label>Presets</label>
+                <div class="preset-row">
+                  <button type="button" class="preset-btn" data-preset="default">Default</button>
+                  <button type="button" class="preset-btn" data-preset="sepia">Sepia</button>
+                  <button type="button" class="preset-btn" data-preset="contrast">Contrast</button>
+                  <button type="button" class="preset-btn" data-preset="paper">Paper</button>
+                </div>
+                <label>Text</label>
+                <input type="color" id="reader-color-fg" value="#c9d1d9">
+                <label>Background</label>
+                <input type="color" id="reader-color-bg" value="#0d1117">
+                <label>Code / blocks</label>
+                <input type="color" id="reader-color-code" value="#21262d">
+              </div>
+            </div>
+          </div>
+          <div id="reader-banner" class="reader-banner hidden"></div>
+          <div class="reader-body">
+            <div id="pane-md-preview"></div>
+            <textarea id="pane-md-editor" class="hidden" spellcheck="false" autocomplete="off"></textarea>
+          </div>
+        </div>
+        <div class="pane"    id="pane-links"></div>
+        <div class="pane"    id="pane-broken"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- #main -->
+
+<!-- ════════════════════════════════════════════════════════════════
+     DATA  (injected by tools/build_graph.py)
+════════════════════════════════════════════════════════════════ -->
+<script>
+const RAW_NODES    = __NODES__;
+const RAW_EDGES    = __EDGES__;
+const PAGES        = __PAGES__;
+const BROKEN_LINKS = __BROKEN__;
+</script>
+
+<!-- ════════════════════════════════════════════════════════════════
+     APPLICATION
+════════════════════════════════════════════════════════════════ -->
+<script>
+/* ── Categories ───────────────────────────────────────────────── */
+const CATS = [
+  { name: 'source',    color: '#4e9af1', types: ['paper','blog','video'] },
+  { name: 'entity',    color: '#56c080', types: ['entity'] },
+  { name: 'concept',   color: '#f5a623', types: ['concept','topic'] },
+  { name: 'system',    color: '#e06050', types: ['system','project'] },
+  { name: 'idea',      color: '#cc77dd', types: ['idea','tooling','workflow'] },
+  { name: 'synthesis', color: '#b06fef', types: ['synthesis'] },
+  { name: 'insight',   color: '#ff8899', types: ['insight'] },
+];
+function catColor(type) {
+  const cat = CATS.find(c => c.types.includes(type || ''));
+  return cat ? cat.color : '#9ca3af';
+}
+
+/* ── Slug → node-id lookup ────────────────────────────────────── */
+const slugMap = {};
+RAW_NODES.forEach(n => {
+  const stem = n.id.replace(/\.md$/, '').split('/').pop().toLowerCase();
+  slugMap[stem] = n.id;
+  slugMap[n.label.toLowerCase()] = n.id;
+});
+
+/* ── Degree map ───────────────────────────────────────────────── */
+const degree = {};
+RAW_EDGES.forEach(e => {
+  degree[e.from] = (degree[e.from] || 0) + 1;
+  degree[e.to]   = (degree[e.to]   || 0) + 1;
+});
+
+/** How nodes are colored on the canvas: type | folder | tag */
+let colorBy = 'type';
+
+/** Stable saturated hex from a string (for folder / tag coloring). */
+function hueHash(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = str.charCodeAt(i) + ((h << 5) - h);
+  const hue = ((Math.abs(h) % 360) + 360) % 360;
+  const H = hue / 360;
+  const s = 0.55;
+  const v = 0.82;
+  const i = Math.floor(H * 6);
+  const f = H * 6 - i;
+  const p = v * (1 - s);
+  const q = v * (1 - f * s);
+  const t = v * (1 - (1 - f) * s);
+  let r, g, b;
+  switch (i % 6) {
+    case 0: r = v; g = t; b = p; break;
+    case 1: r = q; g = v; b = p; break;
+    case 2: r = p; g = v; b = t; break;
+    case 3: r = p; g = q; b = v; break;
+    case 4: r = t; g = p; b = v; break;
+    default: r = v; g = p; b = q;
+  }
+  const toHex = (x) => Math.round(x * 255).toString(16).padStart(2, '0');
+  return '#' + toHex(r) + toHex(g) + toHex(b);
+}
+
+function pickNodeColor(nid, type) {
+  if (colorBy === 'folder') return hueHash(nid.split('/')[0] || 'wiki');
+  if (colorBy === 'tag') {
+    const p = PAGES[nid];
+    const t = (p && p.tags && p.tags[0]) || '';
+    return hueHash(t || '—');
+  }
+  return catColor(type);
+}
+
+/* ── Helpers ──────────────────────────────────────────────────── */
+function lighten(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  const ch = v => Math.min(255, v + 50).toString(16).padStart(2, '0');
+  return '#' + ch(n >> 16) + ch((n >> 8) & 0xff) + ch(n & 0xff);
+}
+
+(function wgEnsureLibs() {
+  const missing = [];
+  if (typeof vis === 'undefined' || !vis.DataSet || !vis.Network) missing.push('vis-network');
+  if (typeof marked === 'undefined') missing.push('marked');
+  if (typeof DOMPurify === 'undefined') missing.push('dompurify');
+  if (typeof mermaid === 'undefined') missing.push('mermaid');
+  if (!missing.length) return;
+  const bar = document.createElement('div');
+  bar.setAttribute('style', [
+    'background:#3d1111', 'color:#f0d0d0', 'padding:14px 18px', 'font:14px/1.5 system-ui,sans-serif',
+    'border-bottom:2px solid #f85149', 'flex-shrink:0', 'z-index:1000',
+  ].join(';'));
+  bar.innerHTML =
+    '<strong>Wiki Graph — libraries did not load (' + missing.join(', ') + ').</strong><br>' +
+    'If you are offline, the CDN scripts in the page head cannot load. Use a local server:<br>' +
+    '<code style="background:#00000044;padding:2px 8px;border-radius:4px;font-size:13px">' +
+    'python tools/serve_graph.py</code> &nbsp;then open the URL it prints (serves repo root for wiki media).';
+  const first = document.body && document.body.firstElementChild;
+  if (first) document.body.insertBefore(bar, first);
+  else document.body.appendChild(bar);
+  throw new Error('Wiki Graph: missing ' + missing.join(', '));
+})();
+
+if (typeof mermaid !== 'undefined') {
+  mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose' });
+}
+if (typeof DOMPurify !== 'undefined') {
+  DOMPurify.addHook('uponSanitizeElement', (node) => {
+    if (node.nodeName === 'IFRAME') {
+      const s = node.getAttribute('src') || '';
+      const yt = /^https:\/\/(www\.)?youtube(-nocookie)?\.com\/embed\//;
+      const vm = /^https:\/\/player\.vimeo\.com\/video\//;
+      if (!yt.test(s) && !vm.test(s)) node.remove();
+    }
+  });
+}
+
+/* ── vis.js datasets ──────────────────────────────────────────── */
+const nodeDS = new vis.DataSet(RAW_NODES.map(n => {
+  const deg = degree[n.id] || 0;
+  const col = pickNodeColor(n.id, n.type);
+  const p   = PAGES[n.id];
+  const m   = p && p.meta ? p.meta : {};
+    return {
+    id:    n.id,
+    label: '',
+    _type: n.type || '',
+    _folder: n.id.split('/')[0] || '',
+    _tags: (p && p.tags) || [],
+    title: [
+      n.label,
+      `Type: ${n.type || '—'}`,
+      m.domain     ? `Domain: ${m.domain}`         : '',
+      m.importance ? `Importance: ${m.importance}`  : '',
+      p && p.last_updated ? `Updated: ${p.last_updated}` : '',
+      `${deg} connection${deg !== 1 ? 's' : ''}`,
+    ].filter(Boolean).join('\n'),
+    color: {
+      background: col, border: col,
+      highlight: { background: '#ffffff', border: col },
+      hover:     { background: lighten(col), border: col },
+    },
+    font: {
+      color: '#e6edf3',
+      size: 12,
+      face: 'system-ui, -apple-system, "Segoe UI", sans-serif',
+      background: 'rgba(13,17,23,0.92)',
+      strokeWidth: 2,
+      strokeColor: '#0d1117',
+      align: 'center',
+    },
+    shape: 'dot',
+    size: 14,
+  };
+}));
+
+const edgeDS = new vis.DataSet(RAW_EDGES.map((e, i) => ({
+  id: i, from: e.from, to: e.to,
+  color: { color: '#30363d', highlight: '#58a6ff', hover: '#58a6ff', opacity: 0.8 },
+  arrows: { to: { enabled: true, scaleFactor: 0.6 } },
+  width: 1.4, smooth: { type: 'dynamic' },
+})));
+
+const network = new vis.Network(
+  document.getElementById('network'),
+  { nodes: nodeDS, edges: edgeDS },
+  {
+    physics: {
+      enabled: true,
+      solver: 'forceAtlas2Based',
+      stabilization: { iterations: 420, updateInterval: 25 },
+      forceAtlas2Based: {
+        theta: 0.5,
+        gravitationalConstant: -38,
+        centralGravity: 0.015,
+        springLength: 220,
+        springConstant: 0.055,
+        damping: 0.5,
+        avoidOverlap: 0.65,
+      },
+    },
+    interaction: {
+      hover: true, tooltipDelay: 200,
+      zoomView: true, dragView: true, dragNodes: true,
+      keyboard: { enabled: false },
+    },
+    nodes: { borderWidth: 1.5 },
+    edges: { selectionWidth: 2.5 },
+  }
+);
+
+function applyPhysicsFromUi() {
+  const lenEl = document.getElementById('phys-spring-len');
+  const kEl = document.getElementById('phys-spring-k');
+  const gEl = document.getElementById('phys-grav');
+  const cEl = document.getElementById('phys-central');
+  if (!lenEl || !kEl || !gEl || !cEl) return;
+  const len = +lenEl.value;
+  const k = +kEl.value / 1000;
+  const grav = +gEl.value;
+  const cent = +cEl.value / 1000;
+  const vLen = document.getElementById('phys-spring-len-v');
+  const vK = document.getElementById('phys-spring-k-v');
+  const vG = document.getElementById('phys-grav-v');
+  const vC = document.getElementById('phys-central-v');
+  if (vLen) vLen.textContent = String(len);
+  if (vK) vK.textContent = k.toFixed(3);
+  if (vG) vG.textContent = String(grav);
+  if (vC) vC.textContent = cent.toFixed(3);
+  try {
+    network.setOptions({
+      physics: {
+        forceAtlas2Based: {
+          springLength: len,
+          springConstant: k,
+          gravitationalConstant: grav,
+          centralGravity: cent,
+        },
+      },
+    });
+  } catch (_) { /* ignore */ }
+  saveState();
+}
+
+document.getElementById('color-by').addEventListener('change', (e) => {
+  colorBy = e.target.value;
+  applyVis();
+  saveState();
+});
+
+['phys-spring-len', 'phys-spring-k', 'phys-grav', 'phys-central'].forEach((id) => {
+  document.getElementById(id).addEventListener('input', applyPhysicsFromUi);
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════ */
+let frozen   = false;
+let hop2mode = false;
+let hlActive = false;
+let hlNodes  = new Set();
+let hlEdges  = new Set();
+let activNid = null;
+let rot      = 0;
+let wgRestoring = false;
+const hiddenCats = new Set();
+const hiddenFolders = new Set();
+const hiddenTags = new Set();
+let leftPanelOpen = true;
+const LS_KEY = 'wg-state-v5';
+const LS_KEY_V4 = 'wg-state-v4';
+const LS_KEY_LEGACY = 'wg-state-v3';
+
+/** Full node title for tooltips (canvas label may be empty in hover-only mode). */
+const labelById = Object.fromEntries(RAW_NODES.map(n => [n.id, n.label]));
+
+let labelsVisible   = true;
+let labelFontIdx    = 1; /* 0=S 1=M 2=L */
+let labelsHoverOnly = false;
+let hoverNid        = null;
+
+const FONT_SCALE = [0.82, 1, 1.18];
+
+function nodeDotSize(deg) {
+  const d = Math.max(0, deg);
+  return Math.min(12 + 5 * Math.sqrt(d), 36);
+}
+
+function nodeFontSize(deg, fontIdx) {
+  const d = Math.max(0, deg);
+  const base = 10 + Math.min(4, Math.sqrt(d));
+  const sz = Math.round(base * FONT_SCALE[Math.max(0, Math.min(2, fontIdx))]);
+  return Math.max(9, Math.min(18, sz));
+}
+
+function fontPropsForNode(nid, selected) {
+  const deg = degree[nid] || 0;
+  return {
+    color: '#e6edf3',
+    size: nodeFontSize(deg, labelFontIdx),
+    face: 'system-ui, -apple-system, "Segoe UI", sans-serif',
+    background: 'rgba(13,17,23,0.92)',
+    strokeWidth: selected ? 3 : 2,
+    strokeColor: '#0d1117',
+    align: 'center',
+  };
+}
+
+function effectiveCanvasLabel(nid) {
+  const full = labelById[nid];
+  if (full == null) return '';
+  if (!labelsVisible) return '';
+  if (labelsHoverOnly) {
+    if (nid === activNid || nid === hoverNid) return full;
+    return '';
+  }
+  return full;
+}
+
+function syncLabelToolbar() {
+  document.getElementById('btn-labels').classList.toggle('active', labelsVisible);
+  document.getElementById('btn-label-hover').classList.toggle('active', labelsHoverOnly);
+  document.querySelectorAll('#label-size-seg [data-font-idx]').forEach(b => {
+    b.classList.toggle('on', Number(b.dataset.fontIdx) === labelFontIdx);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   VISIBILITY ENGINE
+═══════════════════════════════════════════════════════════════ */
+function isNodeHidden(n) {
+  if (hiddenCats.has(n._type)) return true;
+  if (hiddenFolders.has(n._folder)) return true;
+  if (hiddenTags.size > 0 && n._tags.length > 0 && n._tags.every(t => hiddenTags.has(t))) return true;
+  return false;
+}
+
+function applyVis() {
+  let anyVisible = false;
+  nodeDS.forEach(n => {
+    const nid  = n.id;
+    const hide = isNodeHidden(n);
+    const dim  = hlActive && !hlNodes.has(nid);
+    if (!hide) anyVisible = true;
+    const selected = nid === activNid;
+    const col = pickNodeColor(nid, n._type);
+    nodeDS.update({
+      id: nid,
+      hidden: hide,
+      opacity: (hide || dim) ? 0.06 : 1,
+      label: effectiveCanvasLabel(nid),
+      font: fontPropsForNode(nid, selected),
+      size: nodeDotSize(degree[nid] || 0),
+      color: {
+        background: col,
+        border: col,
+        highlight: { background: '#ffffff', border: col },
+        hover: { background: lighten(col), border: col },
+      },
+    });
+  });
+  edgeDS.forEach(e => {
+    const fn = nodeDS.get(e.from), tn = nodeDS.get(e.to);
+    const catHide = (fn && fn.hidden) || (tn && tn.hidden);
+    const hlHide  = hlActive && !hlEdges.has(e.id);
+    edgeDS.update({ id: e.id, hidden: catHide || hlHide });
+  });
+  document.getElementById('empty-state').classList.toggle('show', !anyVisible);
+  saveState();
+}
+
+/** Brief size pulse after search jump so the target is easy to spot. */
+function pulseNode(nid) {
+  const cur = nodeDS.get(nid);
+  if (!cur || cur.hidden) return;
+  const base = nodeDotSize(degree[nid] || 0);
+  nodeDS.update({ id: nid, size: Math.min(base + 14, 48) });
+  setTimeout(() => { applyVis(); }, 380);
+}
+
+function getNeighbours(nid, hops) {
+  let frontier = new Set([nid]), all = new Set([nid]), allE = new Set();
+  for (let h = 0; h < hops; h++) {
+    const next = new Set();
+    frontier.forEach(fid => {
+      network.getConnectedEdges(fid).forEach(eid => {
+        allE.add(eid);
+        network.getConnectedNodes(fid).forEach(nb => { all.add(nb); next.add(nb); });
+      });
+    });
+    frontier = next;
+  }
+  return { nodes: all, edges: allE };
+}
+
+function selectNode(nid) {
+  if (!nid) { clearSel(); return; }
+  if (nid !== activNid && !confirmDiscardIfDirty()) return;
+  const nb = getNeighbours(nid, hop2mode ? 2 : 1);
+  hlActive = true; hlNodes = nb.nodes; hlEdges = nb.edges;
+  activNid = nid;
+  applyVis();
+  network.focus(nid, { scale: Math.max(network.getScale(), 0.85), animation: { duration: 300 } });
+  openPanel(nid);
+}
+
+function clearSel() {
+  if (!confirmDiscardIfDirty()) return false;
+  hlActive = false; hlNodes.clear(); hlEdges.clear(); activNid = null;
+  applyVis();
+  closePanel();
+  return true;
+}
+
+function resetFilters() {
+  hiddenCats.clear();
+  hiddenFolders.clear();
+  hiddenTags.clear();
+  document.querySelectorAll('.lp-pill').forEach(b => b.classList.remove('off'));
+  applyVis();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NETWORK EVENTS
+═══════════════════════════════════════════════════════════════ */
+network.on('click', p => {
+  if (!p.nodes.length) { clearSel(); return; }
+  navPush(p.nodes[0]);
+  selectNode(p.nodes[0]);
+});
+
+network.on('hoverNode', p => {
+  hoverNid = p.node;
+  if (labelsHoverOnly && labelsVisible) applyVis();
+});
+network.on('blurNode', () => {
+  hoverNid = null;
+  if (labelsHoverOnly && labelsVisible) applyVis();
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   NAVIGATION HISTORY
+═══════════════════════════════════════════════════════════════ */
+let navStack = [], navIdx = -1;
+
+function navPush(nid) {
+  if (navStack[navIdx] === nid) return;
+  navStack = navStack.slice(0, navIdx + 1);
+  navStack.push(nid);
+  navIdx = navStack.length - 1;
+  syncNavBtns();
+}
+
+function syncNavBtns() {
+  document.getElementById('pnav-back').disabled = navIdx <= 0;
+  document.getElementById('pnav-fwd').disabled  = navIdx >= navStack.length - 1;
+}
+
+document.getElementById('pnav-back').addEventListener('click', () => {
+  if (navIdx > 0) { navIdx--; selectNode(navStack[navIdx]); syncNavBtns(); }
+});
+document.getElementById('pnav-fwd').addEventListener('click', () => {
+  if (navIdx < navStack.length - 1) { navIdx++; selectNode(navStack[navIdx]); syncNavBtns(); }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   PANEL
+═══════════════════════════════════════════════════════════════ */
+const panelEl      = document.getElementById('panel');
+const paneMdPreview = document.getElementById('pane-md-preview');
+const paneMdEditor  = document.getElementById('pane-md-editor');
+const readerBanner  = document.getElementById('reader-banner');
+const paneLinks    = document.getElementById('pane-links');
+const paneBroken   = document.getElementById('pane-broken');
+const wlRe = /\[\[([^\]|#]+?)(?:#[^\]]*)?(?:\|([^\]]*?))?\]\]/g;
+
+let readerMode = 'preview';
+let noteBuffer = '';
+let noteBufferFullFile = false;
+let noteDirty = false;
+let noteFetchOk = false;
+
+function stripFrontmatter(text) {
+  const m = text.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/);
+  return m ? text.slice(m[0].length) : text;
+}
+
+function canFetchWiki() {
+  return location.protocol === 'http:' || location.protocol === 'https:';
+}
+
+function wikiFileUrl(nid) {
+  const segs = nid.split('/').map((s) => encodeURIComponent(s));
+  return new URL('wiki/' + segs.join('/'), location.origin).href;
+}
+
+function showToast(msg, kind, duration) {
+  const el = document.getElementById('wg-toast');
+  el.textContent = msg;
+  el.className = kind === 'err' ? 'show err' : kind === 'ok' ? 'show ok' : 'show';
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => { el.classList.remove('show', 'ok', 'err'); }, duration || 5000);
+}
+
+function wikiRelPath(nid) {
+  return 'wiki/' + nid;
+}
+
+function setReaderBanner(text, cls) {
+  if (!text) {
+    readerBanner.classList.add('hidden');
+    readerBanner.textContent = '';
+    readerBanner.classList.remove('warn-server');
+    return;
+  }
+  readerBanner.textContent = text;
+  readerBanner.classList.remove('hidden');
+  readerBanner.classList.toggle('warn-server', cls === 'server');
+}
+
+function syncReaderModeUi() {
+  document.querySelectorAll('#reader-mode-seg [data-reader-mode]').forEach((b) => {
+    b.classList.toggle('on', b.dataset.readerMode === readerMode);
+  });
+  const edit = readerMode === 'edit';
+  const raw = readerMode === 'raw' || edit;
+  document.getElementById('btn-save-note').disabled = !edit || !noteDirty;
+  paneMdEditor.readOnly = !edit;
+  if (readerMode === 'preview') {
+    paneMdPreview.classList.remove('hidden');
+    paneMdEditor.classList.add('hidden');
+  } else {
+    paneMdPreview.classList.add('hidden');
+    paneMdEditor.classList.remove('hidden');
+    paneMdEditor.value = noteBuffer;
+  }
+}
+
+function absolutifyMdImages(md, baseUrl) {
+  return md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (m, alt, rawPath) => {
+    const trimmed = rawPath.trim();
+    if (/^(?:https?:|data:|blob:|file:)/i.test(trimmed)) return m;
+    try { return `![${alt}](${new URL(trimmed, baseUrl).href})`; }
+    catch (_) { return m; }
+  });
+}
+
+function renderPreviewFromBuffer() {
+  const page = PAGES[activNid];
+  const body = noteBufferFullFile ? stripFrontmatter(noteBuffer).trim() : noteBuffer.trim();
+  const imgBase = (noteBufferFullFile && noteFetchOk && activNid)
+    ? wikiFileUrl(activNid)
+    : window.location.href.split('#')[0];
+  let md = body || (page && page.content) || '*(empty page)*';
+  md = absolutifyMdImages(md, imgBase);
+  paneMdPreview.innerHTML = panelHtmlFromMarkdown(md);
+  resolvePanelImageSrcs(paneMdPreview, imgBase);
+  configureExternalLinks(paneMdPreview);
+  if (typeof mermaid !== 'undefined') {
+    mermaid.run({ querySelector: '#pane-md-preview .mermaid' }).catch(() => {});
+  }
+}
+
+function setReaderMode(mode) {
+  const prev = readerMode;
+  if (mode === 'preview' && (prev === 'raw' || prev === 'edit')) {
+    noteBuffer = paneMdEditor.value;
+    noteDirty = noteDirty || prev === 'edit';
+  }
+  readerMode = mode;
+  syncReaderModeUi();
+  if (readerMode === 'preview') renderPreviewFromBuffer();
+  saveState();
+}
+
+function tryLoadFullNote(nid) {
+  const page = PAGES[nid];
+  if (!page) return;
+  noteBuffer = page.content || '';
+  noteBufferFullFile = false;
+  noteFetchOk = false;
+  noteDirty = false;
+  setReaderBanner('');
+  if (!canFetchWiki()) {
+    setReaderBanner('Viewing via file:// — content shown from embedded data. Run serve_graph.py for full-file editing.', 'server');
+    return;
+  }
+  fetch(wikiFileUrl(nid), { cache: 'no-store' })
+    .then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.text(); })
+    .then((text) => {
+      if (activNid !== nid) return;
+      noteBuffer = text;
+      noteBufferFullFile = true;
+      noteFetchOk = true;
+      setReaderBanner('');
+      if (readerMode === 'raw' || readerMode === 'edit') {
+        paneMdEditor.value = noteBuffer;
+        syncReaderModeUi();
+      }
+      if (readerMode === 'preview') renderPreviewFromBuffer();
+    })
+    .catch(() => {
+      if (activNid !== nid) return;
+      const msg = location.protocol === 'file:'
+        ? 'Viewing via file://. Run python tools/serve_graph.py for full-file editing.'
+        : 'Live file not reachable — showing embedded content. For full-file editing start serve_graph.py.';
+      setReaderBanner(msg, 'server');
+    });
+}
+
+function confirmDiscardIfDirty() {
+  if (!noteDirty) return true;
+  return window.confirm('Discard unsaved edits to this note?');
+}
+
+function downloadNoteFallback(nid, text, reason) {
+  const name = nid.split('/').pop() || 'note.md';
+  const rel = wikiRelPath(nid);
+  const blob = new Blob([text], { type: 'text/markdown;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  const hint = reason || 'Server not running with --allow-write.';
+  showToast(hint + ' Downloaded ' + name + ' — replace the original at ' + rel, 'err', 8000);
+}
+
+function saveCurrentNote() {
+  if (!activNid || readerMode !== 'edit') return;
+  noteBuffer = paneMdEditor.value;
+  const body = noteBuffer;
+  const rel = wikiRelPath(activNid);
+  if (!canFetchWiki()) {
+    downloadNoteFallback(activNid, body, 'Opened via file:// — cannot save directly.');
+    noteDirty = false;
+    syncReaderModeUi();
+    return;
+  }
+  fetch(wikiFileUrl(activNid), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
+    body,
+  })
+    .then((r) => {
+      if (r.status === 403) {
+        downloadNoteFallback(activNid, body,
+          'Server running without --allow-write. Restart with: python tools/serve_graph.py --allow-write');
+        return;
+      }
+      if (r.status === 405) {
+        downloadNoteFallback(activNid, body,
+          'Server does not support PUT. Update and restart: python tools/serve_graph.py --allow-write');
+        return;
+      }
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      noteDirty = false;
+      noteBufferFullFile = true;
+      syncReaderModeUi();
+      if (PAGES[activNid]) {
+        PAGES[activNid].content = stripFrontmatter(body).trim();
+      }
+      showToast('Saved to ' + rel + '. Rebuild graph (python tools/build_graph.py) to refresh.', 'ok', 5000);
+    })
+    .catch((err) => {
+      downloadNoteFallback(activNid, body,
+        'Save failed (' + (err.message || 'network error') + ').');
+    });
+}
+
+function panelHtmlFromMarkdown(md) {
+  wlRe.lastIndex = 0;
+  const replaced = md.replace(wlRe, (_, slug, alias) => {
+    const display = (alias || slug).trim();
+    const tid = slugMap[slug.trim().toLowerCase()];
+    if (tid) return `<span class="wl" data-nid="${tid}">${display}</span>`;
+    return `<span class="wl-broken" title="Unresolved: ${slug}">${display}</span>`;
+  });
+  const holder = document.createElement('div');
+  holder.innerHTML = marked.parse(replaced);
+  holder.querySelectorAll('pre code.language-mermaid, pre code.lang-mermaid').forEach((code) => {
+    const pre = code.parentElement;
+    if (!pre || pre.tagName !== 'PRE') return;
+    const div = document.createElement('div');
+    div.className = 'mermaid';
+    div.textContent = code.textContent;
+    pre.replaceWith(div);
+  });
+  let html = holder.innerHTML;
+  if (typeof DOMPurify !== 'undefined') {
+    html = DOMPurify.sanitize(html, {
+      USE_PROFILES: { html: true },
+      ADD_TAGS: ['iframe'],
+      ADD_ATTR: [
+        'allow', 'allowfullscreen', 'frameborder', 'src', 'alt', 'title',
+        'width', 'height', 'referrerpolicy', 'loading', 'data-nid', 'class',
+      ],
+    });
+  }
+  return html;
+}
+
+/**
+ * Resolve relative markdown image URLs.
+ * When content is from a fetched full file, paths are relative to the note's
+ * location (e.g. wiki/summaries/) — pass the note URL as baseUrl.
+ * For embedded content (rewritten by build_graph.py), baseUrl defaults to
+ * the graph page URL.
+ */
+function resolvePanelImageSrcs(root, baseUrl) {
+  const base = baseUrl || window.location.href.split('#')[0];
+  root.querySelectorAll('img').forEach((img) => {
+    const raw = img.getAttribute('src');
+    if (!raw || /^(?:https?:|data:|blob:|file:)/i.test(raw.trim())) return;
+    try {
+      img.setAttribute('src', new URL(raw.trim(), base).href);
+    } catch (_) { /* keep original */ }
+    img.setAttribute('loading', 'eager');
+  });
+}
+
+/** Open http(s) links from the reader pane in a new tab (keeps the graph open). */
+function configureExternalLinks(root) {
+  const base = window.location.href.split('#')[0];
+  root.querySelectorAll('a[href]').forEach((a) => {
+    const raw = (a.getAttribute('href') || '').trim();
+    if (!raw || raw.startsWith('#')) return;
+    if (/^javascript:/i.test(raw) || /^data:/i.test(raw) || /^vbscript:/i.test(raw)) return;
+    let protocol = '';
+    try {
+      protocol = new URL(raw, base).protocol.toLowerCase();
+    } catch (_) {
+      return;
+    }
+    if (protocol === 'http:' || protocol === 'https:') {
+      a.setAttribute('target', '_blank');
+      a.setAttribute('rel', 'noopener noreferrer');
+    }
+  });
+}
+
+function openPanel(nid) {
+  const page = PAGES[nid];
+  if (!page) return;
+
+  /* title */
+  document.getElementById('panel-title').textContent =
+    page.label || nid.split('/').pop().replace('.md', '');
+
+  /* copy button */
+  document.getElementById('p-copy').onclick = () => {
+    navigator.clipboard.writeText(page.wiki_path || nid).catch(() => {});
+    const btn = document.getElementById('p-copy');
+    btn.textContent = '✓';
+    setTimeout(() => { btn.textContent = '📋'; }, 1300);
+  };
+
+  /* meta chips */
+  const m = page.meta || {};
+  const chips = [];
+  if (page.type)       chips.push(`<span class="chip">${page.type}</span>`);
+  if (m.domain)        chips.push(`<span class="chip">${m.domain}</span>`);
+  if (m.importance)    chips.push(`<span class="chip ${m.importance}">${m.importance}</span>`);
+  if (m.state)         chips.push(`<span class="chip">${m.state}</span>`);
+  if (m.confidence)    chips.push(`<span class="chip">conf ${m.confidence}</span>`);
+  (page.tags || []).slice(0, 5).forEach(t => chips.push(`<span class="chip">#${t}</span>`));
+  if (page.last_updated) chips.push(`<span class="chip date">${page.last_updated}</span>`);
+  document.getElementById('panel-meta').innerHTML = chips.join('');
+
+  /* ── content pane: reader / editor ── */
+  readerMode = 'preview';
+  tryLoadFullNote(nid);
+  syncReaderModeUi();
+  renderPreviewFromBuffer();
+
+  /* ── links pane ── */
+  const outIds = RAW_EDGES.filter(e => e.from === nid).map(e => e.to);
+  const inIds  = RAW_EDGES.filter(e => e.to   === nid).map(e => e.from);
+  let linksHtml = '';
+  if (outIds.length) {
+    linksHtml += `<div class="lsec"><div class="lsec-title">Outgoing (${outIds.length})</div>`;
+    outIds.forEach(id => { linksHtml += litemHtml(id); });
+    linksHtml += '</div>';
+  }
+  if (inIds.length) {
+    linksHtml += `<div class="lsec"><div class="lsec-title">Backlinks (${inIds.length})</div>`;
+    inIds.forEach(id => { linksHtml += litemHtml(id); });
+    linksHtml += '</div>';
+  }
+  if (!outIds.length && !inIds.length) linksHtml = '<p class="no-links">No connections yet.</p>';
+  paneLinks.innerHTML = linksHtml;
+
+  /* ── broken pane ── */
+  const myBroken = BROKEN_LINKS.filter(b => b.from_id === nid);
+  document.getElementById('b-badge').textContent = myBroken.length ? String(myBroken.length) : '';
+  paneBroken.innerHTML = myBroken.length
+    ? myBroken.map(b =>
+        `<div class="b-item">
+          <div class="b-slug">[[${b.slug}]]</div>
+          <div class="b-from">from: ${b.from_label}</div>
+        </div>`).join('')
+    : '<p class="ok-msg">No broken links in this note ✓</p>';
+
+  panelEl.classList.add('open');
+}
+
+function litemHtml(id) {
+  const n = RAW_NODES.find(r => r.id === id);
+  if (!n) return '';
+  const col = pickNodeColor(id, n.type);
+  const deg = degree[id] || 0;
+  return `<div class="litem" data-nid="${id}">
+    <span class="litem-dot" style="background:${col}"></span>
+    <span class="litem-label">${n.label}</span>
+    <span class="litem-type">${n.type || ''}</span>
+    <span class="litem-deg">${deg}</span>
+  </div>`;
+}
+
+function closePanel() { panelEl.classList.remove('open'); activNid = null; saveState(); }
+document.getElementById('p-close').addEventListener('click', clearSel);
+
+/* click delegation: wikilinks + link items → navigate */
+[paneMdPreview, paneLinks].forEach(el => {
+  el.addEventListener('click', e => {
+    const wl   = e.target.closest('.wl[data-nid]');
+    const item = e.target.closest('.litem[data-nid]');
+    const nid  = (wl || item) ? (wl || item).dataset.nid : null;
+    if (nid) { e.preventDefault(); if (!confirmDiscardIfDirty()) return; navPush(nid); selectNode(nid); }
+  });
+});
+
+document.querySelectorAll('#reader-mode-seg [data-reader-mode]').forEach((b) => {
+  b.addEventListener('click', () => setReaderMode(b.dataset.readerMode));
+});
+
+document.getElementById('btn-save-note').addEventListener('click', () => saveCurrentNote());
+
+paneMdEditor.addEventListener('input', () => {
+  noteBuffer = paneMdEditor.value;
+  noteDirty = true;
+  noteBufferFullFile = true;
+  syncReaderModeUi();
+});
+
+const themePop = document.getElementById('theme-pop');
+document.getElementById('btn-theme').addEventListener('click', (e) => {
+  e.stopPropagation();
+  themePop.classList.toggle('show');
+});
+document.addEventListener('click', () => themePop.classList.remove('show'));
+themePop.addEventListener('click', (e) => e.stopPropagation());
+
+const READER_PRESETS = {
+  default: { fg: '#c9d1d9', bg: '#0d1117', code: '#21262d' },
+  sepia:   { fg: '#3d2e1f', bg: '#f4ecd8', code: '#e8dcc4' },
+  contrast:{ fg: '#ffffff', bg: '#000000', code: '#1a1a1a' },
+  paper:   { fg: '#24292f', bg: '#ffffff', code: '#f6f8fa' },
+};
+
+function applyReaderPreset(key, skipSave) {
+  const p = READER_PRESETS[key];
+  if (!p) return;
+  const root = document.documentElement;
+  root.style.setProperty('--reader-fg', p.fg);
+  root.style.setProperty('--reader-bg', p.bg);
+  root.style.setProperty('--reader-code-bg', p.code);
+  document.getElementById('reader-color-fg').value = p.fg;
+  document.getElementById('reader-color-bg').value = p.bg;
+  document.getElementById('reader-color-code').value = p.code;
+  if (!skipSave) saveState();
+}
+
+function readerColorsFromInputsToCss() {
+  const root = document.documentElement;
+  root.style.setProperty('--reader-fg', document.getElementById('reader-color-fg').value);
+  root.style.setProperty('--reader-bg', document.getElementById('reader-color-bg').value);
+  root.style.setProperty('--reader-code-bg', document.getElementById('reader-color-code').value);
+  saveState();
+}
+
+document.querySelectorAll('#theme-pop .preset-btn').forEach((btn) => {
+  btn.addEventListener('click', () => applyReaderPreset(btn.dataset.preset));
+});
+document.getElementById('reader-color-fg').addEventListener('input', readerColorsFromInputsToCss);
+document.getElementById('reader-color-bg').addEventListener('input', readerColorsFromInputsToCss);
+document.getElementById('reader-color-code').addEventListener('input', readerColorsFromInputsToCss);
+
+/* ═══════════════════════════════════════════════════════════════
+   PANEL TABS
+═══════════════════════════════════════════════════════════════ */
+document.querySelectorAll('.ptab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.ptab').forEach(t => t.classList.remove('on'));
+    document.querySelectorAll('.pane').forEach(p => p.classList.remove('on'));
+    tab.classList.add('on');
+    document.getElementById('pane-' + tab.dataset.pane).classList.add('on');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   PANEL RESIZE
+═══════════════════════════════════════════════════════════════ */
+const resizeHandle = document.getElementById('panel-resize');
+let resizing = false;
+
+function setPanelW(w) {
+  const clamped = Math.max(260, Math.min(w, Math.floor(window.innerWidth * 0.75)));
+  document.documentElement.style.setProperty('--panel-w', clamped + 'px');
+}
+
+resizeHandle.addEventListener('mousedown', e => {
+  e.preventDefault(); resizing = true;
+  resizeHandle.classList.add('dragging');
+  document.body.style.cssText += ';cursor:col-resize;user-select:none';
+});
+document.addEventListener('mousemove', e => {
+  if (!resizing) return;
+  setPanelW(window.innerWidth - e.clientX);
+});
+document.addEventListener('mouseup', () => {
+  if (!resizing) return;
+  resizing = false;
+  resizeHandle.classList.remove('dragging');
+  document.body.style.cursor = '';
+  document.body.style.userSelect = '';
+  saveState();
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   LEFT PANEL — FILTERS
+═══════════════════════════════════════════════════════════════ */
+const leftPanel = document.getElementById('left-panel');
+
+function setLeftPanelOpen(open) {
+  leftPanelOpen = open;
+  leftPanel.classList.toggle('open', open);
+  document.getElementById('btn-sidebar').classList.toggle('active', open);
+  saveState();
+}
+
+document.getElementById('btn-sidebar').addEventListener('click', () => setLeftPanelOpen(!leftPanelOpen));
+document.getElementById('left-panel-close').addEventListener('click', () => setLeftPanelOpen(false));
+
+document.querySelectorAll('.lp-section-hdr').forEach(hdr => {
+  hdr.addEventListener('click', () => {
+    document.getElementById(hdr.dataset.lpSection).classList.toggle('collapsed');
+  });
+});
+
+/* resize */
+const lpResize = document.getElementById('left-panel-resize');
+let lpResizing = false;
+lpResize.addEventListener('mousedown', e => {
+  e.preventDefault(); lpResizing = true;
+  lpResize.classList.add('dragging');
+  document.body.style.cssText += ';cursor:col-resize;user-select:none';
+});
+document.addEventListener('mousemove', e => {
+  if (!lpResizing) return;
+  const rect = leftPanel.getBoundingClientRect();
+  const w = Math.max(180, Math.min(e.clientX - rect.left, Math.floor(window.innerWidth * 0.45)));
+  document.documentElement.style.setProperty('--left-panel-w', w + 'px');
+});
+document.addEventListener('mouseup', () => {
+  if (!lpResizing) return;
+  lpResizing = false;
+  lpResize.classList.remove('dragging');
+  document.body.style.cursor = '';
+  document.body.style.userSelect = '';
+  saveState();
+});
+
+/* — type pills — */
+const lpTypesBody = document.getElementById('lp-types-body');
+CATS.forEach(cat => {
+  const btn = document.createElement('div');
+  btn.className = 'lp-pill';
+  btn.dataset.cat = cat.name;
+  btn.style.borderColor = cat.color;
+  const count = RAW_NODES.filter(n => cat.types.includes(n.type || '')).length;
+  btn.innerHTML = `<span class="lp-pill-dot" style="background:${cat.color}"></span>${cat.name}<span class="lp-pill-count">${count}</span>`;
+  btn.addEventListener('click', () => {
+    const off = btn.classList.toggle('off');
+    cat.types.forEach(t => off ? hiddenCats.add(t) : hiddenCats.delete(t));
+    applyVis();
+  });
+  lpTypesBody.appendChild(btn);
+});
+
+/* — folder pills — */
+const lpFoldersBody = document.getElementById('lp-folders-body');
+const folderCounts = {};
+RAW_NODES.forEach(n => {
+  const f = n.id.split('/')[0] || 'root';
+  folderCounts[f] = (folderCounts[f] || 0) + 1;
+});
+Object.keys(folderCounts).sort().forEach(folder => {
+  const col = hueHash(folder);
+  const btn = document.createElement('div');
+  btn.className = 'lp-pill';
+  btn.dataset.folder = folder;
+  btn.style.borderColor = col;
+  btn.innerHTML = `<span class="lp-pill-dot" style="background:${col}"></span>${folder}<span class="lp-pill-count">${folderCounts[folder]}</span>`;
+  btn.addEventListener('click', () => {
+    const off = btn.classList.toggle('off');
+    if (off) hiddenFolders.add(folder); else hiddenFolders.delete(folder);
+    applyVis();
+  });
+  lpFoldersBody.appendChild(btn);
+});
+
+/* — tag pills — */
+const lpTagsBody = document.getElementById('lp-tags-body');
+const tagCounts = {};
+RAW_NODES.forEach(n => {
+  const p = PAGES[n.id];
+  if (p && p.tags) p.tags.forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; });
+});
+Object.keys(tagCounts).sort().forEach(tag => {
+  const col = hueHash(tag);
+  const btn = document.createElement('div');
+  btn.className = 'lp-pill';
+  btn.dataset.tag = tag;
+  btn.style.borderColor = col;
+  btn.innerHTML = `<span class="lp-pill-dot" style="background:${col}"></span>#${tag}<span class="lp-pill-count">${tagCounts[tag]}</span>`;
+  btn.addEventListener('click', () => {
+    const off = btn.classList.toggle('off');
+    if (off) hiddenTags.add(tag); else hiddenTags.delete(tag);
+    applyVis();
+  });
+  lpTagsBody.appendChild(btn);
+});
+
+setLeftPanelOpen(true);
+syncLabelToolbar();
+applyVis();
+
+/* ═══════════════════════════════════════════════════════════════
+   SEARCH WITH DROPDOWN
+═══════════════════════════════════════════════════════════════ */
+const searchEl  = document.getElementById('search');
+const dropEl    = document.getElementById('search-dropdown');
+let srIdx = -1;
+
+function renderDropdown(q) {
+  if (!q) { dropEl.classList.remove('show'); return; }
+  const hits = RAW_NODES
+    .filter(n => n.label.toLowerCase().includes(q) || n.id.toLowerCase().includes(q))
+    .slice(0, 12);
+  if (!hits.length) { dropEl.classList.remove('show'); return; }
+  dropEl.innerHTML = hits.map(n =>
+    `<div class="sr-item" data-nid="${n.id}">
+      <span class="sr-dot" style="background:${pickNodeColor(n.id, n.type)}"></span>
+      <span class="sr-label">${n.label}</span>
+      <span class="sr-type">${n.type || ''}</span>
+    </div>`
+  ).join('');
+  srIdx = -1;
+  dropEl.classList.add('show');
+}
+
+searchEl.addEventListener('input', e => renderDropdown(e.target.value.trim().toLowerCase()));
+searchEl.addEventListener('keydown', e => {
+  const items = Array.from(dropEl.querySelectorAll('.sr-item'));
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    srIdx = Math.min(srIdx + 1, items.length - 1);
+    items.forEach((el, i) => el.classList.toggle('active', i === srIdx));
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    srIdx = Math.max(srIdx - 1, 0);
+    items.forEach((el, i) => el.classList.toggle('active', i === srIdx));
+  } else if (e.key === 'Enter') {
+    const t = srIdx >= 0 ? items[srIdx] : items[0];
+    if (t) jumpTo(t.dataset.nid);
+  } else if (e.key === 'Escape') {
+    dropEl.classList.remove('show'); searchEl.blur();
+  }
+});
+dropEl.addEventListener('mousedown', e => {
+  const item = e.target.closest('.sr-item');
+  if (item) { e.preventDefault(); jumpTo(item.dataset.nid); }
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('#search-wrap')) dropEl.classList.remove('show');
+});
+
+function jumpTo(nid) {
+  searchEl.value = '';
+  dropEl.classList.remove('show');
+  navPush(nid);
+  selectNode(nid);
+  pulseNode(nid);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   QUICK LISTS
+═══════════════════════════════════════════════════════════════ */
+function buildQuickLists() {
+  const sorted = Object.entries(degree).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  document.getElementById('qc-hubs-body').innerHTML = sorted.map(([id, cnt]) => {
+    const n = RAW_NODES.find(r => r.id === id);
+    if (!n) return '';
+    return `<div class="qcard-item" data-nid="${id}">
+      <span class="litem-dot" style="background:${pickNodeColor(n.id, n.type)}"></span>
+      <span class="qili-label">${n.label}</span>
+      <span class="qcard-badge">${cnt}</span>
+    </div>`;
+  }).join('');
+
+  const orphans = RAW_NODES.filter(n => !degree[n.id]);
+  document.getElementById('qc-orphans-body').innerHTML = orphans.length
+    ? orphans.map(n =>
+        `<div class="qcard-item" data-nid="${n.id}">
+          <span class="litem-dot" style="background:${pickNodeColor(n.id, n.type)}"></span>
+          <span class="qili-label">${n.label}</span>
+        </div>`).join('')
+    : '<div style="padding:5px 10px;color:var(--t4)">None ✓</div>';
+
+  document.querySelectorAll('.qcard-hdr').forEach(hdr => {
+    hdr.addEventListener('click', () => {
+      document.getElementById(hdr.dataset.card).classList.toggle('collapsed');
+    });
+  });
+  document.querySelectorAll('.qcard-item').forEach(el => {
+    el.addEventListener('click', () => { navPush(el.dataset.nid); selectNode(el.dataset.nid); });
+  });
+}
+buildQuickLists();
+
+/* ═══════════════════════════════════════════════════════════════
+   ROTATION (programmatic — labels stay horizontal)
+═══════════════════════════════════════════════════════════════ */
+const rotBadge = document.getElementById('rot-badge');
+
+function rotatePositions(angleDeg) {
+  const rad = angleDeg * Math.PI / 180;
+  const cosA = Math.cos(rad);
+  const sinA = Math.sin(rad);
+  const positions = network.getPositions();
+  const ids = Object.keys(positions);
+  if (!ids.length) return;
+  let cx = 0, cy = 0;
+  for (const p of Object.values(positions)) { cx += p.x; cy += p.y; }
+  cx /= ids.length; cy /= ids.length;
+  const updates = [];
+  for (const id of ids) {
+    const p = positions[id];
+    const dx = p.x - cx, dy = p.y - cy;
+    updates.push({ id, x: cx + dx * cosA - dy * sinA, y: cy + dx * sinA + dy * cosA });
+  }
+  const wasFrozen = frozen;
+  if (!wasFrozen) network.setOptions({ physics: { enabled: false } });
+  nodeDS.update(updates);
+  if (!wasFrozen) network.setOptions({ physics: { enabled: true } });
+}
+
+function rotateBy(d) {
+  rot = (((rot + d) % 360) + 360) % 360;
+  rotBadge.textContent = rot ? `${rot}°` : '0°';
+  rotatePositions(d);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ZOOM / PAN
+═══════════════════════════════════════════════════════════════ */
+function zoom(f) {
+  network.moveTo({ scale: network.getScale() * f,
+    animation: { duration: 200, easingFunction: 'easeInOutQuad' } });
+}
+const PAN = 80;
+function pan(dx, dy) {
+  const s = network.getScale(), p = network.getViewPosition();
+  network.moveTo({ position: { x: p.x + dx / s, y: p.y + dy / s }, animation: false });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TOOLBAR WIRING
+═══════════════════════════════════════════════════════════════ */
+document.getElementById('btn-zi')   .addEventListener('click', () => zoom(1.3));
+document.getElementById('btn-zo')   .addEventListener('click', () => zoom(1/1.3));
+document.getElementById('btn-fit')  .addEventListener('click', () => network.fit({ animation: { duration: 400 } }));
+document.getElementById('btn-rcw')  .addEventListener('click', () => rotateBy(15));
+document.getElementById('btn-rccw') .addEventListener('click', () => rotateBy(-15));
+document.getElementById('reset-btn').addEventListener('click', resetFilters);
+
+document.getElementById('btn-freeze').addEventListener('click', () => {
+  frozen = !frozen;
+  network.setOptions({ physics: { enabled: !frozen } });
+  document.getElementById('btn-freeze').classList.toggle('active', frozen);
+  saveState();
+});
+
+document.getElementById('btn-hop2').addEventListener('click', () => {
+  hop2mode = !hop2mode;
+  document.getElementById('btn-hop2').classList.toggle('active', hop2mode);
+  if (activNid) selectNode(activNid);
+  saveState();
+});
+
+document.getElementById('btn-labels').addEventListener('click', () => {
+  labelsVisible = !labelsVisible;
+  syncLabelToolbar();
+  applyVis();
+});
+
+document.querySelectorAll('#label-size-seg [data-font-idx]').forEach(b => {
+  b.addEventListener('click', () => {
+    labelFontIdx = Math.max(0, Math.min(2, Number(b.dataset.fontIdx) || 1));
+    syncLabelToolbar();
+    applyVis();
+  });
+});
+
+document.getElementById('btn-label-hover').addEventListener('click', () => {
+  labelsHoverOnly = !labelsHoverOnly;
+  hoverNid = null;
+  syncLabelToolbar();
+  applyVis();
+});
+
+document.getElementById('btn-overview').addEventListener('click', () => {
+  hop2mode = false;
+  document.getElementById('btn-hop2').classList.remove('active');
+  rot = 0; rotBadge.textContent = '0°';
+  clearSel();
+  network.fit({ animation: { duration: 400 } });
+  saveState();
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   HELP
+═══════════════════════════════════════════════════════════════ */
+function showHelp() { document.getElementById('help-backdrop').classList.add('show'); }
+function hideHelp() { document.getElementById('help-backdrop').classList.remove('show'); }
+document.getElementById('btn-help') .addEventListener('click', showHelp);
+document.getElementById('help-close').addEventListener('click', hideHelp);
+document.getElementById('help-backdrop').addEventListener('click', e => {
+  if (e.target === e.currentTarget) hideHelp();
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   RESET ALL SETTINGS
+═══════════════════════════════════════════════════════════════ */
+document.getElementById('btn-reset').addEventListener('click', () => {
+  if (!window.confirm('Reset all graph settings to defaults?\n\nThis will clear saved view, filters, physics, reader theme, and panel state.')) return;
+  try {
+    localStorage.removeItem(LS_KEY);
+    localStorage.removeItem(LS_KEY_V4);
+    localStorage.removeItem(LS_KEY_LEGACY);
+  } catch (_) {}
+  location.reload();
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   KEYBOARD
+═══════════════════════════════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'TEXTAREA' && e.target.id === 'pane-md-editor') {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+      e.preventDefault();
+      saveCurrentNote();
+    }
+    return;
+  }
+  if (e.target.tagName === 'INPUT') {
+    if (e.key === 'Escape') { dropEl.classList.remove('show'); e.target.blur(); }
+    return;
+  }
+  if (e.altKey) {
+    if (e.key === 'ArrowLeft'  && navIdx > 0)
+      { e.preventDefault(); navIdx--; selectNode(navStack[navIdx]); syncNavBtns(); }
+    if (e.key === 'ArrowRight' && navIdx < navStack.length - 1)
+      { e.preventDefault(); navIdx++; selectNode(navStack[navIdx]); syncNavBtns(); }
+    return;
+  }
+  switch (e.key) {
+    case '+': case '=':   zoom(1.3);   break;
+    case '-': case '_':   zoom(1/1.3); break;
+    case 'f': case 'F': case '0':
+      network.fit({ animation: { duration: 400 } }); break;
+    case 'ArrowUp':    e.preventDefault(); pan(0, -PAN); break;
+    case 'ArrowDown':  e.preventDefault(); pan(0,  PAN); break;
+    case 'ArrowLeft':  e.preventDefault(); pan(-PAN, 0); break;
+    case 'ArrowRight': e.preventDefault(); pan( PAN, 0); break;
+    case 'r':  rotateBy(15);  break;
+    case 'R':  rotateBy(-15); break;
+    case ' ':
+      e.preventDefault();
+      frozen = !frozen;
+      network.setOptions({ physics: { enabled: !frozen } });
+      document.getElementById('btn-freeze').classList.toggle('active', frozen);
+      break;
+    case 'n': case 'N':
+      hop2mode = !hop2mode;
+      document.getElementById('btn-hop2').classList.toggle('active', hop2mode);
+      if (activNid) selectNode(activNid);
+      saveState();
+      break;
+    case 'l': case 'L':
+      labelsVisible = !labelsVisible;
+      syncLabelToolbar();
+      applyVis();
+      break;
+    case 'Home':
+      hop2mode = false;
+      document.getElementById('btn-hop2').classList.remove('active');
+      rot = 0; rotBadge.textContent = '0°';
+      clearSel();
+      network.fit({ animation: { duration: 400 } });
+      saveState();
+      break;
+    case '/': e.preventDefault(); searchEl.focus(); searchEl.select(); break;
+    case 'Escape':
+      hideHelp(); dropEl.classList.remove('show');
+      if (!clearSel()) break;
+      rot = 0; rotBadge.textContent = '0°';
+      network.fit({ animation: { duration: 400 } });
+      break;
+    case '\\':
+      setLeftPanelOpen(!leftPanelOpen);
+      break;
+    case '?': showHelp(); break;
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   LOCAL-STORAGE STATE
+═══════════════════════════════════════════════════════════════ */
+function saveState() {
+  if (wgRestoring) return;
+  try {
+    const p = network.getViewPosition();
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      scale: network.getScale(), x: p.x, y: p.y,
+      rot, frozen, hop2mode,
+      panelW: getComputedStyle(document.documentElement).getPropertyValue('--panel-w').trim(),
+      leftPanelW: getComputedStyle(document.documentElement).getPropertyValue('--left-panel-w').trim(),
+      leftPanelOpen,
+      activNid,
+      hiddenCats: [...hiddenCats],
+      hiddenFolders: [...hiddenFolders],
+      hiddenTags: [...hiddenTags],
+      showLabels: labelsVisible,
+      labelFontIdx,
+      labelsHoverOnly,
+      colorBy,
+      readerFg: document.getElementById('reader-color-fg').value,
+      readerBg: document.getElementById('reader-color-bg').value,
+      readerCode: document.getElementById('reader-color-code').value,
+      physLen: +document.getElementById('phys-spring-len').value,
+      physK: +document.getElementById('phys-spring-k').value,
+      physGrav: +document.getElementById('phys-grav').value,
+      physCent: +document.getElementById('phys-central').value,
+    }));
+  } catch (_) {}
+}
+
+function isFiniteNum(v) {
+  return typeof v === 'number' && Number.isFinite(v);
+}
+
+function savedViewIsValid(s) {
+  if (!s) return false;
+  const sc = s.scale;
+  if (!isFiniteNum(sc) || sc < 0.02 || sc > 80) return false;
+  if (!isFiniteNum(s.x) || !isFiniteNum(s.y)) return false;
+  if (Math.abs(s.x) > 1e8 || Math.abs(s.y) > 1e8) return false;
+  return true;
+}
+
+function readMergedState() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) return JSON.parse(raw);
+    const v4 = localStorage.getItem(LS_KEY_V4);
+    if (v4) return JSON.parse(v4);
+    const leg = localStorage.getItem(LS_KEY_LEGACY);
+    return leg ? JSON.parse(leg) : null;
+  } catch (_) {
+    return null;
+  }
+}
+
+function restoreState() {
+  wgRestoring = true;
+  try {
+    const s = readMergedState();
+
+    if (s && typeof s.showLabels === 'boolean') labelsVisible = s.showLabels;
+    if (s && typeof s.labelFontIdx === 'number')
+      labelFontIdx = Math.max(0, Math.min(2, s.labelFontIdx | 0));
+    if (s && typeof s.labelsHoverOnly === 'boolean') labelsHoverOnly = s.labelsHoverOnly;
+    syncLabelToolbar();
+
+    if (s && s.colorBy && ['type', 'folder', 'tag'].includes(s.colorBy)) {
+      colorBy = s.colorBy;
+      document.getElementById('color-by').value = colorBy;
+    }
+
+    if (s && typeof s.readerFg === 'string' && s.readerFg.startsWith('#')) {
+      document.getElementById('reader-color-fg').value = s.readerFg;
+      document.getElementById('reader-color-bg').value =
+        (typeof s.readerBg === 'string' && s.readerBg.startsWith('#')) ? s.readerBg : READER_PRESETS.default.bg;
+      document.getElementById('reader-color-code').value =
+        (typeof s.readerCode === 'string' && s.readerCode.startsWith('#')) ? s.readerCode : READER_PRESETS.default.code;
+      document.documentElement.style.setProperty('--reader-fg', s.readerFg);
+      document.documentElement.style.setProperty('--reader-bg', document.getElementById('reader-color-bg').value);
+      document.documentElement.style.setProperty('--reader-code-bg', document.getElementById('reader-color-code').value);
+    } else {
+      applyReaderPreset('default', true);
+    }
+
+    if (s && isFiniteNum(s.physLen)) {
+      const el = document.getElementById('phys-spring-len');
+      if (el) el.value = String(Math.max(80, Math.min(400, s.physLen)));
+    }
+    if (s && isFiniteNum(s.physK)) {
+      const el = document.getElementById('phys-spring-k');
+      if (el) el.value = String(Math.max(15, Math.min(120, s.physK)));
+    }
+    if (s && isFiniteNum(s.physGrav)) {
+      const el = document.getElementById('phys-grav');
+      if (el) el.value = String(Math.max(-120, Math.min(-8, s.physGrav)));
+    }
+    if (s && isFiniteNum(s.physCent)) {
+      const el = document.getElementById('phys-central');
+      if (el) el.value = String(Math.max(5, Math.min(80, s.physCent)));
+    }
+    applyPhysicsFromUi();
+
+    if (s && s.rot) { rot = s.rot; rotBadge.textContent = rot ? `${rot}°` : '0°'; }
+    if (s && s.panelW) document.documentElement.style.setProperty('--panel-w', s.panelW);
+    if (s && s.leftPanelW) document.documentElement.style.setProperty('--left-panel-w', s.leftPanelW);
+    if (s && typeof s.leftPanelOpen === 'boolean') setLeftPanelOpen(s.leftPanelOpen);
+    if (s && s.frozen) {
+      frozen = true;
+      network.setOptions({ physics: { enabled: false } });
+      document.getElementById('btn-freeze').classList.add('active');
+    }
+    if (s && s.hop2mode) {
+      hop2mode = true;
+      document.getElementById('btn-hop2').classList.add('active');
+    }
+    if (s && s.hiddenCats && s.hiddenCats.length) {
+      s.hiddenCats.forEach(t => hiddenCats.add(t));
+      CATS.forEach(cat => {
+        if (cat.types.some(t => hiddenCats.has(t)))
+          document.querySelector(`.lp-pill[data-cat="${cat.name}"]`)?.classList.add('off');
+      });
+    }
+    if (s && s.hiddenFolders && s.hiddenFolders.length) {
+      s.hiddenFolders.forEach(f => hiddenFolders.add(f));
+      document.querySelectorAll('.lp-pill[data-folder]').forEach(b => {
+        if (hiddenFolders.has(b.dataset.folder)) b.classList.add('off');
+      });
+    }
+    if (s && s.hiddenTags && s.hiddenTags.length) {
+      s.hiddenTags.forEach(t => hiddenTags.add(t));
+      document.querySelectorAll('.lp-pill[data-tag]').forEach(b => {
+        if (hiddenTags.has(b.dataset.tag)) b.classList.add('off');
+      });
+    }
+
+    if (savedViewIsValid(s)) {
+      network.moveTo({ position: { x: s.x, y: s.y }, scale: s.scale, animation: false });
+    } else {
+      network.fit({ animation: false });
+    }
+
+    if (s && s.activNid) {
+      navPush(s.activNid);
+      selectNode(s.activNid);
+    } else {
+      applyVis();
+    }
+  } catch (_) {
+    network.fit({ animation: false });
+    applyVis();
+  } finally {
+    wgRestoring = false;
+    try { saveState(); } catch (_) { /* ignore */ }
+  }
+}
+
+network.once('stabilized', restoreState);
+
+let wgResizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(wgResizeTimer);
+  wgResizeTimer = setTimeout(() => {
+    try { network.redraw(); } catch (_) {}
+  }, 120);
+});
+</script>
+</body>
+</html>

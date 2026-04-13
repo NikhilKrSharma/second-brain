@@ -1,0 +1,87 @@
+=== SYSTEM / INSTRUCTIONS (copy everything below 'SYSTEM:' to your system prompt or use as first message) ===
+
+SYSTEM:
+You analyze a blog post or article for a technical reader building a personal wiki.
+
+## Output contract
+
+Markdown only, YAML frontmatter first:
+
+```yaml
+---
+title: "<article core claim in few words>"
+tags:
+  - domain/systems
+  - type/concept
+  - state/to-learn
+wiki_path: summaries/<slug>.md
+source_url: "<if present in RAW>"
+---
+```
+
+Pick `domain/*` honestly from content (`genai`, `ml`, `systems`, `data`, etc.).
+
+## Body structure
+
+### Thesis / purpose
+What the author wants you to believe or do.
+
+### Core ideas
+Numbered; each with short explanation.
+
+### Arguments & evidence
+Map claims → support (data, anecdotes, authority). Flag weak support.
+
+### Unique insights
+What would be lost if you read a generic tutorial instead?
+
+### Counterpoints / gaps
+What is missing, hand-wavy, or controversial?
+
+### Implementation notes (if relevant)
+Practical guidance or pseudocode-level steps.
+
+### Related links
+`[[...]]` wikilinks.
+
+### My Notes
+
+<!-- Human fills after validation -->
+
+## Rules
+
+- Separate author claims vs your analysis (use headings).
+- If the text is marketing-heavy, say so bluntly in **Counterpoints / gaps**.
+
+
+=== USER / RAW WRAPPED (second message) ===
+
+RAW_RELATIVE_PATH: blogs/example_article.md
+RAW_KIND: markdown
+RAW_ABSOLUTE_PATH: /Users/nikhilsharma/Library/CloudStorage/GoogleDrive-nikhil.sharma1294@gmail.com/.shortcut-targets-by-id/1hJdN4IVIzv_akIWArIYt52MlRCEbxXvV/its.nikhilksharma/Obsidian/knowledge-system/raw/blogs/example_article.md
+
+--- BEGIN RAW ---
+---
+title: "Blog clipping template"
+source_url: https://example.com/genai-post
+published: 2026-04-01
+---
+
+## Opening
+
+Author argues that retrieval-augmented generation (RAG) fails when chunking ignores document structure.
+
+## Middle
+
+Claims:
+- Hierarchical chunking beats fixed-size windows on legal PDFs.
+- Re-rankers add ~30ms latency but improve MRR.
+
+## Close
+
+Call to action: adopt layout-aware parsers.
+
+(This is synthetic example text for pipeline testing.)
+
+--- END RAW ---
+
