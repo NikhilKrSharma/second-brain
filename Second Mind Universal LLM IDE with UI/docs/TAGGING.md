@@ -29,7 +29,6 @@ If a note spans two domains, pick the primary one. Do not invent new domain tags
 | `blog` | Blog post, article, newsletter, opinion piece |
 | `video` | YouTube video, talk, lecture, podcast episode |
 | `workflow` | Process, procedure, or operational pattern |
-| `system` | Architecture, platform, end-to-end pipeline |
 | `project` | Time-bounded body of work |
 | `idea` | Speculative, half-formed, or exploratory |
 | `tooling` | Tools, libraries, frameworks, platforms |

@@ -11,7 +11,7 @@ Before writing, read `docs/me.md` to calibrate relevance, importance, and the My
 ```yaml
 ---
 title: "Concise, specific title (not the file name — synthesize the actual concept)"
-type: concept | topic | workflow | system | project | idea | tooling
+type: concept | topic | workflow | project | idea | tooling
 domain: genai | ml | systems | data | product | research
 tags:
   - <domain tag>
@@ -30,9 +30,8 @@ wiki_path: <relative path within wiki/, e.g. summaries/my-note.md>
 **Routing rules for `wiki_path`:**
 - `type: concept` → `concepts/<slug>.md`
 - `type: topic` → `topics/<slug>.md`
-- `type: system` → `systems/<slug>.md`
 - `type: project` → `projects/<slug>.md`
-- Everything else → `summaries/<slug>.md`
+- Everything else → `notes/<slug>.md`
 
 **Slug rules:** lowercase, hyphen-separated, ASCII, derived from title.
 

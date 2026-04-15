@@ -74,11 +74,11 @@ Every `/wiki-*` workflow automatically refreshes `graph/graph.html` before it fi
 ## How It Works
 
 ```
-raw/  →  agent (ingest)  →  wiki/summaries/  →  you (promote)  →  concepts/ | topics/ | insights/
+raw/  →  agent (ingest)  →  wiki/notes/  →  you (promote)  →  concepts/ | topics/ | insights/
 ```
 
 1. **You** drop source files into `raw/` — no structure required
-2. **Agent** reads the source, picks the right extraction template, checks for duplicates, writes a structured wiki note, creates entity/concept pages, and leaves an insight stub for you
+2. **Agent** reads the source, picks the right extraction template, checks for duplicates, writes a structured wiki note, creates concept pages, and leaves an insight stub for you
 3. **You** review, promote mature notes to permanent folders, and write your own synthesis in `wiki/insights/`
 
 The agent handles extraction and first-pass structuring. You own promotion and synthesis.
@@ -124,27 +124,19 @@ Everything else works with zero dependencies.
 ```
 raw/                      # IMMUTABLE — never modify files here
   inbox/                  # General captures, quick notes
-    _high/                # High priority — processed first
-    _low/                 # Low priority
-  blogs/                  # Blog posts, articles, newsletters
-  youtube/                # Video / podcast transcripts
-  research_papers/        # Academic papers (PDF or markdown)
+  research/               # Papers, blogs, articles, videos, web clips, external references
   work/                   # Work docs, meeting notes, specs
   assets/                 # Images and attachments
-  <new-folder>/           # Create freely — auto falls back to general template
 
 wiki/                     # Agent owns this layer (except insights/)
   index.md                # Master catalog — updated on every ingest
   log.md                  # Append-only operation history
   overview.md             # Living synthesis across all sources
-  summaries/              # First-pass LLM extractions (everything starts here)
+  notes/                  # First-pass generated notes (everything starts here)
   concepts/               # Atomic, permanent definitions (promoted manually)
   topics/                 # Maps of Content / curated topic surveys
-  systems/                # Architectures, platforms, end-to-end pipelines
   projects/               # Time-bounded work bodies of knowledge
-  entities/               # People, companies, products, organizations
   insights/               # YOUR synthesis — agent writes stubs only
-  syntheses/              # Saved query answers
   assets/                 # Images, diagrams, files for notes (see docs/assets.md)
     images/
     diagrams/
@@ -152,9 +144,7 @@ wiki/                     # Agent owns this layer (except insights/)
 
 prompts/                  # Extraction templates per source type
   general.md              # Generic captures, inbox, work
-  research_paper.md       # Academic papers
-  youtube.md              # Video / podcast transcripts
-  blog.md                 # Articles, newsletters
+  research.md             # Papers, articles, videos, external references
   refine.md               # Improving existing notes
 
 docs/                     # Reference docs
@@ -197,8 +187,8 @@ All commands work as slash commands in Cursor or VS Code Copilot, or as plain En
 Ingests a raw source file into the wiki.
 
 ```
-/wiki-ingest raw/blogs/my-article.md
-/wiki-ingest raw/research_papers/attention-paper.pdf
+/wiki-ingest raw/research/my-article.md
+/wiki-ingest raw/research/attention-paper.pdf
 /wiki-ingest raw/inbox/my-notes.md
 ```
 
@@ -209,7 +199,7 @@ Ingests a raw source file into the wiki.
 4. Runs `python tools/dedup.py --check "<title>"` — flags duplicates before writing
 5. Selects the right prompt template
 6. Writes the wiki note with full frontmatter schema
-7. Creates/updates entity and concept pages
+7. Creates/updates concept pages
 8. Updates `wiki/index.md` and `wiki/overview.md`
 9. Creates an insight stub in `wiki/insights/`
 10. Appends to `wiki/log.md`
@@ -222,7 +212,7 @@ Ingests a raw source file into the wiki.
 Improves an existing wiki note — body only, frontmatter is never touched.
 
 ```
-/wiki-refine wiki/summaries/my-note.md
+/wiki-refine wiki/notes/my-note.md
 ```
 
 **What the agent does:** reads `prompts/refine.md`, rewrites for clarity, fills gaps, enriches My Notes from `docs/me.md`, adds wikilinks, then rebuilds `graph/graph.html`.
@@ -238,7 +228,7 @@ Searches the wiki and synthesizes a cited answer.
 /wiki-query Summarize everything I know about RAG
 ```
 
-Agent reads up to ~10 relevant pages, synthesizes with `[[WikiLink]]` citations, offers to save the result to `wiki/syntheses/`, and refreshes `graph/graph.html` before finishing.
+Agent reads up to ~10 relevant pages, synthesizes with `[[WikiLink]]` citations, offers to save the result to `wiki/notes/`, and refreshes `graph/graph.html` before finishing.
 
 ---
 
@@ -246,7 +236,7 @@ Agent reads up to ~10 relevant pages, synthesizes with `[[WikiLink]]` citations,
 
 Health check for the entire wiki.
 
-Checks: broken `[[wikilinks]]`, orphan pages (no inbound links), duplicate notes (`tools/dedup.py --lint`), contradictions across pages, stale summaries, missing entity pages, pending insight stubs, and response style drift (`tools/style_lint.py`).
+Checks: broken `[[wikilinks]]`, orphan pages (no inbound links), duplicate notes (`tools/dedup.py --lint`), contradictions across pages, stale notes, missing concept pages, pending insight stubs, and response style drift (`tools/style_lint.py`).
 
 Offers to save the report to `wiki/lint-report.md`, then rebuilds `graph/graph.html` before finishing.
 
@@ -273,10 +263,9 @@ Goal: get things in with zero friction. Don't process, just save.
 | Source type | Where to drop |
 |---|---|
 | Quick note, idea, bullet capture | `raw/inbox/` |
-| Time-sensitive / high priority | `raw/inbox/_high/` |
-| Blog post, article, newsletter | `raw/blogs/` |
-| YouTube / podcast transcript | `raw/youtube/` |
-| Research paper | `raw/research_papers/` (PDF or `.md`) |
+| Blog post, article, newsletter | `raw/research/` |
+| YouTube / podcast transcript | `raw/research/` |
+| Research paper | `raw/research/` (PDF or `.md`) |
 | Work doc, meeting note, spec | `raw/work/` |
 | Anything else | `raw/inbox/` or a new subfolder (auto-routed) |
 
@@ -289,7 +278,7 @@ Goal: get things in with zero friction. Don't process, just save.
 Goal: turn this week's captures into structured wiki notes.
 
 1. Open Cursor or VS Code in this folder
-2. Start with `raw/inbox/_high/`, then the rest
+2. Start with `raw/inbox/`, then the rest
 3. Run `/wiki-ingest <path>` for each file
 4. Handle any dedup flags the agent raises (skip / append / keep both)
 5. Spot-check a few generated notes for quality
@@ -303,9 +292,9 @@ Goal: turn this week's captures into structured wiki notes.
 
 Goal: consolidate what you've learned, promote stable knowledge, write your own synthesis.
 
-1. **Promote summaries** — review `wiki/summaries/`, move well-understood notes to `concepts/` or `topics/` (change `wiki_path` in frontmatter + move file)
+1. **Promote notes** — review `wiki/notes/`, move well-understood notes to `concepts/` or `topics/` (change `wiki_path` in frontmatter + move file)
 2. **Write insights** — open `wiki/insights/`, pick 1–3 pending stubs, write your actual synthesis (this is the human-only layer — the agent never fills this in)
-3. **Synthesize across sources** — run `/wiki-query` on cross-cutting themes, save good answers to `wiki/syntheses/`
+3. **Synthesize across sources** — run `/wiki-query` on cross-cutting themes, save good answers to `wiki/notes/`
 4. **Review the graph** — it is refreshed automatically after `/wiki-query`, `/wiki-ingest`, `/wiki-refine`, and `/wiki-lint`; run `/wiki-graph` manually only when you want an extra refresh on demand
 5. **Full lint** — run `/wiki-lint` for a complete health check
 6. **Update your state tags** — change `state: to-learn` → `learning` → `understood` → `applied` as your understanding evolves
@@ -320,15 +309,12 @@ The agent selects a prompt template based on which `raw/` subfolder the file is 
 
 | raw/ subfolder | Prompt template | Default wiki output |
 |---|---|---|
-| `inbox/`, `inbox/_high/`, `inbox/_low/` | `prompts/general.md` | `wiki/summaries/` |
-| `research_papers/` | `prompts/research_paper.md` | `wiki/summaries/` |
-| `youtube/` | `prompts/youtube.md` | `wiki/summaries/` |
-| `blogs/` | `prompts/blog.md` | `wiki/summaries/` |
-| `clips/` | `prompts/blog.md` | `wiki/summaries/` |
+| `inbox/` | `prompts/general.md` | `wiki/notes/` |
+| `research/` | `prompts/research.md` | `wiki/notes/` |
 | `work/` | `prompts/general.md` | `wiki/projects/` |
-| **any other subfolder** | `prompts/general.md` | `wiki/summaries/` ← **fallback** |
+| **any other subfolder** | `prompts/general.md` | `wiki/notes/` ← **fallback** |
 
-**Key point:** you can freely create new subfolders under `raw/` (e.g. `raw/podcasts/`, `raw/courses/`, `raw/newsletters/`) without changing any rules. They auto-fall back to `general.md` + `summaries/`. To give a folder its own template later, add it to this table in `docs/PIPELINES.md` and note it in `AGENTS.md`.
+**Key point:** you can freely create new subfolders under `raw/` (e.g. `raw/podcasts/`, `raw/courses/`, `raw/newsletters/`) without changing any rules. They auto-fall back to `general.md` + `notes/`. To give a folder its own template later, add it to this table in `docs/PIPELINES.md` and note it in `AGENTS.md`.
 
 ---
 
@@ -339,7 +325,7 @@ Every wiki page uses this YAML frontmatter:
 ```yaml
 ---
 title: "Specific, synthesized title"
-type: concept | topic | paper | blog | video | workflow | system | project | idea | tooling | insight | synthesis
+type: concept | topic | paper | blog | video | workflow | project | idea | tooling | insight
 domain: genai | ml | systems | data | product | research
 tags:
   - <domain tag>        # e.g. genai
@@ -351,7 +337,7 @@ confidence: 0.0–1.0                                 # agent's confidence in ex
 sources:
   - raw/path/to/source.md
 last_updated: YYYY-MM-DD
-wiki_path: summaries/my-note.md                     # determines which folder the note lives in
+wiki_path: notes/my-note.md                     # determines which folder the note lives in
 ---
 ```
 
@@ -361,10 +347,9 @@ wiki_path: summaries/my-note.md                     # determines which folder th
 |---|---|
 | `concept` | `concepts/` |
 | `topic` | `topics/` |
-| `system` | `systems/` |
 | `project` | `projects/` |
 | `insight` | `insights/` |
-| everything else | `summaries/` |
+| everything else | `notes/` |
 
 ---
 
@@ -374,7 +359,7 @@ Full rules in `docs/TAGGING.md`. Summary:
 
 **Domain tags** (exactly one): `genai` · `ml` · `systems` · `data` · `product` · `research`
 
-**Type tags** (exactly one, matches `type` field): `concept` · `topic` · `paper` · `blog` · `video` · `workflow` · `system` · `project` · `idea` · `tooling`
+**Type tags** (exactly one, matches `type` field): `concept` · `topic` · `paper` · `blog` · `video` · `workflow` · `project` · `idea` · `tooling`
 
 **State tags** (optional): `to-learn` · `learning` · `understood` · `applied`
 
@@ -393,9 +378,7 @@ Located in `prompts/`. The agent reads these during ingest — you don't call th
 | File | Used for | Key sections it produces |
 |---|---|---|
 | `general.md` | Inbox, work, anything unclassified | Overview · Core Ideas · Deep Explanation · Examples · Connections · Applications · Limitations · My Notes |
-| `research_paper.md` | Academic papers, preprints | One-Line Thesis · Summary · Key Contributions · Novel Mechanisms · Comparisons · Limitations · Experiments · Glossary · My Notes |
-| `youtube.md` | Video / podcast transcripts | Context · Key Insights · Mental Models · Actionable Takeaways · Claims to Verify · Connections · My Notes |
-| `blog.md` | Blog posts, articles, newsletters | Thesis & Purpose · Core Ideas · Arguments & Evidence · Unique Insights · Counterpoints & Gaps · Implementation Notes · My Notes |
+| `research.md` | Papers, articles, videos, external references | One-Line Thesis · Summary · Key Contributions · Novel Mechanisms · Comparisons · Limitations · Experiments · Glossary · My Notes |
 | `refine.md` | Improving existing notes | (used by `/wiki-refine` — no new sections created) |
 
 To change how a source type is extracted, edit the corresponding template file. The agent will use your updated instructions on the next ingest.
@@ -439,7 +422,7 @@ Extracts documents into structured LLM-ready markdown. Supports PDF, DOCX, XLSX,
 
 ```bash
 pip install pymupdf4llm python-docx openpyxl python-pptx  # one-time setup
-python tools/extract.py raw/research_papers/my-paper.pdf
+python tools/extract.py raw/research/my-paper.pdf
 python tools/extract.py raw/work/report.docx
 python tools/extract.py raw/work/data.xlsx
 python tools/extract.py raw/work/slides.pptx
@@ -485,19 +468,16 @@ Scans instruction and prompt files for verbose-default wording (for example: `th
 ## Wiki Folder Hierarchy
 
 ```
-wiki/summaries/    ← everything lands here first (agent-written)
+wiki/notes/        ← everything lands here first (agent-written)
        ↓  (you promote when understood)
 wiki/concepts/     ← atomic, permanent definitions
 wiki/topics/       ← curated topic maps / MOCs
-wiki/systems/      ← architectures and platforms
 wiki/projects/     ← time-bounded work knowledge
        ↓  (you write)
 wiki/insights/     ← YOUR synthesis (agent creates stubs, you fill them)
-wiki/syntheses/    ← saved /wiki-query answers
-wiki/entities/     ← people, companies, products (auto-created during ingest)
 ```
 
-**Promoting a note:** change `wiki_path` in the frontmatter (e.g. `summaries/rag.md` → `concepts/RAG.md`), update `state` if applicable, and move the file. Update `wiki/index.md` entry.
+**Promoting a note:** change `wiki_path` in the frontmatter (e.g. `notes/rag.md` → `concepts/RAG.md`), update `state` if applicable, and move the file. Update `wiki/index.md` entry.
 
 ---
 
@@ -509,7 +489,7 @@ wiki/entities/     ← people, companies, products (auto-created during ingest)
 ---
 title: "Insight: <topic>"
 type: insight
-linked_note: wiki/summaries/some-note.md
+linked_note: wiki/notes/some-note.md
 status: pending
 created: 2026-04-11
 ---
@@ -525,7 +505,7 @@ You write the insight body when you're ready. An insight is your synthesis — w
 
 ### Adding a new raw source folder
 
-Just create it: `raw/podcasts/`, `raw/courses/`, `raw/newsletters/` — anything you want. The agent automatically falls back to `prompts/general.md` + `wiki/summaries/`. No rule changes needed.
+Just create it: `raw/podcasts/`, `raw/courses/`, `raw/newsletters/` — anything you want. The agent automatically falls back to `prompts/general.md` + `wiki/notes/`. No rule changes needed.
 
 To give it a custom template later:
 1. Create `prompts/podcasts.md` following the structure of an existing template

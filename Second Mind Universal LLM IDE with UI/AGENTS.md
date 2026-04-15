@@ -62,28 +62,19 @@ When the user sends a greeting (hi, hello, hey, etc.), asks for help, or seems u
 ```
 raw/                    # Immutable source documents — NEVER modify these
   inbox/                # Quick captures and general notes
-    _high/              # High-priority — process first
-    _low/               # Low-priority
-  blogs/                # Blog posts, articles, newsletters
-  clips/                # Obsidian Web Clipper captures
-  youtube/              # Video/podcast transcripts
-  research_papers/      # Academic papers (PDF or markdown)
-  work/                 # Work-related materials
+  research/             # Papers, blogs, articles, videos, web clips, external references
+  work/                 # Work-related materials (meeting notes, specs, project docs)
   assets/               # Images and attachments
-  <any new subfolder>/  # Freely create — falls back to general.md + summaries/
 
 wiki/                   # Agent writes here (except insights/)
   index.md              # Catalog of all pages — update on every ingest
   log.md                # Append-only chronological record
   overview.md           # Living synthesis across all sources
-  summaries/            # First-pass LLM outputs — everything lands here first
-  concepts/             # Atomic definitions and mechanisms (promoted from summaries)
+  notes/                # First-pass generated notes — everything lands here first
+  concepts/             # Atomic definitions and mechanisms (promoted from notes)
   topics/               # Curated maps / MOCs (Maps of Content)
-  systems/              # Architectures, platforms, pipelines
   projects/             # Time-bounded work bodies of knowledge
-  entities/             # People, companies, products, organizations
   insights/             # Human-only synthesis — agent creates STUBS ONLY
-  syntheses/            # Saved query answers
   assets/               # Images, diagrams, optional files for notes (see docs/assets.md)
     images/             # Per-note or per-topic image folders
     diagrams/           # Diagram exports / sources
@@ -115,7 +106,7 @@ Every wiki page uses this YAML frontmatter:
 ```yaml
 ---
 title: "Specific, synthesized title"
-type: concept | topic | paper | blog | video | workflow | system | project | idea | tooling | insight | synthesis
+type: concept | topic | paper | blog | video | workflow | project | idea | tooling | insight
 domain: genai | ml | systems | data | product | research
 tags:
   - <domain tag>
@@ -138,10 +129,9 @@ See `docs/TAGGING.md` for full tag taxonomy and rules.
 |---|---|
 | `concept` | `concepts/` |
 | `topic` | `topics/` |
-| `system` | `systems/` |
 | `project` | `projects/` |
 | `insight` | `insights/` |
-| everything else | `summaries/` |
+| everything else | `notes/` |
 
 **Slug rules:** lowercase, hyphen-separated, ASCII, derived from title.
 
@@ -153,14 +143,11 @@ The agent selects a template based on the source's `raw/` subfolder:
 
 | raw/ subfolder | Template | Default wiki folder |
 |---|---|---|
-| `research_papers/` | `prompts/research_paper.md` | `summaries/` |
-| `youtube/` | `prompts/youtube.md` | `summaries/` |
-| `blogs/` | `prompts/blog.md` | `summaries/` |
-| `clips/` | `prompts/blog.md` | `summaries/` |
+| `research/` | `prompts/research.md` | `notes/` |
 | `work/` | `prompts/general.md` | `projects/` |
-| `inbox/` or any other | `prompts/general.md` | `summaries/` |
+| `inbox/` or any other | `prompts/general.md` | `notes/` |
 
-**Fallback:** any folder not listed above uses `prompts/general.md` and routes to `summaries/`. New folders under `raw/` work automatically — no rule changes needed.
+**Fallback:** any folder not listed above uses `prompts/general.md` and routes to `notes/`. New folders under `raw/` work automatically — no rule changes needed.
 
 ---
 
@@ -184,11 +171,10 @@ Steps (in order):
    - **Media (optional):** Add figures or Mermaid diagrams only when they materially aid understanding; otherwise omit. Use `wiki/assets/` per `docs/assets.md`; **never** write new binaries into `raw/`. Copy PDF/PPTX-extracted images from `raw/.../<stem>_images/` into `wiki/assets/images/<slug>/` and fix `![](...)` paths relative to the note.
    - **Video:** embed URLs only (e.g. YouTube/Vimeo embed links or iframes per template); do not store video files in the wiki.
    - **Provenance:** Include **`### Sources and media`** listing each asset and key textual claims (path, original URL or `raw/...`, optional date).
-9. **Update / create entity pages** — for key people, companies, projects mentioned
-10. **Update / create concept pages** — for key ideas and frameworks (if substantial enough for a standalone concept)
-11. **Update `wiki/index.md`** — add entry in the appropriate section
-12. **Update `wiki/overview.md`** — revise synthesis if this source warrants it
-13. **Create insight stub** in `wiki/insights/<slug>.md`:
+9. **Update / create concept pages** — for key ideas, entities, and frameworks (if substantial enough for a standalone concept)
+10. **Update `wiki/index.md`** — add entry in the appropriate section
+11. **Update `wiki/overview.md`** — revise synthesis if this source warrants it
+12. **Create insight stub** in `wiki/insights/<slug>.md`:
     ```yaml
     ---
     title: "Insight: <topic>"
@@ -198,9 +184,9 @@ Steps (in order):
     created: YYYY-MM-DD
     ---
     ```
-14. **Flag contradictions** with existing wiki content
-15. **Append to `wiki/log.md`**: `## [YYYY-MM-DD] ingest | <Title>`
-16. **Rebuild the graph** — run `python tools/build_graph.py --open` so `graph/graph.html` reflects the new wiki state
+13. **Flag contradictions** with existing wiki content
+14. **Append to `wiki/log.md`**: `## [YYYY-MM-DD] ingest | <Title>`
+15. **Rebuild the graph** — run `python tools/build_graph.py --open` so `graph/graph.html` reflects the new wiki state
 
 ---
 
@@ -233,7 +219,7 @@ Steps:
   - Include one `Key Points` bullet: `Files changed: <created/modified file paths>`; if none, state `Files changed: none`
   - Expand only if the user explicitly asks for a detailed explanation
 5. Include a `## Sources` section listing pages used
-6. Ask if the user wants it saved as `wiki/syntheses/<slug>.md`
+6. Ask if the user wants it saved as `wiki/notes/<slug>.md`
 7. If saving: append to `wiki/log.md`: `## [YYYY-MM-DD] query | <question>`
 8. Rebuild the graph — run `python tools/build_graph.py --open` so `graph/graph.html` is refreshed before the workflow completes
 
@@ -248,8 +234,8 @@ Check for:
 - **Broken links** — `[[WikiLinks]]` pointing to pages that don't exist
 - **Duplicate notes** — run `python tools/dedup.py --lint`
 - **Contradictions** — claims that conflict across pages
-- **Stale summaries** — pages not updated after newer sources changed the picture
-- **Missing entity pages** — entities mentioned in 3+ pages but lacking their own page
+- **Stale notes** — pages not updated after newer sources changed the picture
+- **Missing concept pages** — concepts mentioned in 3+ pages but lacking their own page
 - **Pending insight stubs** — count and list `wiki/insights/` pages with `status: pending`
 - **Data gaps** — questions the wiki can't answer; suggest sources
 - **Response style drift** — run `python tools/style_lint.py` and report findings
@@ -292,8 +278,7 @@ Keep `Key Points` to 3-5 bullets by default.
 ## Naming Conventions
 
 - Wiki note slugs: `kebab-case.md`
-- Entity pages: `TitleCase.md` (e.g. `OpenAI.md`, `SamAltman.md`)
-- Concept pages: `TitleCase.md` (e.g. `ReinforcementLearning.md`, `RAG.md`)
+- Concept pages: `TitleCase.md` (e.g. `ReinforcementLearning.md`, `RAG.md`, `OpenAI.md`)
 
 ---
 
@@ -305,8 +290,8 @@ Keep `Key Points` to 3-5 bullets by default.
 ## Overview
 - [Overview](overview.md) — living synthesis
 
-## Summaries
-- [Note Title](summaries/slug.md) — one-line description
+## Notes
+- [Note Title](notes/slug.md) — one-line description
 
 ## Concepts
 - [Concept Name](concepts/ConceptName.md) — one-line definition
@@ -314,20 +299,11 @@ Keep `Key Points` to 3-5 bullets by default.
 ## Topics
 - [Topic Name](topics/TopicName.md) — one-line description
 
-## Systems
-- [System Name](systems/slug.md) — one-line description
-
 ## Projects
 - [Project Name](projects/slug.md) — one-line description
 
-## Entities
-- [Entity Name](entities/EntityName.md) — one-line description
-
 ## Insights
 - [Insight Title](insights/slug.md) — status: pending | complete
-
-## Syntheses
-- [Analysis Title](syntheses/slug.md) — what question it answers
 ```
 
 ---

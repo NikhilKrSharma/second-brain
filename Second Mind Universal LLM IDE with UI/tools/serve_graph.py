@@ -34,7 +34,7 @@ def _safe_wiki_md_target(url_path: str) -> Path | None:
     """Return a resolved path under ``wiki/`` for a PUT target, or None if invalid.
 
     Args:
-        url_path: Request path (e.g. ``/wiki/summaries/foo.md``).
+        url_path: Request path (e.g. ``/wiki/notes/foo.md``).
 
     Returns:
         Resolved ``.md`` path inside ``wiki``, or None.

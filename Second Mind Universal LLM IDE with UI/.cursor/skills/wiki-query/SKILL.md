@@ -21,7 +21,7 @@ Follow the Query Workflow defined in AGENTS.md:
    - Include one `Key Points` bullet: `Files changed: <created/modified file paths>`; if none, state `Files changed: none`
    - Expand into a detailed explanation only if the user explicitly asks
 5. Include a ## Sources section at the end listing pages you drew from
-6. Ask the user if they want the answer saved as wiki/syntheses/<slug>.md
+6. Ask the user if they want the answer saved as wiki/notes/<slug>.md
 7. If saving: append to wiki/log.md: ## [today's date] query | <question>
 8. Rebuild the graph by running `python tools/build_graph.py --open` so graph/graph.html is refreshed before the workflow completes
 

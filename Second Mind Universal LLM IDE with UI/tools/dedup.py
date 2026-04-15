@@ -15,7 +15,7 @@ JSON output for --check:
     {
       "query": "<title>",
       "matches": [
-        { "score": 0.94, "title": "Attention is All You Need", "path": "wiki/summaries/attention-is-all-you-need.md" },
+        { "score": 0.94, "title": "Attention is All You Need", "path": "wiki/notes/attention-is-all-you-need.md" },
         ...
       ],
       "verdict": "duplicate" | "related" | "new"

@@ -27,7 +27,7 @@ When the user sends a greeting (hi, hello, hey, etc.), asks for help, or seems u
 
 ## Quick reference
 
-- **Ingest** a source → follow the Ingest Workflow in AGENTS.md (detect type → extract PDF/DOCX/XLSX/PPTX if needed → dedup check → select prompt template → write note → create/update entities & concepts → update index & overview → insight stub → log)
+- **Ingest** a source → follow the Ingest Workflow in AGENTS.md (detect type → extract PDF/DOCX/XLSX/PPTX if needed → dedup check → select prompt template → write note → create/update concepts → update index & overview → insight stub → log)
 - **Refine** a note → read `prompts/refine.md`, improve body only, preserve frontmatter exactly
 - **Query** the wiki → read `wiki/index.md` + `docs/me.md`, read relevant pages, synthesize with `[[wikilink]]` citations
 - **Lint** the wiki → run `python tools/dedup.py --lint`, check orphan pages, broken links, contradictions, style drift via `python tools/style_lint.py`
@@ -41,9 +41,9 @@ When the user sends a greeting (hi, hello, hey, etc.), asks for help, or seems u
 - Always rebuild the graph with `python tools/build_graph.py --open` after any `/wiki-*` workflow
 - Always run `python tools/dedup.py --check "<title>"` before writing a new note
 - Read `docs/me.md` before writing My Notes sections or assessing importance
-- Use `[[PageName]]` wikilinks; source slugs: kebab-case; entity/concept pages: TitleCase.md
+- Use `[[PageName]]` wikilinks; source slugs: kebab-case; concept pages: TitleCase.md
 - `wiki/insights/` is human-only — agent creates STUBS ONLY (status: pending)
-- New folders under `raw/` automatically fall back to prompts/general.md + wiki/summaries/
+- New folders under `raw/` automatically fall back to prompts/general.md + wiki/notes/
 
 ## Output style
 
@@ -59,12 +59,9 @@ When the user sends a greeting (hi, hello, hey, etc.), asks for help, or seems u
 
 | raw/ subfolder | Template |
 |---|---|
-| research_papers/ | prompts/research_paper.md |
-| youtube/ | prompts/youtube.md |
-| blogs/ | prompts/blog.md |
-| clips/ | prompts/blog.md → (Obsidian Web Clipper) |
+| research/ | prompts/research.md |
 | work/ | prompts/general.md → wiki/projects/ |
-| anything else | prompts/general.md → wiki/summaries/ |
+| anything else | prompts/general.md → wiki/notes/ |
 
 ## Slash commands
 

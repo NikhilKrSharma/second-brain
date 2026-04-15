@@ -3,18 +3,12 @@
 ## Overview
 - [Overview](overview.md) — living synthesis across all wiki content
 
-## Summaries
+## Notes
 
 ## Concepts
 
 ## Topics
 
-## Systems
-
 ## Projects
 
-## Entities
-
 ## Insights
-
-## Syntheses

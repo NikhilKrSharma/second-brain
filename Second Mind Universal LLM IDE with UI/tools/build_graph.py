@@ -34,15 +34,12 @@ TYPE_COLORS = {
     "paper":     "#4e9af1",
     "blog":      "#4e9af1",
     "video":     "#4e9af1",
-    "entity":    "#56c080",
     "concept":   "#f5a623",
     "topic":     "#e0a040",
-    "system":    "#e06050",
     "project":   "#e06050",
     "workflow":  "#8899aa",
     "idea":      "#cc77dd",
     "tooling":   "#cc77dd",
-    "synthesis": "#b06fef",
     "insight":   "#ff8899",
 }
 DEFAULT_COLOR = "#aaaaaa"
@@ -126,14 +123,11 @@ def slug_to_path(slug: str) -> Optional[Path]:
     """Resolve a [[Slug]] to a file path, tolerating missing extension."""
     candidates = [
         WIKI_DIR / f"{slug}.md",
-        WIKI_DIR / "summaries" / f"{slug}.md",
-        WIKI_DIR / "entities" / f"{slug}.md",
+        WIKI_DIR / "notes" / f"{slug}.md",
         WIKI_DIR / "concepts" / f"{slug}.md",
         WIKI_DIR / "topics" / f"{slug}.md",
-        WIKI_DIR / "systems" / f"{slug}.md",
         WIKI_DIR / "projects" / f"{slug}.md",
         WIKI_DIR / "insights" / f"{slug}.md",
-        WIKI_DIR / "syntheses" / f"{slug}.md",
     ]
     for c in candidates:
         if c.exists():

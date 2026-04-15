@@ -1,0 +1,219 @@
+{
+  "main": {
+    "id": "f21106cc72442b6c",
+    "type": "split",
+    "children": [
+      {
+        "id": "800a8b4a73ce28f8",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "c634def968a5c560",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "wiki/summaries/stryker-sync-badge.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "stryker-sync-badge"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "0895f49b441994ab",
+    "type": "split",
+    "children": [
+      {
+        "id": "5b574818cd14db4a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ff499b5c596d0886",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "66973c13f9b54c2b",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "d11ec99570171e34",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "e8fd35b6d0586667",
+    "type": "split",
+    "children": [
+      {
+        "id": "f61d4ece17e206b9",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "3942cd6bd294f6db",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "wiki/summaries/stryker-sync-badge.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for stryker-sync-badge"
+            }
+          },
+          {
+            "id": "6740a852633615e5",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "wiki/summaries/stryker-sync-badge.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from stryker-sync-badge"
+            }
+          },
+          {
+            "id": "740167a4cb9a307e",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "7b562dc16891ad14",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "461b627de6b0b757",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "wiki/summaries/stryker-sync-badge.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of stryker-sync-badge"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false,
+      "audio-recorder:Start/stop recording": false
+    }
+  },
+  "active": "c634def968a5c560",
+  "lastOpenFiles": [
+    "wiki/log.md",
+    "wiki/insights/stryker-sync-badge.md",
+    "wiki/overview.md",
+    "wiki/index.md",
+    "wiki/entities/EMDAN.md",
+    "wiki/entities/VoceraEngage.md",
+    "wiki/concepts/HandsfreeHospitalCommunication.md",
+    "wiki/entities/SyncBadge.md",
+    "wiki/entities/Vocera.md",
+    "wiki/entities/Stryker.md",
+    "wiki/summaries/stryker-sync-badge.md",
+    "graph/graph.html",
+    "graph/template.html",
+    "tools/style_lint.py",
+    "Stryker Onboarding and Enterprise Access Inventory.md",
+    "wiki/insights/insight-stryker-onboarding-and-enterprise-access-inventory.md",
+    "wiki/entities/EquatePlus.md",
+    "wiki/entities/DKM.md",
+    "wiki/entities/Paybooks.md",
+    "wiki/entities/Amex.md",
+    "wiki/concepts/OnboardingWorkflow.md",
+    "wiki/concepts/EnterpriseAccessInventory.md",
+    "wiki/projects/stryker-onboarding-and-enterprise-access-inventory.md",
+    "wiki/concepts/CredentialHygiene.md",
+    "wiki/concepts/AccessProvisioning.md",
+    "raw/work/OfficialDetails.md",
+    "raw/blogs/stryker-clinical-communication-portfolio-2026.md",
+    "wiki/concepts/WorkflowIntelligence.md",
+    "wiki/entities/Epic.md"
+  ]
+}

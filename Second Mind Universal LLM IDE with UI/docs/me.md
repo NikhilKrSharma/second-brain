@@ -7,7 +7,7 @@ This file provides personal context for the agent. It is read during ingestion (
 
 ## Background & Expertise
 
-*I am ML/AI/GenAI engineer with around 7 years of experience, strong in NLP and weak in computer vision, system design, MLOps and DSA*
+*I am ML/AI/GenAI engineer with around 7 years of experience, strong in NLP and weaker in computer vision, system design, MLOps and DSA*
 
 ---
 

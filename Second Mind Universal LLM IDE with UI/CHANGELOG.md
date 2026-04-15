@@ -6,6 +6,7 @@ All notable changes to this Second Mind LLM Wiki workspace are recorded here.
 
 ### Added
 
+- **Graph node delete** (`graph/template.html`, `tools/serve_graph.py`): delete button (🗑) in the side-panel header soft-deletes a wiki page — moves the file to `deleted/` (preserving subfolder structure) and removes the node + edges from the live graph. Requires `python tools/serve_graph.py --allow-write`. New `do_DELETE` handler in `serve_graph.py`; `deleted/` added to `.gitignore`.
 - **Graph left filter sidebar** (`graph/template.html`): collapsible/resizable left panel with **By Type**, **By Folder**, and **By Tag** filter sections. Sidebar toggles via `☰` toolbar button or `\` key; resizable via drag handle; state persisted in `wg-state-v5`.
 - **Graph reset button** (`graph/template.html`): `⟲` toolbar button with confirmation dialog clears all localStorage settings and reloads the page to defaults.
 

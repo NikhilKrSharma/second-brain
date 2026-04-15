@@ -10,10 +10,10 @@ How to use this knowledge system day-to-day. The goal is low friction capture, c
 
 | Source type | Where to save |
 |---|---|
-| Quick notes, bullets, ideas | `raw/inbox/` (use `_high/` if time-sensitive) |
-| Blog posts, articles | `raw/blogs/` |
-| YouTube / video transcripts | `raw/youtube/` |
-| Research papers (PDF or text) | `raw/research_papers/` |
+| Quick notes, bullets, ideas | `raw/inbox/` (use `now/` if time-sensitive) |
+| Blog posts, articles | `raw/research/` |
+| YouTube / video transcripts | `raw/research/` |
+| Research papers (PDF or text) | `raw/research/` |
 | Work-related materials | `raw/work/` |
 | Anything else | `raw/inbox/` or create a subfolder under `raw/` |
 
@@ -28,7 +28,7 @@ How to use this knowledge system day-to-day. The goal is low friction capture, c
 
 **What:** Turn raw captures into wiki notes using `/wiki-ingest`.
 
-1. Review what's accumulated in `raw/` (prioritize `raw/inbox/_high/` first)
+1. Review what's accumulated in `raw/` (start with `raw/inbox/`)
 2. For each file, run `/wiki-ingest <path>`
 3. The agent: detects type → selects prompt template → runs dedup check → writes wiki note → creates insight stub
 4. For PDFs/DOCX/XLSX/PPTX: agent calls `python tools/extract.py <path>` first, then ingests the output
@@ -41,12 +41,12 @@ How to use this knowledge system day-to-day. The goal is low friction capture, c
 
 **What:** Review summaries and promote stable knowledge into permanent pages.
 
-1. Review `wiki/summaries/` — what has become well-understood?
-   - Promote mature summaries by changing `wiki_path` to `concepts/` or `topics/`
+1. Review `wiki/notes/` — what has become well-understood?
+   - Promote mature notes by changing `wiki_path` to `concepts/` or `topics/`
    - Update `state` tag to `understood` or `applied`
 2. Review `wiki/insights/` stubs — write 1–3 completed insight notes (human-only)
 3. Run `/wiki-query` on cross-cutting themes to synthesize across sources
-4. Save good query answers as `wiki/syntheses/` pages
+4. Save good query answers as `wiki/notes/` pages
 5. Review tags for consistency — prune or consolidate facet tags
 6. Review `graph/graph.html` to see what's connected; it is refreshed automatically after each `/wiki-*` workflow, and you can still run `/wiki-graph` on demand. For notes with images under `wiki/assets/`, run `python tools/serve_graph.py` and open `http://127.0.0.1:8765/graph/graph.html` so the reader pane can load media over HTTP.
 
@@ -73,6 +73,6 @@ You write the insight when you're ready. An insight is synthesis — it connects
 
 ## Key Principle
 
-> `raw/` → agent process → `wiki/summaries/` → human promote → `concepts/` / `topics/` / `insights/`
+> `raw/` → agent process → `wiki/notes/` → human promote → `concepts/` / `topics/` / `insights/`
 
 The agent handles extraction and first-pass structuring. You own promotion and synthesis.

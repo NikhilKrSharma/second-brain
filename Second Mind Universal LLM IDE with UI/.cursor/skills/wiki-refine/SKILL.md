@@ -9,7 +9,7 @@ Improve an existing wiki note.
 
 Usage: /wiki-refine <wiki-path>
 
-The argument should be the path to an existing wiki note, e.g. `wiki/summaries/my-note.md`
+The argument should be the path to an existing wiki note, e.g. `wiki/notes/my-note.md`
 
 Follow the Refine Workflow defined in AGENTS.md:
 

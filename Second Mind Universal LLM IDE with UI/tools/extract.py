@@ -6,7 +6,7 @@ Supports: PDF, DOCX, XLSX, PPTX
 
 Usage:
     python tools/extract.py <path-to-file>
-    python tools/extract.py raw/research_papers/my-paper.pdf
+    python tools/extract.py raw/research/my-paper.pdf
     python tools/extract.py raw/work/report.docx
     python tools/extract.py raw/work/data.xlsx
     python tools/extract.py raw/work/slides.pptx

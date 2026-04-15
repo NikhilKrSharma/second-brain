@@ -11,12 +11,12 @@ Structural checks (use search tools):
 1. Orphan pages — wiki pages with no inbound [[wikilinks]] from other pages
 2. Broken links — [[WikiLinks]] pointing to pages that don't exist
 3. Duplicate notes — run `python tools/dedup.py --lint`
-4. Missing entity pages — names referenced in 3+ pages but lacking their own page
+4. Missing concept pages — concepts or entities referenced in 3+ pages but lacking their own page
 5. Pending insight stubs — count and list wiki/insights/ pages with `status: pending`
 
 Semantic checks (read and reason over page content):
 6. Contradictions — claims that conflict between pages
-7. Stale summaries — pages not updated after newer sources changed the picture
+7. Stale notes — pages not updated after newer sources changed the picture
 8. Data gaps — important questions the wiki can't answer; suggest specific sources to find
 9. Response style drift — run `python tools/style_lint.py` and include findings
 
