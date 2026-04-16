@@ -22,7 +22,6 @@ Follow the Refine Workflow defined in AGENTS.md:
 6. Preserve all section headings exactly
 7. Overwrite the file with the improved body
 8. Append to wiki/log.md: ## [today's date] refine | <Title>
-9. Rebuild the graph by running `python tools/build_graph.py --open` so graph/graph.html reflects the refined note
 
 After completing, respond using fixed headings: `Outcome`, `Key Points`, `Next Step`.
 - Keep `Key Points` to 3-5 bullets by default.

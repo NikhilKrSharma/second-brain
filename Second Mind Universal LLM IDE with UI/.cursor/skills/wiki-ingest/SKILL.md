@@ -31,10 +31,8 @@ Follow the Ingest Workflow defined in AGENTS.md exactly:
 10. Create/update concept pages (wiki/concepts/) for key ideas, entities, and frameworks
 11. Update wiki/index.md - add entry in the correct section
 12. Update wiki/overview.md - revise synthesis if warranted
-13. Create insight stub in wiki/insights/<slug>.md (status: pending, linked_note: <wiki_path>)
-14. Flag any contradictions with existing wiki content
-15. Append to wiki/log.md: ## [today's date] ingest | <Title>
-16. Rebuild the graph by running `python tools/build_graph.py --open` so graph/graph.html reflects the new wiki state
+13. Flag any contradictions with existing wiki content
+14. Append to wiki/log.md: ## [today's date] ingest | <Title>
 
 After completing all writes, respond using fixed headings: `Outcome`, `Key Points`, `Next Step`.
 - Keep `Key Points` to 3-5 bullets by default.

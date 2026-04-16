@@ -25,43 +25,19 @@ When the user sends a greeting (hi, hello, hey, etc.), asks for help, or seems u
 >
 > You can also just describe what you want in plain English — no slash commands needed.
 
-## Quick reference
+## Key rules (always apply — see AGENTS.md for full details)
 
-- **Ingest** a source → follow the Ingest Workflow in AGENTS.md (detect type → extract PDF/DOCX/XLSX/PPTX if needed → dedup check → select prompt template → write note → create/update concepts → update index & overview → insight stub → log)
-- **Refine** a note → read `prompts/refine.md`, improve body only, preserve frontmatter exactly
-- **Query** the wiki → read `wiki/index.md` + `docs/me.md`, read relevant pages, synthesize with `[[wikilink]]` citations
-- **Lint** the wiki → run `python tools/dedup.py --lint`, check orphan pages, broken links, contradictions, style drift via `python tools/style_lint.py`
-- **Build graph** → run `python tools/build_graph.py --open`
-- After any `/wiki-*` workflow, run `python tools/build_graph.py --open` before responding so `graph/graph.html` stays current
-
-## Key rules
-
-- Never modify files under `raw/` — they are immutable source documents (ingest copies media into `wiki/assets/` per `docs/assets.md`; video = embed URLs only)
-- Always append to `wiki/log.md` after any workflow completes
-- Always rebuild the graph with `python tools/build_graph.py --open` after any `/wiki-*` workflow
+- Never modify source files under `raw/` — `tools/extract.py` may write transient artifacts alongside them
+- Always append to `wiki/log.md` after any write workflow (ingest, refine, saved query, lint)
 - Always run `python tools/dedup.py --check "<title>"` before writing a new note
 - Read `docs/me.md` before writing My Notes sections or assessing importance
 - Use `[[PageName]]` wikilinks; source slugs: kebab-case; concept pages: TitleCase.md
-- `wiki/insights/` is human-only — agent creates STUBS ONLY (status: pending)
-- New folders under `raw/` automatically fall back to prompts/general.md + wiki/notes/
-
-## Output style
-
-- Default to concise first-stage responses with globally fixed headings: `Outcome`, `Key Points`, `Next Step`
-- Keep first-stage `Key Points` to 3-5 bullets by default
+- Default to concise responses with fixed headings: `Outcome`, `Key Points`, `Next Step`
 - Include one `Key Points` bullet in every workflow response: `Files changed: <created/modified file paths>`; if none, state `Files changed: none`
-- Rarely exceed 5 bullets only when correctness or completeness would otherwise be lost
-- Use one short sentence per bullet where possible; avoid filler and repeated rationale
-- Expand into a detailed explanation only after the user explicitly asks for more detail
-- Keep heading names fixed across all workflows and plain-language requests
 
-## Prompt routing
+## Workflows, routing, and output style
 
-| raw/ subfolder | Template |
-|---|---|
-| research/ | prompts/research.md |
-| work/ | prompts/general.md → wiki/projects/ |
-| anything else | prompts/general.md → wiki/notes/ |
+All workflow steps, prompt-template routing, frontmatter schema, and naming conventions are defined in `AGENTS.md`. Read it before acting on any `/wiki-*` command.
 
 ## Slash commands
 

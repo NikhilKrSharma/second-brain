@@ -42,8 +42,8 @@ WIKI_DIR   = REPO_ROOT / "wiki"
 DUPLICATE_THRESHOLD = 0.90
 RELATED_THRESHOLD   = 0.70
 
-# Folders excluded from dedup (insights are human-written, syntheses are query outputs)
-EXCLUDED_FOLDERS = {"insights", "syntheses"}
+# Folders excluded from dedup
+EXCLUDED_FOLDERS = set()
 
 
 # ---------------------------------------------------------------------------
@@ -61,6 +61,25 @@ def _similarity(a: str, b: str) -> float:
     return SequenceMatcher(None, _normalise(a), _normalise(b)).ratio()
 
 
+def _extract_body_start(path: Path, max_chars: int = 500) -> str:
+    """Read the first max_chars of the note body (after frontmatter)."""
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return ""
+    body = re.sub(r"^---\s*\n.*?\n---\s*\n?", "", text, count=1, flags=re.DOTALL)
+    return _normalise(body[:max_chars])
+
+
+def _content_similarity(path_a: Path, path_b: Path) -> float:
+    """Compare first 500 chars of body content between two notes."""
+    a = _extract_body_start(path_a)
+    b = _extract_body_start(path_b)
+    if not a or not b:
+        return 0.0
+    return SequenceMatcher(None, a, b).ratio()
+
+
 def _extract_title(path: Path) -> Optional[str]:
     """Read the `title:` field from YAML frontmatter without a YAML parser."""
     try:
@@ -72,7 +91,7 @@ def _extract_title(path: Path) -> Optional[str]:
 
 
 def _index_wiki() -> List[dict]:
-    """Return list of {title, path} for all wiki notes (excluding ignored folders)."""
+    """Return list of {title, path, abs_path} for all wiki notes (excluding ignored folders)."""
     entries = []
     for md in WIKI_DIR.rglob("*.md"):
         if md.name in {"index.md", "log.md", "overview.md", "lint-report.md"}:
@@ -83,7 +102,11 @@ def _index_wiki() -> List[dict]:
             continue
         title = _extract_title(md)
         if title:
-            entries.append({"title": title, "path": str(md.relative_to(REPO_ROOT))})
+            entries.append({
+                "title": title,
+                "path": str(md.relative_to(REPO_ROOT)),
+                "abs_path": md,
+            })
     return entries
 
 
@@ -121,15 +144,19 @@ def cmd_lint() -> None:
     pairs = []
     for i in range(len(index)):
         for j in range(i + 1, len(index)):
-            score = _similarity(index[i]["title"], index[j]["title"])
-            if score >= RELATED_THRESHOLD:
+            title_score = _similarity(index[i]["title"], index[j]["title"])
+            if title_score >= RELATED_THRESHOLD:
+                content_score = _content_similarity(index[i]["abs_path"], index[j]["abs_path"])
+                combined = max(title_score, content_score)
                 pairs.append({
-                    "score":   round(score, 3),
+                    "score":         round(combined, 3),
+                    "title_score":   round(title_score, 3),
+                    "content_score": round(content_score, 3),
                     "title_a": index[i]["title"],
                     "path_a":  index[i]["path"],
                     "title_b": index[j]["title"],
                     "path_b":  index[j]["path"],
-                    "verdict": "duplicate" if score >= DUPLICATE_THRESHOLD else "related",
+                    "verdict": "duplicate" if combined >= DUPLICATE_THRESHOLD else "related",
                 })
 
     pairs.sort(key=lambda x: x["score"], reverse=True)
@@ -147,7 +174,7 @@ def cmd_lint() -> None:
         print(f"LIKELY DUPLICATES (score >= {DUPLICATE_THRESHOLD})")
         print(f"{'='*60}")
         for p in duplicates:
-            print(f"\n  Score: {p['score']}")
+            print(f"\n  Score: {p['score']}  (title: {p['title_score']}, content: {p['content_score']})")
             print(f"  A: {p['title_a']}")
             print(f"     {p['path_a']}")
             print(f"  B: {p['title_b']}")
@@ -158,7 +185,7 @@ def cmd_lint() -> None:
         print(f"CLOSELY RELATED (score {RELATED_THRESHOLD}–{DUPLICATE_THRESHOLD})")
         print(f"{'='*60}")
         for p in related:
-            print(f"\n  Score: {p['score']}")
+            print(f"\n  Score: {p['score']}  (title: {p['title_score']}, content: {p['content_score']})")
             print(f"  A: {p['title_a']}")
             print(f"  B: {p['title_b']}")
 

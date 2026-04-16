@@ -1,6 +1,6 @@
 # LLM Wiki Agent — Schema & Workflow Instructions
 
-This wiki is maintained entirely by your coding agent. Just open this folder in Cursor or VS Code with Copilot and talk to it. No API keys needed. The agent calls these utilities (pure stdlib unless you add PDF deps): `tools/extract.py` and `tools/dedup.py` for ingest/dedup; `tools/build_graph.py` after every `/wiki-*` workflow; `tools/style_lint.py` during `/wiki-lint`. You do not need to run them manually unless you want to.
+This wiki is maintained entirely by your coding agent. Just open this folder in Cursor or VS Code with Copilot and talk to it. No API keys needed. The agent calls these utilities (pure stdlib unless you add extraction deps — see `requirements.txt`): `tools/extract.py` and `tools/dedup.py` for ingest/dedup; `tools/style_lint.py` and `tools/validate_frontmatter.py` during `/wiki-lint`. Graph rebuilds (`tools/build_graph.py`) are user-initiated via `/wiki-graph` — never run automatically.
 
 **Orientation:** `AGENTS.md` is the single source of truth for all workflows. Cursor auto-loads `.cursor/rules/wiki-agent.mdc`; VS Code Copilot auto-loads `.github/copilot-instructions.md`. Human-facing documentation is in `README.md`.
 
@@ -11,7 +11,6 @@ This wiki is maintained entirely by your coding agent. Just open this folder in 
 - Default to concise first-stage responses with globally fixed headings: `Outcome`, `Key Points`, `Next Step`
 - Keep first-stage `Key Points` to 3-5 bullets by default
 - Include one `Key Points` bullet in every workflow response: `Files changed: <created/modified file paths>`; if none, state `Files changed: none`
-- After every completed `/wiki-*` workflow, ensure `graph/graph.html` is refreshed by running `python tools/build_graph.py --open`
 - Rarely exceed 5 bullets only when correctness or completeness would otherwise be lost
 - Expand into a detailed explanation only after the user explicitly asks for more detail
 - Keep heading names fixed across all workflows and plain-language requests
@@ -28,7 +27,7 @@ This wiki is maintained entirely by your coding agent. Just open this folder in 
 | `/wiki-lint` | Wiki health check — orphans, broken links, duplicates, contradictions, stale notes, style drift (see Lint Workflow) |
 | `/wiki-graph` | Build the knowledge graph |
 
-Cursor: `.cursor/prompts/` · VS Code Copilot: `.github/prompts/`
+Cursor: `.cursor/rules/` + `.cursor/skills/` · VS Code Copilot: `.github/prompts/`
 
 ---
 
@@ -66,7 +65,7 @@ raw/                    # Immutable source documents — NEVER modify these
   work/                 # Work-related materials (meeting notes, specs, project docs)
   assets/               # Images and attachments
 
-wiki/                   # Agent writes here (except insights/)
+wiki/                   # Agent writes here
   index.md              # Catalog of all pages — update on every ingest
   log.md                # Append-only chronological record
   overview.md           # Living synthesis across all sources
@@ -74,7 +73,6 @@ wiki/                   # Agent writes here (except insights/)
   concepts/             # Atomic definitions and mechanisms (promoted from notes)
   topics/               # Curated maps / MOCs (Maps of Content)
   projects/             # Time-bounded work bodies of knowledge
-  insights/             # Human-only synthesis — agent creates STUBS ONLY
   assets/               # Images, diagrams, optional files for notes (see docs/assets.md)
     images/             # Per-note or per-topic image folders
     diagrams/           # Diagram exports / sources
@@ -93,8 +91,10 @@ tools/                  # Utility scripts (agent calls these)
   extract.py            # PDF/DOCX/XLSX/PPTX -> structured markdown
   dedup.py              # Duplicate detection (no deps)
   style_lint.py         # Instruction/prompt verbose-default scan (no deps)
+  validate_frontmatter.py  # Frontmatter schema validation (no deps)
+deleted/                # Soft-deleted wiki pages (serve_graph.py HTTP DELETE)
 graph/                  # Auto-generated graph output
-requirements.txt        # pip install pymupdf4llm (for PDF extraction only)
+requirements.txt        # pip install -r requirements.txt (extraction deps)
 ```
 
 ---
@@ -106,7 +106,7 @@ Every wiki page uses this YAML frontmatter:
 ```yaml
 ---
 title: "Specific, synthesized title"
-type: concept | topic | paper | blog | video | workflow | project | idea | tooling | insight
+type: concept | topic | paper | blog | video | workflow | project | idea | tooling
 domain: genai | ml | systems | data | product | research
 tags:
   - <domain tag>
@@ -130,8 +130,16 @@ See `docs/TAGGING.md` for full tag taxonomy and rules.
 | `concept` | `concepts/` |
 | `topic` | `topics/` |
 | `project` | `projects/` |
-| `insight` | `insights/` |
 | everything else | `notes/` |
+
+**Type decision tree (choose the first match):**
+1. Atomic definition or mechanism — a single well-bounded idea → `concept`
+2. Curated map linking multiple concepts (survey or MOC) → `topic`
+3. Time-bounded body of work with deliverables → `project`
+4. Process, procedure, or operational pattern → `workflow`
+5. Speculative, half-formed, or exploratory → `idea`
+6. Tool, library, framework, or platform → `tooling`
+7. Otherwise → keep source format (`paper`, `blog`, `video`) and route to `notes/`
 
 **Slug rules:** lowercase, hyphen-separated, ASCII, derived from title.
 
@@ -161,7 +169,8 @@ Steps (in order):
 2. **Detect source type** — from the `raw/` subfolder path
 3. **If PDF/DOCX/XLSX/PPTX** — run `python tools/extract.py <path>`, ingest the `_extracted.md` output instead
 4. **Run dedup check** — `python tools/dedup.py --check "<proposed title>"`
-   - Score >= 0.90 → stop, flag as likely duplicate, ask user: skip / append / keep both
+   - Score >= 0.90 → stop, flag as likely duplicate, ask user: **skip** / **append** / **keep both**
+     - **Append:** merge new content into the existing note — add new sections, update existing ones with newer information, combine source lists, bump `last_updated`. Do not duplicate shared content.
    - Score 0.70-0.89 → proceed, note the related page, add wikilinks between them
    - Score < 0.70 → proceed normally
 5. **Load prompt template** — based on routing table above
@@ -174,19 +183,8 @@ Steps (in order):
 9. **Update / create concept pages** — for key ideas, entities, and frameworks (if substantial enough for a standalone concept)
 10. **Update `wiki/index.md`** — add entry in the appropriate section
 11. **Update `wiki/overview.md`** — revise synthesis if this source warrants it
-12. **Create insight stub** in `wiki/insights/<slug>.md`:
-    ```yaml
-    ---
-    title: "Insight: <topic>"
-    type: insight
-    linked_note: <wiki_path of the new note>
-    status: pending
-    created: YYYY-MM-DD
-    ---
-    ```
-13. **Flag contradictions** with existing wiki content
-14. **Append to `wiki/log.md`**: `## [YYYY-MM-DD] ingest | <Title>`
-15. **Rebuild the graph** — run `python tools/build_graph.py --open` so `graph/graph.html` reflects the new wiki state
+12. **Flag contradictions** with existing wiki content
+13. **Append to `wiki/log.md`**: `## [YYYY-MM-DD] ingest | <Title>`
 
 ---
 
@@ -201,7 +199,6 @@ Steps:
 4. Improve the note body following `prompts/refine.md` — preserve frontmatter exactly
 5. Overwrite the file with improved body
 6. Append to `wiki/log.md`: `## [YYYY-MM-DD] refine | <Title>`
-7. Rebuild the graph — run `python tools/build_graph.py --open` so `graph/graph.html` reflects the refined note
 
 ---
 
@@ -221,7 +218,8 @@ Steps:
 5. Include a `## Sources` section listing pages used
 6. Ask if the user wants it saved as `wiki/notes/<slug>.md`
 7. If saving: append to `wiki/log.md`: `## [YYYY-MM-DD] query | <question>`
-8. Rebuild the graph — run `python tools/build_graph.py --open` so `graph/graph.html` is refreshed before the workflow completes
+
+If the user chose **not** to save, skip step 7 (no log entry needed).
 
 ---
 
@@ -233,10 +231,10 @@ Check for:
 - **Orphan pages** — wiki pages with no inbound `[[links]]` from other pages
 - **Broken links** — `[[WikiLinks]]` pointing to pages that don't exist
 - **Duplicate notes** — run `python tools/dedup.py --lint`
+- **Frontmatter validation** — run `python tools/validate_frontmatter.py` (checks required fields, valid types/domains, tag counts, slug conventions)
 - **Contradictions** — claims that conflict across pages
 - **Stale notes** — pages not updated after newer sources changed the picture
 - **Missing concept pages** — concepts mentioned in 3+ pages but lacking their own page
-- **Pending insight stubs** — count and list `wiki/insights/` pages with `status: pending`
 - **Data gaps** — questions the wiki can't answer; suggest sources
 - **Response style drift** — run `python tools/style_lint.py` and report findings
 
@@ -244,7 +242,6 @@ Output a structured lint report using fixed headings: `Outcome`, `Key Points`, `
 Keep `Key Points` to 3-5 bullets by default and expand only on explicit user request.
 Ask if user wants it saved to `wiki/lint-report.md`.
 Append to `wiki/log.md`: `## [YYYY-MM-DD] lint | Wiki health check`
-After completing the lint workflow, rebuild the graph by running `python tools/build_graph.py --open` so `graph/graph.html` is refreshed before the workflow completes.
 
 ---
 
@@ -260,15 +257,14 @@ python tools/build_graph.py --open
 The script (pure stdlib) parses all `[[wikilinks]]`, rewrites local markdown image paths for the reader pane, builds `graph/graph.json` and `graph/graph.html`, and appends to `wiki/log.md` automatically.
 After it runs, summarize with fixed headings: `Outcome`, `Key Points`, `Next Step`.
 Keep `Key Points` to 3-5 bullets by default.
-`/wiki-graph` is both a standalone command and the refresh step that other `/wiki-*` workflows must perform before they finish.
+`/wiki-graph` is user-initiated only — it is never run automatically by other workflows.
 
 ---
 
 ## Key Rules
 
-- **Never modify files under `raw/`** — they are immutable source documents
+- **Never modify source files under `raw/`** — they are immutable. `tools/extract.py` may write transient `_extracted.md` / `_images/` artifacts alongside them
 - **Media for wiki notes** lives under `wiki/assets/` (`docs/assets.md`); ingest **copies** from `raw/.../_images/` when needed; **video = embed URLs only**
-- **`wiki/insights/` is human-only** — agent writes stubs only (status: pending); never writes completed insights
 - **Always append to `wiki/log.md`** after any workflow completes
 - **Always run dedup before writing** a new note
 - **Read `docs/me.md`** before writing My Notes or assessing importance
@@ -301,9 +297,6 @@ Keep `Key Points` to 3-5 bullets by default.
 
 ## Projects
 - [Project Name](projects/slug.md) — one-line description
-
-## Insights
-- [Insight Title](insights/slug.md) — status: pending | complete
 ```
 
 ---

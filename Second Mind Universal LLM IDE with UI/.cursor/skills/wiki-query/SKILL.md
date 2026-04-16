@@ -23,6 +23,7 @@ Follow the Query Workflow defined in AGENTS.md:
 5. Include a ## Sources section at the end listing pages you drew from
 6. Ask the user if they want the answer saved as wiki/notes/<slug>.md
 7. If saving: append to wiki/log.md: ## [today's date] query | <question>
-8. Rebuild the graph by running `python tools/build_graph.py --open` so graph/graph.html is refreshed before the workflow completes
+
+If the user chose **not** to save, skip step 7 (no log entry needed).
 
 If the wiki is empty, say so and suggest running /wiki-ingest first.

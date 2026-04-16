@@ -23,7 +23,6 @@ TARGET_FILES = [
 ]
 
 TARGET_FILES.extend(sorted((REPO_ROOT / ".github/prompts").glob("*.md")))
-TARGET_FILES.extend(sorted((REPO_ROOT / ".cursor/prompts").glob("*.md")))
 
 _skills_dir = REPO_ROOT / ".cursor" / "skills"
 if _skills_dir.is_dir():

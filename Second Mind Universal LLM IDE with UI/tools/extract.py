@@ -24,6 +24,7 @@ Output:
 
 import sys
 import re
+import shutil
 from pathlib import Path
 from datetime import date
 from typing import Optional
@@ -265,6 +266,7 @@ def extract_xlsx(file_path: Path, out_md: Path, image_dir: Path) -> dict:
             lines.append("| " + " | ".join(row[:max_cols]) + " |")
         lines.append("")
 
+    sheet_count = len(wb.sheetnames)
     wb.close()
 
     md_text = "\n".join(lines)
@@ -272,7 +274,7 @@ def extract_xlsx(file_path: Path, out_md: Path, image_dir: Path) -> dict:
     header = (
         f"<!-- EXTRACTED FROM XLSX -->\n"
         f"<!-- Source: {file_path.name} -->\n"
-        f"<!-- Sheets: {len(wb.sheetnames)} -->\n"
+        f"<!-- Sheets: {sheet_count} -->\n"
         f"<!-- Extracted: {date.today().isoformat()} -->\n\n"
     )
 
@@ -282,7 +284,7 @@ def extract_xlsx(file_path: Path, out_md: Path, image_dir: Path) -> dict:
         "words": len(re.findall(r"\w+", md_text)),
         "tables": table_count,
         "images": 0,
-        "pages": f"{len(wb.sheetnames)} sheets, {total_rows} rows",
+        "pages": f"{sheet_count} sheets, {total_rows} rows",
     }
 
 
@@ -395,7 +397,7 @@ def extract_pptx(file_path: Path, out_md: Path, image_dir: Path) -> dict:
 # Router
 # ---------------------------------------------------------------------------
 
-def extract(file_path: Path) -> None:
+def extract(file_path: Path) -> tuple:
     if not file_path.exists():
         print(f"ERROR: File not found: {file_path}", file=sys.stderr)
         sys.exit(1)
@@ -436,14 +438,44 @@ def extract(file_path: Path) -> None:
     if stats.get("pages"):
         print(f"  Pages:   {stats['pages']}")
 
+    return out_md, image_dir
+
+
+def copy_images_to_wiki(image_dir: Path, slug: str) -> Optional[Path]:
+    """Copy extracted images into wiki/assets/images/<slug>/ and return the dest dir."""
+    if not image_dir.exists() or not any(image_dir.iterdir()):
+        return None
+
+    repo_root = Path(__file__).parent.parent
+    dest = repo_root / "wiki" / "assets" / "images" / slug
+    dest.mkdir(parents=True, exist_ok=True)
+
+    copied = 0
+    for img in image_dir.iterdir():
+        if img.is_file():
+            shutil.copy2(img, dest / img.name)
+            copied += 1
+
+    print(f"  Copied {copied} image(s) → {dest.relative_to(repo_root)}")
+    return dest
+
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print(
-            "Usage: python tools/extract.py <path-to-file>\n"
-            f"Supported: {', '.join(sorted(SUPPORTED_EXTENSIONS))}",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+    import argparse
 
-    extract(Path(sys.argv[1]))
+    parser = argparse.ArgumentParser(
+        description="Extract documents into structured LLM-ready markdown.",
+        epilog=f"Supported: {', '.join(sorted(SUPPORTED_EXTENSIONS))}",
+    )
+    parser.add_argument("file", help="Path to the file to extract")
+    parser.add_argument(
+        "--copy-images",
+        metavar="SLUG",
+        help="After extraction, copy images into wiki/assets/images/<SLUG>/",
+    )
+    args = parser.parse_args()
+
+    out_md, image_dir = extract(Path(args.file))
+
+    if args.copy_images:
+        copy_images_to_wiki(image_dir, args.copy_images)

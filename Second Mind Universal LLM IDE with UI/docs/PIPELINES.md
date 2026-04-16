@@ -29,7 +29,6 @@ This folder holds all external learning material: academic papers, blog posts, a
 1. **If PDF/DOCX/XLSX/PPTX:** agent runs `python tools/extract.py <path>` — outputs structured markdown to `raw/research/<stem>_extracted.md` preserving text, tables, and image references
 2. Agent ingests the extracted markdown using `prompts/research.md`
 3. Output: `wiki/notes/<slug>.md`
-4. Agent creates insight stub in `wiki/insights/`
 
 **Tips:**
 - Include a `.md` sidecar alongside the PDF if you already have notes (agent merges)

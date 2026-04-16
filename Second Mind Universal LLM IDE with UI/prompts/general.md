@@ -27,11 +27,25 @@ wiki_path: <relative path within wiki/, e.g. summaries/my-note.md>
 ---
 ```
 
+**Confidence calibration:**
+- Noisy or incomplete source (quick note, partial transcript) → 0.4–0.6
+- Opinion piece or personal note without citations → 0.5–0.6
+- Well-structured article, documentation, or verified material → 0.7–0.9
+
 **Routing rules for `wiki_path`:**
 - `type: concept` → `concepts/<slug>.md`
 - `type: topic` → `topics/<slug>.md`
 - `type: project` → `projects/<slug>.md`
 - Everything else → `notes/<slug>.md`
+
+**Type decision tree (choose the first match):**
+1. Is it an atomic definition or mechanism — a single well-bounded idea? → `concept`
+2. Is it a curated map linking multiple concepts (a survey or MOC)? → `topic`
+3. Is it a time-bounded body of work with deliverables? → `project`
+4. Is it a process, procedure, or operational pattern? → `workflow`
+5. Is it speculative, half-formed, or exploratory? → `idea`
+6. Is it about a tool, library, framework, or platform? → `tooling`
+7. Otherwise → keep the source format (`paper`, `blog`, `video`) and route to `notes/`
 
 **Slug rules:** lowercase, hyphen-separated, ASCII, derived from title.
 

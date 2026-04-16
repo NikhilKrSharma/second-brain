@@ -30,7 +30,7 @@ How to use this knowledge system day-to-day. The goal is low friction capture, c
 
 1. Review what's accumulated in `raw/` (start with `raw/inbox/`)
 2. For each file, run `/wiki-ingest <path>`
-3. The agent: detects type → selects prompt template → runs dedup check → writes wiki note → creates insight stub
+3. The agent: detects type → selects prompt template → runs dedup check → writes wiki note
 4. For PDFs/DOCX/XLSX/PPTX: agent calls `python tools/extract.py <path>` first, then ingests the output
 5. Review any dedup flags the agent raised — decide whether to merge, skip, or keep both
 6. Run `/wiki-lint` occasionally to catch broken links and orphan pages
@@ -41,38 +41,27 @@ How to use this knowledge system day-to-day. The goal is low friction capture, c
 
 **What:** Review summaries and promote stable knowledge into permanent pages.
 
+**Promotion heuristics — a note is ready for promotion when:**
+- Referenced by **3+ other wiki pages** AND `state: understood` or `applied`
+- **Age > 30 days** AND `importance: high` — knowledge has settled and is clearly valuable
+- You can explain the concept to someone without re-reading the source
+
+**Promotion targets:**
+- Atomic, well-bounded idea → promote to `concepts/<TitleCase>.md`
+- Survey or map linking multiple concepts → promote to `topics/<TitleCase>.md`
+
 1. Review `wiki/notes/` — what has become well-understood?
    - Promote mature notes by changing `wiki_path` to `concepts/` or `topics/`
    - Update `state` tag to `understood` or `applied`
-2. Review `wiki/insights/` stubs — write 1–3 completed insight notes (human-only)
-3. Run `/wiki-query` on cross-cutting themes to synthesize across sources
+2. Run `/wiki-query` on cross-cutting themes to synthesize across sources
 4. Save good query answers as `wiki/notes/` pages
 5. Review tags for consistency — prune or consolidate facet tags
 6. Review `graph/graph.html` to see what's connected; it is refreshed automatically after each `/wiki-*` workflow, and you can still run `/wiki-graph` on demand. For notes with images under `wiki/assets/`, run `python tools/serve_graph.py` and open `http://127.0.0.1:8765/graph/graph.html` so the reader pane can load media over HTTP.
 
 ---
 
-## Insight Workflow (ongoing)
-
-`wiki/insights/` is **human-only** — the agent never writes completed insights, only stubs.
-
-When the agent ingests a source, it creates a stub:
-```yaml
----
-title: "Insight: <topic>"
-type: insight
-linked_note: <wiki path of the source note>
-status: pending
-created: YYYY-MM-DD
----
-```
-
-You write the insight when you're ready. An insight is synthesis — it connects ideas, draws conclusions, identifies patterns across multiple sources. It's what you actually think, not what a source says.
-
----
-
 ## Key Principle
 
-> `raw/` → agent process → `wiki/notes/` → human promote → `concepts/` / `topics/` / `insights/`
+> `raw/` → agent process → `wiki/notes/` → human promote → `concepts/` / `topics/`
 
 The agent handles extraction and first-pass structuring. You own promotion and synthesis.

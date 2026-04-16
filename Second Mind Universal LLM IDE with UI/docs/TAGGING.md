@@ -15,7 +15,7 @@ All wiki pages must follow this tagging schema. Tags are facets — they make no
 | `product` | Product thinking, strategy, GTM, growth, UX, metrics |
 | `research` | Research methodology, academic processes, meta-science |
 
-If a note spans two domains, pick the primary one. Do not invent new domain tags.
+If a note spans two domains, pick the primary one. New domains can be added here as your interests expand — just keep it to a short, lowercase, single-word tag.
 
 ---
 

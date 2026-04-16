@@ -18,6 +18,7 @@ reader pane resolves ``wiki/assets/`` when opened via ``file://`` or ``python to
 
 import os
 import re
+import sys
 import json
 import argparse
 import webbrowser
@@ -40,7 +41,6 @@ TYPE_COLORS = {
     "workflow":  "#8899aa",
     "idea":      "#cc77dd",
     "tooling":   "#cc77dd",
-    "insight":   "#ff8899",
 }
 DEFAULT_COLOR = "#aaaaaa"
 
@@ -127,7 +127,6 @@ def slug_to_path(slug: str) -> Optional[Path]:
         WIKI_DIR / "concepts" / f"{slug}.md",
         WIKI_DIR / "topics" / f"{slug}.md",
         WIKI_DIR / "projects" / f"{slug}.md",
-        WIKI_DIR / "insights" / f"{slug}.md",
     ]
     for c in candidates:
         if c.exists():
@@ -156,7 +155,7 @@ def parse_tags(text: str) -> List[str]:
     return []
 
 
-def build(open_after: bool = False) -> None:
+def build(open_after: bool = False, no_log: bool = False) -> None:
     GRAPH_DIR.mkdir(exist_ok=True)
     repo_root = REPO_ROOT.resolve()
     graph_dir = GRAPH_DIR.resolve()
@@ -237,10 +236,11 @@ def build(open_after: bool = False) -> None:
     html_path.write_text(_render_html(graph), encoding="utf-8")
     print(f"Wrote {html_path}")
 
-    # Append to log
-    today = date.today().isoformat()
-    with LOG_FILE.open("a", encoding="utf-8") as f:
-        f.write(f"\n## [{today}] graph | Knowledge graph rebuilt\n")
+    # Append to log (skip when called as a sub-step of another workflow)
+    if not no_log:
+        today = date.today().isoformat()
+        with LOG_FILE.open("a", encoding="utf-8") as f:
+            f.write(f"\n## [{today}] graph | Knowledge graph rebuilt\n")
 
     if open_after:
         webbrowser.open(html_path.as_uri())
@@ -302,8 +302,26 @@ def _render_html(graph: dict) -> str:
 # Entry point
 # ---------------------------------------------------------------------------
 
+def validate() -> bool:
+    """Run frontmatter validation on all wiki pages before building.
+    Returns True if all pages pass, False otherwise.
+    """
+    from validate_frontmatter import validate_all, print_report
+    errors = validate_all()
+    print_report(errors)
+    return len(errors) == 0
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Build the wiki knowledge graph.")
     parser.add_argument("--open", action="store_true", help="Open graph.html in browser after build")
+    parser.add_argument("--no-log", action="store_true", help="Skip appending to wiki/log.md (use when another workflow already logs)")
+    parser.add_argument("--validate", action="store_true", help="Validate frontmatter before building; exit with error if issues found")
     args = parser.parse_args()
-    build(open_after=args.open)
+    if args.validate:
+        ok = validate()
+        if not ok:
+            print("\nValidation failed. Fix issues above before building.")
+            sys.exit(1)
+        print()
+    build(open_after=args.open, no_log=args.no_log)
