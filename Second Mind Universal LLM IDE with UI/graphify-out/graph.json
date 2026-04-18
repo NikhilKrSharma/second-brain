@@ -1,0 +1,3106 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {
+    "hyperedges": [
+      {
+        "id": "vocera_voice_pipeline",
+        "label": "Vocera Voice Processing Pipeline",
+        "nodes": [
+          "wake_word_detection",
+          "stt_pipeline",
+          "nlu_intent_routing",
+          "condensedintentclassification_concept",
+          "intent_reconstruction_engine",
+          "vocera_voice_server"
+        ],
+        "relation": "form",
+        "confidence": "EXTRACTED",
+        "confidence_score": 0.95,
+        "source_file": "wiki/notes/stryker-sync-badge.md"
+      },
+      {
+        "id": "smarthospital_five_pillars",
+        "label": "SmartHospital Platform Five Pillars",
+        "nodes": [
+          "clinical_communication_pillar",
+          "workflow_engine_pillar",
+          "virtual_care_pillar",
+          "ambient_intelligence_pillar",
+          "connected_infrastructure_pillar"
+        ],
+        "relation": "form",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "wiki/notes/stryker-smart-hospital-platform.md"
+      },
+      {
+        "id": "condensed_intent_model_evaluation",
+        "label": "Condensed Intent Model Evaluation Candidates",
+        "nodes": [
+          "gpt_4o",
+          "gpt_4o_mini",
+          "gpt_41_nano",
+          "condensedintentclassification_concept"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 0.9,
+        "source_file": "wiki/notes/vocera-condensed-intent-ner-system.md"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "label": "Wiki Overview",
+      "file_type": "document",
+      "source_file": "wiki/overview.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "overview_doc",
+      "community": 1,
+      "norm_label": "wiki overview"
+    },
+    {
+      "label": "Wiki Log",
+      "file_type": "document",
+      "source_file": "wiki/log.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "log_doc",
+      "community": 7,
+      "norm_label": "wiki log"
+    },
+    {
+      "label": "Wiki Index",
+      "file_type": "document",
+      "source_file": "wiki/index.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "index_doc",
+      "community": 1,
+      "norm_label": "wiki index"
+    },
+    {
+      "label": "Stryker SmartHospital Platform \u2014 US Marketing Hub",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "stryker_smart_hospital_platform_note",
+      "community": 1,
+      "norm_label": "stryker smarthospital platform \u2014 us marketing hub"
+    },
+    {
+      "label": "Stryker Sync Badge \u2014 Hands-Free Clinical Communication Device",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "stryker_sync_badge_note",
+      "community": 1,
+      "norm_label": "stryker sync badge \u2014 hands-free clinical communication device"
+    },
+    {
+      "label": "Condensed Intent & NER System \u2014 Vocera Voice Platform",
+      "file_type": "document",
+      "source_file": "wiki/notes/vocera-condensed-intent-ner-system.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "vocera_condensed_intent_ner_note",
+      "community": 2,
+      "norm_label": "condensed intent & ner system \u2014 vocera voice platform"
+    },
+    {
+      "label": "Stryker Medical-Surgical Equipment \u2014 US Portfolio Overview",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-medical-surgical-equipment.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "stryker_med_surg_equipment_note",
+      "community": 1,
+      "norm_label": "stryker medical-surgical equipment \u2014 us portfolio overview"
+    },
+    {
+      "label": "SmartHospital Platform (Concept)",
+      "file_type": "document",
+      "source_file": "wiki/concepts/SmartHospitalPlatform.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "smarthospitalplatform_concept",
+      "community": 3,
+      "norm_label": "smarthospital platform (concept)"
+    },
+    {
+      "label": "Condensed Intent Classification (Concept)",
+      "file_type": "document",
+      "source_file": "wiki/concepts/CondensedIntentClassification.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "condensedintentclassification_concept",
+      "community": 2,
+      "norm_label": "condensed intent classification (concept)"
+    },
+    {
+      "label": "Hands-Free Hospital Communication (Concept)",
+      "file_type": "document",
+      "source_file": "wiki/concepts/HandsfreeHospitalCommunication.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "handsfreehospitalcommunication_concept",
+      "community": 1,
+      "norm_label": "hands-free hospital communication (concept)"
+    },
+    {
+      "label": "Stryker",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-medical-surgical-equipment.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "stryker_company",
+      "community": 1,
+      "norm_label": "stryker"
+    },
+    {
+      "label": "Vocera",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "vocera_platform",
+      "community": 1,
+      "norm_label": "vocera"
+    },
+    {
+      "label": "Sync Badge",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "syncbadge_product",
+      "community": 1,
+      "norm_label": "sync badge"
+    },
+    {
+      "label": "Smartbadge",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "smartbadge_product",
+      "community": 1,
+      "norm_label": "smartbadge"
+    },
+    {
+      "label": "Vocera Engage",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "vocera_engage_middleware",
+      "community": 1,
+      "norm_label": "vocera engage"
+    },
+    {
+      "label": "EMDAN (Medical Device Alarm Notification)",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "emdan_system",
+      "community": 1,
+      "norm_label": "emdan (medical device alarm notification)"
+    },
+    {
+      "label": "Vocera Voice Server",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "vocera_voice_server",
+      "community": 2,
+      "norm_label": "vocera voice server"
+    },
+    {
+      "label": "Intent Reconstruction Engine",
+      "file_type": "document",
+      "source_file": "wiki/notes/vocera-condensed-intent-ner-system.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "intent_reconstruction_engine",
+      "community": 2,
+      "norm_label": "intent reconstruction engine"
+    },
+    {
+      "label": "ProCuity Beds",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "procuity_beds",
+      "community": 3,
+      "norm_label": "procuity beds"
+    },
+    {
+      "label": "Prime Series Transport",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "prime_series",
+      "community": 3,
+      "norm_label": "prime series transport"
+    },
+    {
+      "label": "Clinical Communication (SmartHospital Pillar)",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "clinical_communication_pillar",
+      "community": 3,
+      "norm_label": "clinical communication (smarthospital pillar)"
+    },
+    {
+      "label": "Workflow Engine (SmartHospital Pillar)",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "workflow_engine_pillar",
+      "community": 3,
+      "norm_label": "workflow engine (smarthospital pillar)"
+    },
+    {
+      "label": "Virtual Care (SmartHospital Pillar)",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "virtual_care_pillar",
+      "community": 3,
+      "norm_label": "virtual care (smarthospital pillar)"
+    },
+    {
+      "label": "Ambient Intelligence (SmartHospital Pillar)",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "ambient_intelligence_pillar",
+      "community": 3,
+      "norm_label": "ambient intelligence (smarthospital pillar)"
+    },
+    {
+      "label": "Connected Infrastructure (SmartHospital Pillar)",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "connected_infrastructure_pillar",
+      "community": 3,
+      "norm_label": "connected infrastructure (smarthospital pillar)"
+    },
+    {
+      "label": "SmartED (Care Space)",
+      "file_type": "document",
+      "source_file": "wiki/concepts/SmartHospitalPlatform.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "smart_ed",
+      "community": 3,
+      "norm_label": "smarted (care space)"
+    },
+    {
+      "label": "SmartRoom (Care Space)",
+      "file_type": "document",
+      "source_file": "wiki/concepts/SmartHospitalPlatform.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "smart_room",
+      "community": 3,
+      "norm_label": "smartroom (care space)"
+    },
+    {
+      "label": "SmartOR (Care Space)",
+      "file_type": "document",
+      "source_file": "wiki/concepts/SmartHospitalPlatform.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "smart_or",
+      "community": 3,
+      "norm_label": "smartor (care space)"
+    },
+    {
+      "label": "Speech-to-Text Pipeline",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "stt_pipeline",
+      "community": 2,
+      "norm_label": "speech-to-text pipeline"
+    },
+    {
+      "label": "Wake Word Detection (Okay Vocera)",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "wake_word_detection",
+      "community": 2,
+      "norm_label": "wake word detection (okay vocera)"
+    },
+    {
+      "label": "NLU Intent Routing",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "nlu_intent_routing",
+      "community": 2,
+      "norm_label": "nlu intent routing"
+    },
+    {
+      "label": "Why Condensed Intent over Vanilla LLM",
+      "file_type": "document",
+      "source_file": "wiki/notes/vocera-condensed-intent-ner-system.md",
+      "source_location": "Deep Explanation > Why vanilla LLMs fail at scale",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_condensed_over_vanilla",
+      "community": 2,
+      "norm_label": "why condensed intent over vanilla llm"
+    },
+    {
+      "label": "Model-Agnostic Design for Enterprise Healthcare",
+      "file_type": "document",
+      "source_file": "wiki/notes/vocera-condensed-intent-ner-system.md",
+      "source_location": "Deep Explanation > Model-Agnostic Design",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_model_agnostic",
+      "community": 2,
+      "norm_label": "model-agnostic design for enterprise healthcare"
+    },
+    {
+      "label": "Interoperability-First Platform Strategy",
+      "file_type": "document",
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": "Unique Insights",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_interoperability_first",
+      "community": 1,
+      "norm_label": "interoperability-first platform strategy"
+    },
+    {
+      "label": "GPT-4o",
+      "file_type": "document",
+      "source_file": "wiki/notes/vocera-condensed-intent-ner-system.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gpt_4o",
+      "community": 2,
+      "norm_label": "gpt-4o"
+    },
+    {
+      "label": "GPT-4o-mini",
+      "file_type": "document",
+      "source_file": "wiki/notes/vocera-condensed-intent-ner-system.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gpt_4o_mini",
+      "community": 2,
+      "norm_label": "gpt-4o-mini"
+    },
+    {
+      "label": "GPT-4.1-nano",
+      "file_type": "document",
+      "source_file": "wiki/notes/vocera-condensed-intent-ner-system.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "gpt_41_nano",
+      "community": 2,
+      "norm_label": "gpt-4.1-nano"
+    },
+    {
+      "label": "ProCuity LEX / ZX",
+      "type": "product",
+      "confidence": 0.75,
+      "source": "wiki/assets/images/stryker-smart-hospital/product-procuity-lex-zx.jpg",
+      "properties": {
+        "description": "Stryker ProCuity LEX/ZX hospital bed models, part of the SmartHospital Platform acute-care product grid",
+        "category": "hospital_bed",
+        "url": "https://www.stryker.com/us/en/acute-care/products/procuity.html"
+      },
+      "id": "product_procuity_lex_zx_procuity_lex_zx",
+      "community": 6,
+      "norm_label": "procuity lex / zx"
+    },
+    {
+      "label": "Vocera Engage",
+      "type": "product",
+      "confidence": 0.75,
+      "source": "wiki/assets/images/stryker-smart-hospital/product-vocera-engage.jpg",
+      "properties": {
+        "description": "Clinical communication middleware app enabling smartphone-based messaging, alerts, and workflow integration within the Vocera ecosystem",
+        "category": "software_middleware",
+        "url": "https://www.stryker.com/us/en/smart-care/products/vocera-engage.html"
+      },
+      "id": "product_vocera_engage_vocera_engage",
+      "community": 6,
+      "norm_label": "vocera engage"
+    },
+    {
+      "label": "Ambient Intelligence",
+      "type": "concept",
+      "confidence": 0.75,
+      "source": "wiki/assets/images/stryker-smart-hospital/pillar-ambient-intelligence.jpg",
+      "properties": {
+        "description": "One of five SmartHospital Platform marketing pillars \u2014 covers ambient monitoring and sensor-driven environmental awareness in clinical settings",
+        "pillar_hub_url": "https://www.stryker.com/us/en/portfolios/medical-surgical-equipment/smart-hospital/ambient-intelligence.html"
+      },
+      "id": "pillar_ambient_intelligence_ambient_intelligence",
+      "community": 6,
+      "norm_label": "ambient intelligence"
+    },
+    {
+      "label": "ProCuity ZMX",
+      "type": "product",
+      "confidence": 0.75,
+      "source": "wiki/assets/images/stryker-smart-hospital/product-procuity-zmx.jpg",
+      "properties": {
+        "description": "Stryker ProCuity ZMX ICU-grade hospital bed, positioned within the SmartHospital Platform connected infrastructure",
+        "category": "hospital_bed_icu",
+        "url": "https://www.stryker.com/us/en/acute-care/products/procuity-icu.html"
+      },
+      "id": "product_procuity_zmx_procuity_zmx",
+      "community": 6,
+      "norm_label": "procuity zmx"
+    },
+    {
+      "label": "Clinical Communication",
+      "type": "concept",
+      "confidence": 0.75,
+      "source": "wiki/assets/images/stryker-smart-hospital/pillar-clinical-communication.jpg",
+      "properties": {
+        "description": "One of five SmartHospital Platform marketing pillars \u2014 covers voice badges, middleware, and messaging products (Vocera stack, Sync Badge)",
+        "pillar_hub_url": "https://www.stryker.com/us/en/portfolios/medical-surgical-equipment/smart-hospital/clinical-communication.html"
+      },
+      "id": "pillar_clinical_communication_clinical_communication",
+      "community": 6,
+      "norm_label": "clinical communication"
+    },
+    {
+      "label": "Stryker",
+      "type": "organization",
+      "confidence": 1.0,
+      "source": "wiki/notes/stryker-smart-hospital-platform.md",
+      "properties": {
+        "description": "Parent company manufacturing and marketing the SmartHospital Platform"
+      },
+      "id": "img_ctx_stryker",
+      "community": 6,
+      "norm_label": "stryker"
+    },
+    {
+      "label": "SmartHospital Platform",
+      "type": "platform",
+      "confidence": 1.0,
+      "source": "wiki/concepts/SmartHospitalPlatform.md",
+      "properties": {
+        "description": "Stryker's connected-hospital marketing umbrella \u2014 'operating system for modern healthcare' \u2014 bundling five pillars across SmartED, SmartRoom, SmartOR care settings"
+      },
+      "id": "img_ctx_smart_hospital_platform",
+      "community": 6,
+      "norm_label": "smarthospital platform"
+    },
+    {
+      "label": "ProCuity",
+      "type": "product_family",
+      "confidence": 0.8,
+      "source": "wiki/notes/stryker-smart-hospital-platform.md",
+      "properties": {
+        "description": "Stryker hospital bed product family including LEX/ZX (med-surg) and ZMX (ICU) models"
+      },
+      "id": "img_ctx_procuity",
+      "community": 6,
+      "norm_label": "procuity"
+    },
+    {
+      "label": "Vocera",
+      "type": "brand",
+      "confidence": 1.0,
+      "source": "wiki/notes/stryker-smart-hospital-platform.md",
+      "properties": {
+        "description": "Stryker-acquired clinical communication brand \u2014 voice badges, middleware, collaboration suite"
+      },
+      "id": "img_ctx_vocera",
+      "community": 6,
+      "norm_label": "vocera"
+    },
+    {
+      "label": "Sync Badge",
+      "type": "product",
+      "properties": {
+        "description": "Wearable communication badge for hospital staff enabling voice-driven clinical communication",
+        "category": "wearable_device",
+        "form_factor": "badge",
+        "use_case": "clinical_communication",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/product-sync-badge.jpg"
+      },
+      "confidence": 0.8,
+      "id": "product_sync_badge_sync_badge",
+      "community": 4,
+      "norm_label": "sync badge"
+    },
+    {
+      "label": "Vocera Vina",
+      "type": "product",
+      "properties": {
+        "description": "Smartphone application for clinical communications allowing voice and messaging workflows on personal or shared devices",
+        "category": "software_application",
+        "platform": "smartphone",
+        "use_case": "clinical_communication",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/product-vocera-vina.jpg"
+      },
+      "confidence": 0.8,
+      "id": "product_vocera_vina_vocera_vina",
+      "community": 4,
+      "norm_label": "vocera vina"
+    },
+    {
+      "label": "Ambient Monitoring",
+      "type": "product",
+      "properties": {
+        "description": "Patient surveillance system providing continuous ambient monitoring of patient status and room conditions",
+        "category": "monitoring_system",
+        "use_case": "patient_surveillance",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/product-ambient-monitoring.jpg"
+      },
+      "confidence": 0.8,
+      "id": "product_ambient_monitoring_ambient_monitoring",
+      "community": 4,
+      "norm_label": "ambient monitoring"
+    },
+    {
+      "label": "Prime Series",
+      "type": "product",
+      "properties": {
+        "description": "Hospital bed line with integrated smart features for patient care, safety, and clinical workflow",
+        "category": "hospital_bed",
+        "form_factor": "bed",
+        "use_case": "patient_care",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/product-prime-series.jpg"
+      },
+      "confidence": 0.8,
+      "id": "product_prime_series_prime_series",
+      "community": 4,
+      "norm_label": "prime series"
+    },
+    {
+      "label": "Vocera Smartbadge",
+      "type": "product",
+      "properties": {
+        "description": "Hands-free wearable voice communication device for clinical staff enabling instant voice-activated calling and messaging",
+        "category": "wearable_device",
+        "form_factor": "badge",
+        "use_case": "hands_free_communication",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/product-vocera-smartbadge.jpg"
+      },
+      "confidence": 0.8,
+      "id": "product_vocera_smartbadge_vocera_smartbadge",
+      "community": 4,
+      "norm_label": "vocera smartbadge"
+    },
+    {
+      "label": "Stryker",
+      "type": "organization",
+      "properties": {
+        "description": "Medical technology company manufacturing smart hospital products",
+        "industry": "medical_technology"
+      },
+      "confidence": 0.9,
+      "id": "product_sync_badge_stryker",
+      "community": 4,
+      "norm_label": "stryker"
+    },
+    {
+      "label": "Stryker Smart Hospital Platform",
+      "type": "platform",
+      "properties": {
+        "description": "Integrated platform connecting communication, monitoring, and care devices across hospital environments"
+      },
+      "confidence": 0.85,
+      "id": "product_sync_badge_smart_hospital_platform",
+      "community": 4,
+      "norm_label": "stryker smart hospital platform"
+    },
+    {
+      "label": "Vocera",
+      "type": "brand",
+      "properties": {
+        "description": "Clinical communication brand within Stryker product portfolio, originally an independent company acquired by Stryker"
+      },
+      "confidence": 0.85,
+      "id": "product_vocera_vina_vocera",
+      "community": 4,
+      "norm_label": "vocera"
+    },
+    {
+      "label": "Patient Safety",
+      "type": "concept",
+      "properties": {
+        "description": "Clinical objective of preventing harm to patients through monitoring, communication, and workflow optimization"
+      },
+      "confidence": 0.7,
+      "id": "product_ambient_monitoring_patient_safety",
+      "community": 4,
+      "norm_label": "patient safety"
+    },
+    {
+      "label": "Hands-Free Communication",
+      "type": "concept",
+      "properties": {
+        "description": "Voice-activated communication modality allowing clinical staff to communicate without using their hands"
+      },
+      "confidence": 0.8,
+      "id": "product_vocera_smartbadge_hands_free_communication",
+      "community": 4,
+      "norm_label": "hands-free communication"
+    },
+    {
+      "label": "Clinical Workflow",
+      "type": "concept",
+      "properties": {
+        "description": "Operational processes and task sequences followed by healthcare staff in patient care delivery"
+      },
+      "confidence": 0.7,
+      "id": "product_vocera_smartbadge_clinical_workflow",
+      "community": 4,
+      "norm_label": "clinical workflow"
+    },
+    {
+      "label": "Smart Hospital Platform",
+      "type": "platform",
+      "properties": {
+        "description": "Stryker's connected healthcare ecosystem marketed as the 'operating system for modern healthcare', spanning patient rooms through ORs with five marketing pillars: clinical communication, workflow engine, virtual care, ambient intelligence, connected infrastructure",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/hero-smart-hospital-platform.jpg",
+        "vendor": "Stryker",
+        "url": "https://www.stryker.com/us/en/portfolios/medical-surgical-equipment/smart-hospital.html",
+        "care_spaces": [
+          "SmartED",
+          "SmartRoom",
+          "SmartOR"
+        ],
+        "image_role": "hero_banner"
+      },
+      "confidence": 0.8,
+      "id": "hero_shp_smart_hospital_platform",
+      "community": 0,
+      "norm_label": "smart hospital platform"
+    },
+    {
+      "label": "Stryker",
+      "type": "organization",
+      "properties": {
+        "description": "Medical technology corporation; parent company of the Vocera product line (now Stryker Smart Care) and manufacturer of the Smart Hospital Platform",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/hero-smart-hospital-platform.jpg",
+        "role": "manufacturer"
+      },
+      "confidence": 0.85,
+      "id": "hero_shp_stryker",
+      "community": 0,
+      "norm_label": "stryker"
+    },
+    {
+      "label": "Virtual Nursing",
+      "type": "product",
+      "properties": {
+        "description": "Telehealth / remote nursing system enabling remote clinical observation and interaction with patients; part of the Virtual Care pillar of the Smart Hospital Platform",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/product-virtual-nursing.jpg",
+        "product_category": "virtual_care",
+        "url": "https://www.stryker.com/us/en/smart-care/products/virtual-nursing.html",
+        "image_role": "product_thumbnail"
+      },
+      "confidence": 0.8,
+      "id": "prod_vn_virtual_nursing",
+      "community": 0,
+      "norm_label": "virtual nursing"
+    },
+    {
+      "label": "Telehealth",
+      "type": "concept",
+      "properties": {
+        "description": "Remote delivery of healthcare services via telecommunications technology; Virtual Nursing is Stryker's implementation for inpatient settings",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/product-virtual-nursing.jpg"
+      },
+      "confidence": 0.7,
+      "id": "prod_vn_telehealth",
+      "community": 0,
+      "norm_label": "telehealth"
+    },
+    {
+      "label": "Remote Patient Monitoring",
+      "type": "concept",
+      "properties": {
+        "description": "Technology-enabled monitoring of patients outside traditional clinical settings or via remote nursing stations within a hospital",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/product-virtual-nursing.jpg"
+      },
+      "confidence": 0.65,
+      "id": "prod_vn_remote_patient_monitoring",
+      "community": 0,
+      "norm_label": "remote patient monitoring"
+    },
+    {
+      "label": "Vocera Edge",
+      "type": "product",
+      "properties": {
+        "description": "Network gateway device in the Vocera product line; provides network infrastructure connectivity for Vocera communication devices and services within the hospital",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/product-vocera-edge.jpg",
+        "product_category": "connected_infrastructure",
+        "device_type": "network_gateway",
+        "url": "https://www.stryker.com/us/en/smart-care/products/vocera-edge.html",
+        "image_role": "product_thumbnail"
+      },
+      "confidence": 0.8,
+      "id": "prod_ve_vocera_edge",
+      "community": 0,
+      "norm_label": "vocera edge"
+    },
+    {
+      "label": "Network Gateway",
+      "type": "concept",
+      "properties": {
+        "description": "Hardware appliance that bridges communication between clinical wearable devices (Smartbadge, Sync Badge) and backend Vocera Voice Server / Collaboration Suite infrastructure",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/product-vocera-edge.jpg"
+      },
+      "confidence": 0.7,
+      "id": "prod_ve_network_gateway",
+      "community": 0,
+      "norm_label": "network gateway"
+    },
+    {
+      "label": "Vocera Accessories",
+      "type": "product",
+      "properties": {
+        "description": "Peripheral accessories for Vocera wearable devices \u2014 includes headsets, batteries, charging stations, and lanyards primarily for the Smartbadge and Sync Badge",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/product-vocera-accessories.jpg",
+        "product_category": "accessories",
+        "accessory_types": [
+          "headset",
+          "battery",
+          "charger",
+          "lanyard"
+        ],
+        "url": "https://www.stryker.com/us/en/smart-care/products/vocera-accessories.html",
+        "image_role": "product_thumbnail"
+      },
+      "confidence": 0.8,
+      "id": "prod_va_vocera_accessories",
+      "community": 0,
+      "norm_label": "vocera accessories"
+    },
+    {
+      "label": "Vocera Smartbadge",
+      "type": "product",
+      "properties": {
+        "description": "Hands-free wearable communication badge (previous generation); primary device that Vocera Accessories are designed to support",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/product-vocera-accessories.jpg",
+        "url": "https://www.stryker.com/us/en/smart-care/products/vocera-smartbadge.html"
+      },
+      "confidence": 0.75,
+      "id": "prod_va_smartbadge",
+      "community": 0,
+      "norm_label": "vocera smartbadge"
+    },
+    {
+      "label": "Sync Badge",
+      "type": "product",
+      "properties": {
+        "description": "Current-generation hands-free wearable communication device; successor to the Vocera Smartbadge, activated via 'Okay Vocera' wake word",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/product-vocera-accessories.jpg",
+        "wake_word": "Okay Vocera"
+      },
+      "confidence": 0.7,
+      "id": "prod_va_sync_badge",
+      "community": 0,
+      "norm_label": "sync badge"
+    },
+    {
+      "label": "Vocera Collaboration Suite",
+      "type": "product",
+      "properties": {
+        "description": "Main software platform for clinical communication in hospitals; provides voice, messaging, alerting, and workflow routing across Vocera devices, smartphones, and desktop clients",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/product-vocera-collaboration-suite.jpg",
+        "product_category": "clinical_communication",
+        "software_type": "platform",
+        "url": "https://www.stryker.com/us/en/smart-care/products/vocera-collaboration-suite.html",
+        "image_role": "product_thumbnail"
+      },
+      "confidence": 0.8,
+      "id": "prod_vcs_vocera_collaboration_suite",
+      "community": 0,
+      "norm_label": "vocera collaboration suite"
+    },
+    {
+      "label": "Clinical Communication",
+      "type": "concept",
+      "properties": {
+        "description": "One of five marketing pillars of the Smart Hospital Platform; encompasses voice, messaging, alerting, and workflow-driven communication among clinical staff",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/product-vocera-collaboration-suite.jpg",
+        "pillar_of": "Smart Hospital Platform"
+      },
+      "confidence": 0.75,
+      "id": "prod_vcs_clinical_communication",
+      "community": 0,
+      "norm_label": "clinical communication"
+    },
+    {
+      "label": "Vocera",
+      "type": "brand",
+      "properties": {
+        "description": "Clinical communication brand acquired by Stryker; now branded as Stryker Smart Care; encompasses Smartbadge, Sync Badge, Edge, Collaboration Suite, Engage, Ease, Vina, and accessories",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/product-vocera-collaboration-suite.jpg"
+      },
+      "confidence": 0.8,
+      "id": "prod_vcs_vocera",
+      "community": 0,
+      "norm_label": "vocera"
+    },
+    {
+      "label": "Virtual Care Pillar",
+      "type": "concept",
+      "properties": {
+        "description": "Marketing pillar of the Smart Hospital Platform covering telehealth, virtual nursing, and virtual monitoring capabilities",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/hero-smart-hospital-platform.jpg"
+      },
+      "confidence": 0.7,
+      "id": "hero_shp_virtual_care_pillar",
+      "community": 0,
+      "norm_label": "virtual care pillar"
+    },
+    {
+      "label": "Connected Infrastructure Pillar",
+      "type": "concept",
+      "properties": {
+        "description": "Marketing pillar of the Smart Hospital Platform covering network gateways, device connectivity, and infrastructure layer",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/hero-smart-hospital-platform.jpg"
+      },
+      "confidence": 0.7,
+      "id": "hero_shp_connected_infrastructure_pillar",
+      "community": 0,
+      "norm_label": "connected infrastructure pillar"
+    },
+    {
+      "label": "Workflow Engine",
+      "type": "pillar",
+      "properties": {
+        "description": "SmartHospital Platform pillar for automation and alerting orchestration across hospital workflows",
+        "domain": "product",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/pillar-workflow-engine.jpg",
+        "hub_url": "https://www.stryker.com/us/en/portfolios/medical-surgical-equipment/smart-hospital/workflow-engine.html"
+      },
+      "confidence": 1.0,
+      "id": "pillar_workflow_engine_workflow_engine",
+      "community": 5,
+      "norm_label": "workflow engine"
+    },
+    {
+      "label": "Vocera Ease",
+      "type": "product",
+      "properties": {
+        "description": "Patient and family messaging application enabling secure communication between care teams and patients/families",
+        "domain": "product",
+        "brand": "Vocera",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/product-vocera-ease.jpg",
+        "product_url": "https://www.stryker.com/us/en/smart-care/products/vocera-ease.html"
+      },
+      "confidence": 1.0,
+      "id": "product_vocera_ease_vocera_ease",
+      "community": 5,
+      "norm_label": "vocera ease"
+    },
+    {
+      "label": "Connected Infrastructure",
+      "type": "pillar",
+      "properties": {
+        "description": "SmartHospital Platform pillar for IoT device integration and infrastructure connectivity across hospital environments",
+        "domain": "product",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/pillar-connected-infrastructure.jpg",
+        "hub_url": "https://www.stryker.com/us/en/portfolios/medical-surgical-equipment/smart-hospital/connected-infrastructure.html"
+      },
+      "confidence": 1.0,
+      "id": "pillar_connected_infrastructure_connected_infrastructure",
+      "community": 5,
+      "norm_label": "connected infrastructure"
+    },
+    {
+      "label": "Virtual Care",
+      "type": "pillar",
+      "properties": {
+        "description": "SmartHospital Platform pillar for telehealth and remote patient monitoring capabilities",
+        "domain": "product",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/pillar-virtual-care.jpg",
+        "hub_url": "https://www.stryker.com/us/en/portfolios/medical-surgical-equipment/smart-hospital/virtual-care.html"
+      },
+      "confidence": 1.0,
+      "id": "pillar_virtual_care_virtual_care",
+      "community": 5,
+      "norm_label": "virtual care"
+    },
+    {
+      "label": "Virtual Monitoring",
+      "type": "product",
+      "properties": {
+        "description": "Patient surveillance system enabling remote continuous observation of patients via video and sensor feeds",
+        "domain": "product",
+        "source_file": "wiki/assets/images/stryker-smart-hospital/product-virtual-monitoring.jpg",
+        "product_url": "https://www.stryker.com/us/en/smart-care/products/virtual-monitoring.html"
+      },
+      "confidence": 1.0,
+      "id": "product_virtual_monitoring_virtual_monitoring",
+      "community": 5,
+      "norm_label": "virtual monitoring"
+    },
+    {
+      "label": "SmartHospital Platform",
+      "type": "platform",
+      "properties": {
+        "description": "Stryker marketing umbrella for a connected hospital \u2014 positioned as the operating system for modern healthcare",
+        "domain": "product",
+        "owner": "Stryker"
+      },
+      "confidence": 1.0,
+      "id": "smart_hospital_platform",
+      "community": 5,
+      "norm_label": "smarthospital platform"
+    },
+    {
+      "label": "Stryker",
+      "type": "organization",
+      "properties": {
+        "description": "Medical technology company and parent organization of the SmartHospital Platform and Vocera product lines",
+        "domain": "product"
+      },
+      "confidence": 1.0,
+      "id": "stryker",
+      "community": 5,
+      "norm_label": "stryker"
+    },
+    {
+      "label": "Vocera",
+      "type": "brand",
+      "properties": {
+        "description": "Stryker brand for clinical communication products including badges, messaging apps, and collaboration software",
+        "domain": "product"
+      },
+      "confidence": 1.0,
+      "id": "vocera",
+      "community": 5,
+      "norm_label": "vocera"
+    },
+    {
+      "label": "Clinical Communication",
+      "type": "pillar",
+      "properties": {
+        "description": "SmartHospital Platform pillar for clinical messaging, voice, and care team coordination",
+        "domain": "product"
+      },
+      "confidence": 0.85,
+      "id": "pillar_clinical_communication",
+      "community": 5,
+      "norm_label": "clinical communication"
+    },
+    {
+      "label": "Ambient Intelligence",
+      "type": "pillar",
+      "properties": {
+        "description": "SmartHospital Platform pillar for ambient sensor-based monitoring and intelligence",
+        "domain": "product"
+      },
+      "confidence": 0.85,
+      "id": "pillar_ambient_intelligence",
+      "community": 5,
+      "norm_label": "ambient intelligence"
+    },
+    {
+      "label": "Virtual Nursing",
+      "type": "product",
+      "properties": {
+        "description": "Remote nursing presence solution enabling virtual nurse-patient interactions",
+        "domain": "product"
+      },
+      "confidence": 0.8,
+      "id": "product_virtual_nursing",
+      "community": 5,
+      "norm_label": "virtual nursing"
+    }
+  ],
+  "links": [
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/overview.md",
+      "source_location": "[[Vocera]]",
+      "weight": 1.0,
+      "_src": "overview_doc",
+      "_tgt": "vocera_platform",
+      "source": "overview_doc",
+      "target": "vocera_platform"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/overview.md",
+      "source_location": "[[Stryker]]",
+      "weight": 1.0,
+      "_src": "overview_doc",
+      "_tgt": "stryker_company",
+      "source": "overview_doc",
+      "target": "stryker_company"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/overview.md",
+      "source_location": "[[SyncBadge]]",
+      "weight": 1.0,
+      "_src": "overview_doc",
+      "_tgt": "syncbadge_product",
+      "source": "overview_doc",
+      "target": "syncbadge_product"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/overview.md",
+      "source_location": "[[Smartbadge]]",
+      "weight": 1.0,
+      "_src": "overview_doc",
+      "_tgt": "smartbadge_product",
+      "source": "overview_doc",
+      "target": "smartbadge_product"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/overview.md",
+      "source_location": "[[HandsfreeHospitalCommunication]]",
+      "weight": 1.0,
+      "_src": "overview_doc",
+      "_tgt": "handsfreehospitalcommunication_concept",
+      "source": "overview_doc",
+      "target": "handsfreehospitalcommunication_concept"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/overview.md",
+      "source_location": "[[vocera-condensed-intent-ner-system]]",
+      "weight": 1.0,
+      "_src": "overview_doc",
+      "_tgt": "vocera_condensed_intent_ner_note",
+      "source": "overview_doc",
+      "target": "vocera_condensed_intent_ner_note"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/overview.md",
+      "source_location": "[[CondensedIntentClassification]]",
+      "weight": 1.0,
+      "_src": "overview_doc",
+      "_tgt": "condensedintentclassification_concept",
+      "source": "overview_doc",
+      "target": "condensedintentclassification_concept"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/overview.md",
+      "source_location": "[[SmartHospitalPlatform]] (via stryker-smart-hospital-platform)",
+      "weight": 1.0,
+      "_src": "overview_doc",
+      "_tgt": "smarthospitalplatform_concept",
+      "source": "overview_doc",
+      "target": "smarthospitalplatform_concept"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/overview.md",
+      "source_location": "[[EMDAN]]",
+      "weight": 1.0,
+      "_src": "overview_doc",
+      "_tgt": "emdan_system",
+      "source": "overview_doc",
+      "target": "emdan_system"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/overview.md",
+      "source_location": "[[VoceraEngage]]",
+      "weight": 1.0,
+      "_src": "overview_doc",
+      "_tgt": "vocera_engage_middleware",
+      "source": "overview_doc",
+      "target": "vocera_engage_middleware"
+    },
+    {
+      "relation": "lists",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/index.md",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "index_doc",
+      "_tgt": "overview_doc",
+      "source": "overview_doc",
+      "target": "index_doc"
+    },
+    {
+      "relation": "lists",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/index.md",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "index_doc",
+      "_tgt": "vocera_condensed_intent_ner_note",
+      "source": "index_doc",
+      "target": "vocera_condensed_intent_ner_note"
+    },
+    {
+      "relation": "lists",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/index.md",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "index_doc",
+      "_tgt": "stryker_sync_badge_note",
+      "source": "index_doc",
+      "target": "stryker_sync_badge_note"
+    },
+    {
+      "relation": "lists",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/index.md",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "index_doc",
+      "_tgt": "stryker_med_surg_equipment_note",
+      "source": "index_doc",
+      "target": "stryker_med_surg_equipment_note"
+    },
+    {
+      "relation": "lists",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/index.md",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "index_doc",
+      "_tgt": "stryker_smart_hospital_platform_note",
+      "source": "index_doc",
+      "target": "stryker_smart_hospital_platform_note"
+    },
+    {
+      "relation": "lists",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/index.md",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "index_doc",
+      "_tgt": "condensedintentclassification_concept",
+      "source": "index_doc",
+      "target": "condensedintentclassification_concept"
+    },
+    {
+      "relation": "lists",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/index.md",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "index_doc",
+      "_tgt": "smarthospitalplatform_concept",
+      "source": "index_doc",
+      "target": "smarthospitalplatform_concept"
+    },
+    {
+      "relation": "lists",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/index.md",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "index_doc",
+      "_tgt": "handsfreehospitalcommunication_concept",
+      "source": "index_doc",
+      "target": "handsfreehospitalcommunication_concept"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": "[[Stryker]]",
+      "weight": 1.0,
+      "_src": "stryker_smart_hospital_platform_note",
+      "_tgt": "stryker_company",
+      "source": "stryker_smart_hospital_platform_note",
+      "target": "stryker_company"
+    },
+    {
+      "relation": "described_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/concepts/SmartHospitalPlatform.md",
+      "source_location": "[[stryker-smart-hospital-platform]]",
+      "weight": 1.0,
+      "_src": "smarthospitalplatform_concept",
+      "_tgt": "stryker_smart_hospital_platform_note",
+      "source": "stryker_smart_hospital_platform_note",
+      "target": "smarthospitalplatform_concept"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": "[[Vocera]]",
+      "weight": 1.0,
+      "_src": "stryker_smart_hospital_platform_note",
+      "_tgt": "vocera_platform",
+      "source": "stryker_smart_hospital_platform_note",
+      "target": "vocera_platform"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": "[[SyncBadge]]",
+      "weight": 1.0,
+      "_src": "stryker_smart_hospital_platform_note",
+      "_tgt": "syncbadge_product",
+      "source": "stryker_smart_hospital_platform_note",
+      "target": "syncbadge_product"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": "[[Smartbadge]]",
+      "weight": 1.0,
+      "_src": "stryker_smart_hospital_platform_note",
+      "_tgt": "smartbadge_product",
+      "source": "stryker_smart_hospital_platform_note",
+      "target": "smartbadge_product"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": "[[VoceraEngage]]",
+      "weight": 1.0,
+      "_src": "stryker_smart_hospital_platform_note",
+      "_tgt": "vocera_engage_middleware",
+      "source": "stryker_smart_hospital_platform_note",
+      "target": "vocera_engage_middleware"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-medical-surgical-equipment.md",
+      "source_location": "[[stryker-smart-hospital-platform]]",
+      "weight": 1.0,
+      "_src": "stryker_med_surg_equipment_note",
+      "_tgt": "stryker_smart_hospital_platform_note",
+      "source": "stryker_smart_hospital_platform_note",
+      "target": "stryker_med_surg_equipment_note"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": "[[stryker-sync-badge]]",
+      "weight": 1.0,
+      "_src": "stryker_smart_hospital_platform_note",
+      "_tgt": "stryker_sync_badge_note",
+      "source": "stryker_smart_hospital_platform_note",
+      "target": "stryker_sync_badge_note"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": "[[HandsfreeHospitalCommunication]]",
+      "weight": 1.0,
+      "_src": "stryker_smart_hospital_platform_note",
+      "_tgt": "handsfreehospitalcommunication_concept",
+      "source": "stryker_smart_hospital_platform_note",
+      "target": "handsfreehospitalcommunication_concept"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": "[[Stryker]]",
+      "weight": 1.0,
+      "_src": "stryker_sync_badge_note",
+      "_tgt": "stryker_company",
+      "source": "stryker_sync_badge_note",
+      "target": "stryker_company"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": "[[Vocera]]",
+      "weight": 1.0,
+      "_src": "stryker_sync_badge_note",
+      "_tgt": "vocera_platform",
+      "source": "stryker_sync_badge_note",
+      "target": "vocera_platform"
+    },
+    {
+      "relation": "describes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": "primary subject",
+      "weight": 1.0,
+      "_src": "stryker_sync_badge_note",
+      "_tgt": "syncbadge_product",
+      "source": "stryker_sync_badge_note",
+      "target": "syncbadge_product"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": "[[VoceraEngage]]",
+      "weight": 1.0,
+      "_src": "stryker_sync_badge_note",
+      "_tgt": "vocera_engage_middleware",
+      "source": "stryker_sync_badge_note",
+      "target": "vocera_engage_middleware"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": "[[EMDAN]]",
+      "weight": 1.0,
+      "_src": "stryker_sync_badge_note",
+      "_tgt": "emdan_system",
+      "source": "stryker_sync_badge_note",
+      "target": "emdan_system"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": "[[HandsfreeHospitalCommunication]]",
+      "weight": 1.0,
+      "_src": "stryker_sync_badge_note",
+      "_tgt": "handsfreehospitalcommunication_concept",
+      "source": "stryker_sync_badge_note",
+      "target": "handsfreehospitalcommunication_concept"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/vocera-condensed-intent-ner-system.md",
+      "source_location": "[[stryker-sync-badge]]",
+      "weight": 1.0,
+      "_src": "vocera_condensed_intent_ner_note",
+      "_tgt": "stryker_sync_badge_note",
+      "source": "stryker_sync_badge_note",
+      "target": "vocera_condensed_intent_ner_note"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/vocera-condensed-intent-ner-system.md",
+      "source_location": "[[HandsfreeHospitalCommunication]]",
+      "weight": 1.0,
+      "_src": "vocera_condensed_intent_ner_note",
+      "_tgt": "handsfreehospitalcommunication_concept",
+      "source": "vocera_condensed_intent_ner_note",
+      "target": "handsfreehospitalcommunication_concept"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/vocera-condensed-intent-ner-system.md",
+      "source_location": "[[SmartHospitalPlatform]]",
+      "weight": 1.0,
+      "_src": "vocera_condensed_intent_ner_note",
+      "_tgt": "smarthospitalplatform_concept",
+      "source": "vocera_condensed_intent_ner_note",
+      "target": "smarthospitalplatform_concept"
+    },
+    {
+      "relation": "instantiated_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/concepts/CondensedIntentClassification.md",
+      "source_location": "[[vocera-condensed-intent-ner-system]]",
+      "weight": 1.0,
+      "_src": "condensedintentclassification_concept",
+      "_tgt": "vocera_condensed_intent_ner_note",
+      "source": "vocera_condensed_intent_ner_note",
+      "target": "condensedintentclassification_concept"
+    },
+    {
+      "relation": "evaluates",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/vocera-condensed-intent-ner-system.md",
+      "source_location": "evaluating vanilla GPT-4o",
+      "weight": 1.0,
+      "_src": "vocera_condensed_intent_ner_note",
+      "_tgt": "gpt_4o",
+      "source": "vocera_condensed_intent_ner_note",
+      "target": "gpt_4o"
+    },
+    {
+      "relation": "evaluates",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/vocera-condensed-intent-ner-system.md",
+      "source_location": "evaluating GPT-4o-mini",
+      "weight": 1.0,
+      "_src": "vocera_condensed_intent_ner_note",
+      "_tgt": "gpt_4o_mini",
+      "source": "vocera_condensed_intent_ner_note",
+      "target": "gpt_4o_mini"
+    },
+    {
+      "relation": "evaluates",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/vocera-condensed-intent-ner-system.md",
+      "source_location": "evaluating GPT-4.1-nano",
+      "weight": 1.0,
+      "_src": "vocera_condensed_intent_ner_note",
+      "_tgt": "gpt_41_nano",
+      "source": "vocera_condensed_intent_ner_note",
+      "target": "gpt_41_nano"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/vocera-condensed-intent-ner-system.md",
+      "source_location": "Model-Agnostic Design section",
+      "weight": 1.0,
+      "_src": "rationale_model_agnostic",
+      "_tgt": "vocera_condensed_intent_ner_note",
+      "source": "vocera_condensed_intent_ner_note",
+      "target": "rationale_model_agnostic"
+    },
+    {
+      "relation": "runs",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": "Voice Server hosts STT+NLU; condensed intent is the NLU layer",
+      "weight": 1.0,
+      "_src": "vocera_voice_server",
+      "_tgt": "vocera_condensed_intent_ner_note",
+      "source": "vocera_condensed_intent_ner_note",
+      "target": "vocera_voice_server"
+    },
+    {
+      "relation": "describes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-medical-surgical-equipment.md",
+      "source_location": "[[Stryker]]",
+      "weight": 1.0,
+      "_src": "stryker_med_surg_equipment_note",
+      "_tgt": "stryker_company",
+      "source": "stryker_med_surg_equipment_note",
+      "target": "stryker_company"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/concepts/SmartHospitalPlatform.md",
+      "source_location": "[[stryker-medical-surgical-equipment]]",
+      "weight": 1.0,
+      "_src": "smarthospitalplatform_concept",
+      "_tgt": "stryker_med_surg_equipment_note",
+      "source": "stryker_med_surg_equipment_note",
+      "target": "smarthospitalplatform_concept"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-medical-surgical-equipment.md",
+      "source_location": "[[Vocera]]",
+      "weight": 1.0,
+      "_src": "stryker_med_surg_equipment_note",
+      "_tgt": "vocera_platform",
+      "source": "stryker_med_surg_equipment_note",
+      "target": "vocera_platform"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-medical-surgical-equipment.md",
+      "source_location": "[[SyncBadge]]",
+      "weight": 1.0,
+      "_src": "stryker_med_surg_equipment_note",
+      "_tgt": "syncbadge_product",
+      "source": "stryker_med_surg_equipment_note",
+      "target": "syncbadge_product"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-medical-surgical-equipment.md",
+      "source_location": "[[HandsfreeHospitalCommunication]]",
+      "weight": 1.0,
+      "_src": "stryker_med_surg_equipment_note",
+      "_tgt": "handsfreehospitalcommunication_concept",
+      "source": "stryker_med_surg_equipment_note",
+      "target": "handsfreehospitalcommunication_concept"
+    },
+    {
+      "relation": "owned_by",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/concepts/SmartHospitalPlatform.md",
+      "source_location": "[[Stryker]] marketing umbrella",
+      "weight": 1.0,
+      "_src": "smarthospitalplatform_concept",
+      "_tgt": "stryker_company",
+      "source": "smarthospitalplatform_concept",
+      "target": "stryker_company"
+    },
+    {
+      "relation": "includes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/concepts/SmartHospitalPlatform.md",
+      "source_location": "[[SyncBadge]]",
+      "weight": 1.0,
+      "_src": "smarthospitalplatform_concept",
+      "_tgt": "syncbadge_product",
+      "source": "smarthospitalplatform_concept",
+      "target": "syncbadge_product"
+    },
+    {
+      "relation": "includes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/concepts/SmartHospitalPlatform.md",
+      "source_location": "[[VoceraEngage]]",
+      "weight": 1.0,
+      "_src": "smarthospitalplatform_concept",
+      "_tgt": "vocera_engage_middleware",
+      "source": "smarthospitalplatform_concept",
+      "target": "vocera_engage_middleware"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/concepts/SmartHospitalPlatform.md",
+      "source_location": "[[HandsfreeHospitalCommunication]]",
+      "weight": 1.0,
+      "_src": "smarthospitalplatform_concept",
+      "_tgt": "handsfreehospitalcommunication_concept",
+      "source": "smarthospitalplatform_concept",
+      "target": "handsfreehospitalcommunication_concept"
+    },
+    {
+      "relation": "has_pillar",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": "Five marketing pillars",
+      "weight": 1.0,
+      "_src": "smarthospitalplatform_concept",
+      "_tgt": "clinical_communication_pillar",
+      "source": "smarthospitalplatform_concept",
+      "target": "clinical_communication_pillar"
+    },
+    {
+      "relation": "has_pillar",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": "Five marketing pillars",
+      "weight": 1.0,
+      "_src": "smarthospitalplatform_concept",
+      "_tgt": "workflow_engine_pillar",
+      "source": "smarthospitalplatform_concept",
+      "target": "workflow_engine_pillar"
+    },
+    {
+      "relation": "has_pillar",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": "Five marketing pillars",
+      "weight": 1.0,
+      "_src": "smarthospitalplatform_concept",
+      "_tgt": "virtual_care_pillar",
+      "source": "smarthospitalplatform_concept",
+      "target": "virtual_care_pillar"
+    },
+    {
+      "relation": "has_pillar",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": "Five marketing pillars",
+      "weight": 1.0,
+      "_src": "smarthospitalplatform_concept",
+      "_tgt": "ambient_intelligence_pillar",
+      "source": "smarthospitalplatform_concept",
+      "target": "ambient_intelligence_pillar"
+    },
+    {
+      "relation": "has_pillar",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": "Five marketing pillars",
+      "weight": 1.0,
+      "_src": "smarthospitalplatform_concept",
+      "_tgt": "connected_infrastructure_pillar",
+      "source": "smarthospitalplatform_concept",
+      "target": "connected_infrastructure_pillar"
+    },
+    {
+      "relation": "has_care_space",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/concepts/SmartHospitalPlatform.md",
+      "source_location": "SmartED, SmartRoom, SmartOR",
+      "weight": 1.0,
+      "_src": "smarthospitalplatform_concept",
+      "_tgt": "smart_ed",
+      "source": "smarthospitalplatform_concept",
+      "target": "smart_ed"
+    },
+    {
+      "relation": "has_care_space",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/concepts/SmartHospitalPlatform.md",
+      "source_location": "SmartED, SmartRoom, SmartOR",
+      "weight": 1.0,
+      "_src": "smarthospitalplatform_concept",
+      "_tgt": "smart_room",
+      "source": "smarthospitalplatform_concept",
+      "target": "smart_room"
+    },
+    {
+      "relation": "has_care_space",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/concepts/SmartHospitalPlatform.md",
+      "source_location": "SmartED, SmartRoom, SmartOR",
+      "weight": 1.0,
+      "_src": "smarthospitalplatform_concept",
+      "_tgt": "smart_or",
+      "source": "smarthospitalplatform_concept",
+      "target": "smart_or"
+    },
+    {
+      "relation": "includes_product",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": "product grid: ProCuity LEX/ZX, ZMX",
+      "weight": 1.0,
+      "_src": "smarthospitalplatform_concept",
+      "_tgt": "procuity_beds",
+      "source": "smarthospitalplatform_concept",
+      "target": "procuity_beds"
+    },
+    {
+      "relation": "includes_product",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": "product grid: Prime Series",
+      "weight": 1.0,
+      "_src": "smarthospitalplatform_concept",
+      "_tgt": "prime_series",
+      "source": "smarthospitalplatform_concept",
+      "target": "prime_series"
+    },
+    {
+      "relation": "feeds",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/concepts/CondensedIntentClassification.md",
+      "source_location": "[[HandsfreeHospitalCommunication]]",
+      "weight": 1.0,
+      "_src": "condensedintentclassification_concept",
+      "_tgt": "handsfreehospitalcommunication_concept",
+      "source": "condensedintentclassification_concept",
+      "target": "handsfreehospitalcommunication_concept"
+    },
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/vocera-condensed-intent-ner-system.md",
+      "source_location": "NLU layer of the Vocera voice pipeline",
+      "weight": 1.0,
+      "_src": "nlu_intent_routing",
+      "_tgt": "condensedintentclassification_concept",
+      "source": "condensedintentclassification_concept",
+      "target": "nlu_intent_routing"
+    },
+    {
+      "relation": "uses",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/vocera-condensed-intent-ner-system.md",
+      "source_location": "Intent Reconstruction Engine maps back",
+      "weight": 1.0,
+      "_src": "condensedintentclassification_concept",
+      "_tgt": "intent_reconstruction_engine",
+      "source": "condensedintentclassification_concept",
+      "target": "intent_reconstruction_engine"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/vocera-condensed-intent-ner-system.md",
+      "source_location": "Why vanilla LLMs fail at scale section",
+      "weight": 1.0,
+      "_src": "rationale_condensed_over_vanilla",
+      "_tgt": "condensedintentclassification_concept",
+      "source": "condensedintentclassification_concept",
+      "target": "rationale_condensed_over_vanilla"
+    },
+    {
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": "SyncBadge is the leading solution for hands-free hospital comms",
+      "weight": 1.0,
+      "_src": "syncbadge_product",
+      "_tgt": "handsfreehospitalcommunication_concept",
+      "source": "handsfreehospitalcommunication_concept",
+      "target": "syncbadge_product"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/concepts/HandsfreeHospitalCommunication.md",
+      "source_location": "[[Vocera]]",
+      "weight": 1.0,
+      "_src": "handsfreehospitalcommunication_concept",
+      "_tgt": "vocera_platform",
+      "source": "handsfreehospitalcommunication_concept",
+      "target": "vocera_platform"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/concepts/HandsfreeHospitalCommunication.md",
+      "source_location": "[[Stryker]]",
+      "weight": 1.0,
+      "_src": "handsfreehospitalcommunication_concept",
+      "_tgt": "stryker_company",
+      "source": "handsfreehospitalcommunication_concept",
+      "target": "stryker_company"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/concepts/HandsfreeHospitalCommunication.md",
+      "source_location": "[[EMDAN]]",
+      "weight": 1.0,
+      "_src": "handsfreehospitalcommunication_concept",
+      "_tgt": "emdan_system",
+      "source": "handsfreehospitalcommunication_concept",
+      "target": "emdan_system"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/concepts/HandsfreeHospitalCommunication.md",
+      "source_location": "[[VoceraEngage]]",
+      "weight": 1.0,
+      "_src": "handsfreehospitalcommunication_concept",
+      "_tgt": "vocera_engage_middleware",
+      "source": "handsfreehospitalcommunication_concept",
+      "target": "vocera_engage_middleware"
+    },
+    {
+      "relation": "encompasses",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": "Clinical communication pillar maps to hands-free voice domain",
+      "weight": 1.0,
+      "_src": "clinical_communication_pillar",
+      "_tgt": "handsfreehospitalcommunication_concept",
+      "source": "handsfreehospitalcommunication_concept",
+      "target": "clinical_communication_pillar"
+    },
+    {
+      "relation": "acquired",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": "Stryker acquired Vocera in 2022",
+      "weight": 1.0,
+      "_src": "stryker_company",
+      "_tgt": "vocera_platform",
+      "source": "stryker_company",
+      "target": "vocera_platform"
+    },
+    {
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": "part of the Vocera product line",
+      "weight": 1.0,
+      "_src": "syncbadge_product",
+      "_tgt": "vocera_platform",
+      "source": "vocera_platform",
+      "target": "syncbadge_product"
+    },
+    {
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": "product grid lists Vocera Smartbadge",
+      "weight": 1.0,
+      "_src": "smartbadge_product",
+      "_tgt": "vocera_platform",
+      "source": "vocera_platform",
+      "target": "smartbadge_product"
+    },
+    {
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": "Vocera Engage middleware",
+      "weight": 1.0,
+      "_src": "vocera_engage_middleware",
+      "_tgt": "vocera_platform",
+      "source": "vocera_platform",
+      "target": "vocera_engage_middleware"
+    },
+    {
+      "relation": "triggers",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": "Okay Vocera wake word",
+      "weight": 1.0,
+      "_src": "syncbadge_product",
+      "_tgt": "wake_word_detection",
+      "source": "syncbadge_product",
+      "target": "wake_word_detection"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": "Unique Insights: platform strategy is interoperability-first",
+      "weight": 1.0,
+      "_src": "rationale_interoperability_first",
+      "_tgt": "syncbadge_product",
+      "source": "syncbadge_product",
+      "target": "rationale_interoperability_first"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "wiki/overview.md",
+      "source_location": "both Vocera wearable badges; SyncBadge=clinical, Smartbadge=non-clinical",
+      "weight": 1.0,
+      "_src": "syncbadge_product",
+      "_tgt": "smartbadge_product",
+      "source": "syncbadge_product",
+      "target": "smartbadge_product"
+    },
+    {
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": "EMDAN (Vocera Engage middleware, FDA 510(k)-cleared)",
+      "weight": 1.0,
+      "_src": "emdan_system",
+      "_tgt": "vocera_engage_middleware",
+      "source": "vocera_engage_middleware",
+      "target": "emdan_system"
+    },
+    {
+      "relation": "supports",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": "alarm notification supports ambient monitoring pillar",
+      "weight": 1.0,
+      "_src": "emdan_system",
+      "_tgt": "ambient_intelligence_pillar",
+      "source": "emdan_system",
+      "target": "ambient_intelligence_pillar"
+    },
+    {
+      "relation": "sends_audio_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": "architecture diagram",
+      "weight": 1.0,
+      "_src": "wake_word_detection",
+      "_tgt": "vocera_voice_server",
+      "source": "vocera_voice_server",
+      "target": "wake_word_detection"
+    },
+    {
+      "relation": "runs",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": "STT (Speech-to-Text)",
+      "weight": 1.0,
+      "_src": "vocera_voice_server",
+      "_tgt": "stt_pipeline",
+      "source": "vocera_voice_server",
+      "target": "stt_pipeline"
+    },
+    {
+      "relation": "belongs_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md",
+      "source_location": "beds are connected infrastructure hardware",
+      "weight": 1.0,
+      "_src": "procuity_beds",
+      "_tgt": "connected_infrastructure_pillar",
+      "source": "procuity_beds",
+      "target": "connected_infrastructure_pillar"
+    },
+    {
+      "relation": "feeds",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-sync-badge.md",
+      "source_location": "STT \u2192 NLU / Intent Classification",
+      "weight": 1.0,
+      "_src": "stt_pipeline",
+      "_tgt": "nlu_intent_routing",
+      "source": "stt_pipeline",
+      "target": "nlu_intent_routing"
+    },
+    {
+      "label": "includes_product",
+      "confidence": 0.8,
+      "properties": {
+        "detail": "ProCuity LEX/ZX beds appear in the SmartHospital product grid"
+      },
+      "_src": "img_ctx_smart_hospital_platform",
+      "_tgt": "product_procuity_lex_zx_procuity_lex_zx",
+      "source": "product_procuity_lex_zx_procuity_lex_zx",
+      "target": "img_ctx_smart_hospital_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "has_model",
+      "confidence": 0.8,
+      "properties": {
+        "detail": "LEX/ZX are med-surg models in the ProCuity bed family"
+      },
+      "_src": "img_ctx_procuity",
+      "_tgt": "product_procuity_lex_zx_procuity_lex_zx",
+      "source": "product_procuity_lex_zx_procuity_lex_zx",
+      "target": "img_ctx_procuity",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "sibling_product",
+      "confidence": 0.7,
+      "properties": {
+        "detail": "Both are ProCuity bed models \u2014 LEX/ZX for med-surg, ZMX for ICU"
+      },
+      "_src": "product_procuity_lex_zx_procuity_lex_zx",
+      "_tgt": "product_procuity_zmx_procuity_zmx",
+      "source": "product_procuity_lex_zx_procuity_lex_zx",
+      "target": "product_procuity_zmx_procuity_zmx",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "includes_product",
+      "confidence": 0.8,
+      "properties": {
+        "detail": "Vocera Engage appears in the SmartHospital product grid under clinical communication"
+      },
+      "_src": "img_ctx_smart_hospital_platform",
+      "_tgt": "product_vocera_engage_vocera_engage",
+      "source": "product_vocera_engage_vocera_engage",
+      "target": "img_ctx_smart_hospital_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "brand_product",
+      "confidence": 1.0,
+      "properties": {
+        "detail": "Vocera Engage is a product under the Vocera brand"
+      },
+      "_src": "img_ctx_vocera",
+      "_tgt": "product_vocera_engage_vocera_engage",
+      "source": "product_vocera_engage_vocera_engage",
+      "target": "img_ctx_vocera",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "pillar_contains",
+      "confidence": 0.75,
+      "properties": {
+        "detail": "Vocera Engage sits under the Clinical Communication pillar"
+      },
+      "_src": "pillar_clinical_communication_clinical_communication",
+      "_tgt": "product_vocera_engage_vocera_engage",
+      "source": "product_vocera_engage_vocera_engage",
+      "target": "pillar_clinical_communication_clinical_communication",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "has_pillar",
+      "confidence": 0.8,
+      "properties": {
+        "detail": "Ambient Intelligence is one of five SmartHospital Platform capability pillars"
+      },
+      "_src": "img_ctx_smart_hospital_platform",
+      "_tgt": "pillar_ambient_intelligence_ambient_intelligence",
+      "source": "pillar_ambient_intelligence_ambient_intelligence",
+      "target": "img_ctx_smart_hospital_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "includes_product",
+      "confidence": 0.8,
+      "properties": {
+        "detail": "ProCuity ZMX ICU bed appears in the SmartHospital product grid"
+      },
+      "_src": "img_ctx_smart_hospital_platform",
+      "_tgt": "product_procuity_zmx_procuity_zmx",
+      "source": "product_procuity_zmx_procuity_zmx",
+      "target": "img_ctx_smart_hospital_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "has_model",
+      "confidence": 0.8,
+      "properties": {
+        "detail": "ZMX is the ICU model in the ProCuity bed family"
+      },
+      "_src": "img_ctx_procuity",
+      "_tgt": "product_procuity_zmx_procuity_zmx",
+      "source": "product_procuity_zmx_procuity_zmx",
+      "target": "img_ctx_procuity",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "has_pillar",
+      "confidence": 0.8,
+      "properties": {
+        "detail": "Clinical Communication is one of five SmartHospital Platform capability pillars"
+      },
+      "_src": "img_ctx_smart_hospital_platform",
+      "_tgt": "pillar_clinical_communication_clinical_communication",
+      "source": "pillar_clinical_communication_clinical_communication",
+      "target": "img_ctx_smart_hospital_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "markets",
+      "confidence": 1.0,
+      "properties": {
+        "detail": "Stryker markets SmartHospital Platform as its connected-hospital umbrella"
+      },
+      "_src": "img_ctx_stryker",
+      "_tgt": "img_ctx_smart_hospital_platform",
+      "source": "img_ctx_stryker",
+      "target": "img_ctx_smart_hospital_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "manufactures",
+      "confidence": 1.0,
+      "properties": {
+        "detail": "Stryker manufactures the ProCuity bed line"
+      },
+      "_src": "img_ctx_stryker",
+      "_tgt": "img_ctx_procuity",
+      "source": "img_ctx_stryker",
+      "target": "img_ctx_procuity",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "owns_brand",
+      "confidence": 1.0,
+      "properties": {
+        "detail": "Stryker acquired and owns the Vocera brand"
+      },
+      "_src": "img_ctx_stryker",
+      "_tgt": "img_ctx_vocera",
+      "source": "img_ctx_stryker",
+      "target": "img_ctx_vocera",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "component_of",
+      "properties": {
+        "context": "Sync Badge is a product within the Stryker Smart Hospital Platform"
+      },
+      "confidence": 0.85,
+      "_src": "product_sync_badge_sync_badge",
+      "_tgt": "product_sync_badge_smart_hospital_platform",
+      "source": "product_sync_badge_sync_badge",
+      "target": "product_sync_badge_smart_hospital_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "manufactures",
+      "properties": {
+        "context": "Stryker manufactures the Sync Badge"
+      },
+      "confidence": 0.9,
+      "_src": "product_sync_badge_stryker",
+      "_tgt": "product_sync_badge_sync_badge",
+      "source": "product_sync_badge_sync_badge",
+      "target": "product_sync_badge_stryker",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "related_product",
+      "properties": {
+        "context": "Both are wearable badge-form-factor communication devices in the same platform"
+      },
+      "confidence": 0.8,
+      "_src": "product_sync_badge_sync_badge",
+      "_tgt": "product_vocera_smartbadge_vocera_smartbadge",
+      "source": "product_sync_badge_sync_badge",
+      "target": "product_vocera_smartbadge_vocera_smartbadge",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "enables",
+      "properties": {
+        "context": "Sync Badge enables hands-free clinical communication"
+      },
+      "confidence": 0.8,
+      "_src": "product_sync_badge_sync_badge",
+      "_tgt": "product_vocera_smartbadge_hands_free_communication",
+      "source": "product_sync_badge_sync_badge",
+      "target": "product_vocera_smartbadge_hands_free_communication",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "component_of",
+      "properties": {
+        "context": "Vocera Vina is a software product within the Stryker Smart Hospital Platform"
+      },
+      "confidence": 0.85,
+      "_src": "product_vocera_vina_vocera_vina",
+      "_tgt": "product_sync_badge_smart_hospital_platform",
+      "source": "product_vocera_vina_vocera_vina",
+      "target": "product_sync_badge_smart_hospital_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "brand_of",
+      "properties": {
+        "context": "Vocera Vina is a product under the Vocera brand"
+      },
+      "confidence": 0.85,
+      "_src": "product_vocera_vina_vocera",
+      "_tgt": "product_vocera_vina_vocera_vina",
+      "source": "product_vocera_vina_vocera_vina",
+      "target": "product_vocera_vina_vocera",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "supports",
+      "properties": {
+        "context": "Vocera Vina smartphone app supports clinical communication workflows"
+      },
+      "confidence": 0.75,
+      "_src": "product_vocera_vina_vocera_vina",
+      "_tgt": "product_vocera_smartbadge_clinical_workflow",
+      "source": "product_vocera_vina_vocera_vina",
+      "target": "product_vocera_smartbadge_clinical_workflow",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "complements",
+      "properties": {
+        "context": "Vocera Vina smartphone app complements the Smartbadge as mobile vs wearable communication endpoints"
+      },
+      "confidence": 0.75,
+      "_src": "product_vocera_vina_vocera_vina",
+      "_tgt": "product_vocera_smartbadge_vocera_smartbadge",
+      "source": "product_vocera_vina_vocera_vina",
+      "target": "product_vocera_smartbadge_vocera_smartbadge",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "component_of",
+      "properties": {
+        "context": "Ambient Monitoring is a product within the Stryker Smart Hospital Platform"
+      },
+      "confidence": 0.85,
+      "_src": "product_ambient_monitoring_ambient_monitoring",
+      "_tgt": "product_sync_badge_smart_hospital_platform",
+      "source": "product_ambient_monitoring_ambient_monitoring",
+      "target": "product_sync_badge_smart_hospital_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "manufactures",
+      "properties": {
+        "context": "Stryker manufactures the Ambient Monitoring system"
+      },
+      "confidence": 0.9,
+      "_src": "product_sync_badge_stryker",
+      "_tgt": "product_ambient_monitoring_ambient_monitoring",
+      "source": "product_ambient_monitoring_ambient_monitoring",
+      "target": "product_sync_badge_stryker",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "supports",
+      "properties": {
+        "context": "Ambient Monitoring supports patient safety through continuous surveillance"
+      },
+      "confidence": 0.8,
+      "_src": "product_ambient_monitoring_ambient_monitoring",
+      "_tgt": "product_ambient_monitoring_patient_safety",
+      "source": "product_ambient_monitoring_ambient_monitoring",
+      "target": "product_ambient_monitoring_patient_safety",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "integrates_with",
+      "properties": {
+        "context": "Ambient monitoring can integrate with smart hospital beds for comprehensive patient monitoring"
+      },
+      "confidence": 0.65,
+      "_src": "product_ambient_monitoring_ambient_monitoring",
+      "_tgt": "product_prime_series_prime_series",
+      "source": "product_ambient_monitoring_ambient_monitoring",
+      "target": "product_prime_series_prime_series",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "component_of",
+      "properties": {
+        "context": "Prime Series beds are a product within the Stryker Smart Hospital Platform"
+      },
+      "confidence": 0.85,
+      "_src": "product_prime_series_prime_series",
+      "_tgt": "product_sync_badge_smart_hospital_platform",
+      "source": "product_prime_series_prime_series",
+      "target": "product_sync_badge_smart_hospital_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "manufactures",
+      "properties": {
+        "context": "Stryker manufactures the Prime Series hospital beds"
+      },
+      "confidence": 0.9,
+      "_src": "product_sync_badge_stryker",
+      "_tgt": "product_prime_series_prime_series",
+      "source": "product_prime_series_prime_series",
+      "target": "product_sync_badge_stryker",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "supports",
+      "properties": {
+        "context": "Prime Series smart beds support patient safety with integrated monitoring features"
+      },
+      "confidence": 0.7,
+      "_src": "product_prime_series_prime_series",
+      "_tgt": "product_ambient_monitoring_patient_safety",
+      "source": "product_prime_series_prime_series",
+      "target": "product_ambient_monitoring_patient_safety",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "component_of",
+      "properties": {
+        "context": "Vocera Smartbadge is a product within the Stryker Smart Hospital Platform"
+      },
+      "confidence": 0.85,
+      "_src": "product_vocera_smartbadge_vocera_smartbadge",
+      "_tgt": "product_sync_badge_smart_hospital_platform",
+      "source": "product_vocera_smartbadge_vocera_smartbadge",
+      "target": "product_sync_badge_smart_hospital_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "brand_of",
+      "properties": {
+        "context": "Vocera Smartbadge is a product under the Vocera brand"
+      },
+      "confidence": 0.85,
+      "_src": "product_vocera_vina_vocera",
+      "_tgt": "product_vocera_smartbadge_vocera_smartbadge",
+      "source": "product_vocera_smartbadge_vocera_smartbadge",
+      "target": "product_vocera_vina_vocera",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "enables",
+      "properties": {
+        "context": "Vocera Smartbadge enables hands-free voice communication for clinical staff"
+      },
+      "confidence": 0.85,
+      "_src": "product_vocera_smartbadge_vocera_smartbadge",
+      "_tgt": "product_vocera_smartbadge_hands_free_communication",
+      "source": "product_vocera_smartbadge_vocera_smartbadge",
+      "target": "product_vocera_smartbadge_hands_free_communication",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "owns",
+      "properties": {
+        "context": "Stryker owns and operates the Smart Hospital Platform"
+      },
+      "confidence": 0.9,
+      "_src": "product_sync_badge_stryker",
+      "_tgt": "product_sync_badge_smart_hospital_platform",
+      "source": "product_sync_badge_stryker",
+      "target": "product_sync_badge_smart_hospital_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "acquired",
+      "properties": {
+        "context": "Stryker acquired Vocera Communications"
+      },
+      "confidence": 0.85,
+      "_src": "product_sync_badge_stryker",
+      "_tgt": "product_vocera_vina_vocera",
+      "source": "product_sync_badge_stryker",
+      "target": "product_vocera_vina_vocera",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "manufactures",
+      "properties": {
+        "detail": "Stryker positions Smart Hospital Platform as its flagship connected healthcare ecosystem"
+      },
+      "confidence": 0.85,
+      "_src": "hero_shp_stryker",
+      "_tgt": "hero_shp_smart_hospital_platform",
+      "source": "hero_shp_smart_hospital_platform",
+      "target": "hero_shp_stryker",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "is_part_of",
+      "properties": {
+        "detail": "Virtual Nursing is a product within the Smart Hospital Platform product grid, under the Virtual Care pillar"
+      },
+      "confidence": 0.85,
+      "_src": "prod_vn_virtual_nursing",
+      "_tgt": "hero_shp_smart_hospital_platform",
+      "source": "hero_shp_smart_hospital_platform",
+      "target": "prod_vn_virtual_nursing",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "is_part_of",
+      "properties": {
+        "detail": "Vocera Edge is listed in the Smart Hospital Platform product mosaic as infrastructure"
+      },
+      "confidence": 0.85,
+      "_src": "prod_ve_vocera_edge",
+      "_tgt": "hero_shp_smart_hospital_platform",
+      "source": "hero_shp_smart_hospital_platform",
+      "target": "prod_ve_vocera_edge",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "is_part_of",
+      "properties": {
+        "detail": "Vocera Accessories appear in the Smart Hospital Platform product grid"
+      },
+      "confidence": 0.85,
+      "_src": "prod_va_vocera_accessories",
+      "_tgt": "hero_shp_smart_hospital_platform",
+      "source": "hero_shp_smart_hospital_platform",
+      "target": "prod_va_vocera_accessories",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "is_part_of",
+      "properties": {
+        "detail": "Vocera Collaboration Suite is the core software platform within the Smart Hospital Platform ecosystem"
+      },
+      "confidence": 0.85,
+      "_src": "prod_vcs_vocera_collaboration_suite",
+      "_tgt": "hero_shp_smart_hospital_platform",
+      "source": "hero_shp_smart_hospital_platform",
+      "target": "prod_vcs_vocera_collaboration_suite",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "pillar_of",
+      "properties": {
+        "detail": "Virtual Care is one of five marketing pillars of the Smart Hospital Platform"
+      },
+      "confidence": 0.8,
+      "_src": "hero_shp_virtual_care_pillar",
+      "_tgt": "hero_shp_smart_hospital_platform",
+      "source": "hero_shp_smart_hospital_platform",
+      "target": "hero_shp_virtual_care_pillar",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "pillar_of",
+      "properties": {
+        "detail": "Connected Infrastructure is one of five marketing pillars of the Smart Hospital Platform"
+      },
+      "confidence": 0.8,
+      "_src": "hero_shp_connected_infrastructure_pillar",
+      "_tgt": "hero_shp_smart_hospital_platform",
+      "source": "hero_shp_smart_hospital_platform",
+      "target": "hero_shp_connected_infrastructure_pillar",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "pillar_of",
+      "properties": {
+        "detail": "Clinical Communication is one of five marketing pillars of the Smart Hospital Platform"
+      },
+      "confidence": 0.8,
+      "_src": "prod_vcs_clinical_communication",
+      "_tgt": "hero_shp_smart_hospital_platform",
+      "source": "hero_shp_smart_hospital_platform",
+      "target": "prod_vcs_clinical_communication",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "acquired_by",
+      "properties": {
+        "detail": "Vocera was acquired by Stryker and rebranded as Stryker Smart Care"
+      },
+      "confidence": 0.85,
+      "_src": "prod_vcs_vocera",
+      "_tgt": "hero_shp_stryker",
+      "source": "hero_shp_stryker",
+      "target": "prod_vcs_vocera",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "implements",
+      "properties": {
+        "detail": "Virtual Nursing is Stryker's inpatient telehealth implementation for remote clinical observation"
+      },
+      "confidence": 0.75,
+      "_src": "prod_vn_virtual_nursing",
+      "_tgt": "prod_vn_telehealth",
+      "source": "prod_vn_virtual_nursing",
+      "target": "prod_vn_telehealth",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "enables",
+      "properties": {
+        "detail": "Virtual Nursing enables remote monitoring of patients from virtual nursing stations"
+      },
+      "confidence": 0.65,
+      "_src": "prod_vn_virtual_nursing",
+      "_tgt": "prod_vn_remote_patient_monitoring",
+      "source": "prod_vn_virtual_nursing",
+      "target": "prod_vn_remote_patient_monitoring",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "belongs_to_pillar",
+      "properties": {
+        "detail": "Virtual Nursing is categorized under the Virtual Care marketing pillar"
+      },
+      "confidence": 0.8,
+      "_src": "prod_vn_virtual_nursing",
+      "_tgt": "hero_shp_virtual_care_pillar",
+      "source": "prod_vn_virtual_nursing",
+      "target": "hero_shp_virtual_care_pillar",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "functions_as",
+      "properties": {
+        "detail": "Vocera Edge serves as a network gateway bridging wearable devices to backend infrastructure"
+      },
+      "confidence": 0.8,
+      "_src": "prod_ve_vocera_edge",
+      "_tgt": "prod_ve_network_gateway",
+      "source": "prod_ve_vocera_edge",
+      "target": "prod_ve_network_gateway",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "provides_connectivity_for",
+      "properties": {
+        "detail": "Vocera Edge provides the network layer that connects clinical devices to the Collaboration Suite backend"
+      },
+      "confidence": 0.75,
+      "_src": "prod_ve_vocera_edge",
+      "_tgt": "prod_vcs_vocera_collaboration_suite",
+      "source": "prod_ve_vocera_edge",
+      "target": "prod_vcs_vocera_collaboration_suite",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "belongs_to_pillar",
+      "properties": {
+        "detail": "Vocera Edge falls under the Connected Infrastructure marketing pillar"
+      },
+      "confidence": 0.75,
+      "_src": "prod_ve_vocera_edge",
+      "_tgt": "hero_shp_connected_infrastructure_pillar",
+      "source": "prod_ve_vocera_edge",
+      "target": "hero_shp_connected_infrastructure_pillar",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "branded_under",
+      "properties": {
+        "detail": "Vocera Edge is part of the Vocera product line"
+      },
+      "confidence": 0.85,
+      "_src": "prod_ve_vocera_edge",
+      "_tgt": "prod_vcs_vocera",
+      "source": "prod_ve_vocera_edge",
+      "target": "prod_vcs_vocera",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "communicates_via",
+      "properties": {
+        "detail": "Sync Badge connects to backend infrastructure through the Vocera Edge network gateway"
+      },
+      "confidence": 0.7,
+      "_src": "prod_va_sync_badge",
+      "_tgt": "prod_ve_vocera_edge",
+      "source": "prod_ve_vocera_edge",
+      "target": "prod_va_sync_badge",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "communicates_via",
+      "properties": {
+        "detail": "Smartbadge connects to backend infrastructure through the Vocera Edge network gateway"
+      },
+      "confidence": 0.7,
+      "_src": "prod_va_smartbadge",
+      "_tgt": "prod_ve_vocera_edge",
+      "source": "prod_ve_vocera_edge",
+      "target": "prod_va_smartbadge",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "compatible_with",
+      "properties": {
+        "detail": "Vocera Accessories (headsets, batteries, chargers) are designed primarily for the Smartbadge wearable device"
+      },
+      "confidence": 0.8,
+      "_src": "prod_va_vocera_accessories",
+      "_tgt": "prod_va_smartbadge",
+      "source": "prod_va_vocera_accessories",
+      "target": "prod_va_smartbadge",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "compatible_with",
+      "properties": {
+        "detail": "Vocera Accessories also support the current-generation Sync Badge device"
+      },
+      "confidence": 0.7,
+      "_src": "prod_va_vocera_accessories",
+      "_tgt": "prod_va_sync_badge",
+      "source": "prod_va_vocera_accessories",
+      "target": "prod_va_sync_badge",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "branded_under",
+      "properties": {
+        "detail": "Vocera Accessories are part of the Vocera product line"
+      },
+      "confidence": 0.85,
+      "_src": "prod_va_vocera_accessories",
+      "_tgt": "prod_vcs_vocera",
+      "source": "prod_va_vocera_accessories",
+      "target": "prod_vcs_vocera",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "succeeds",
+      "properties": {
+        "detail": "Sync Badge is the current-generation successor to the Vocera Smartbadge"
+      },
+      "confidence": 0.75,
+      "_src": "prod_va_sync_badge",
+      "_tgt": "prod_va_smartbadge",
+      "source": "prod_va_smartbadge",
+      "target": "prod_va_sync_badge",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "connects_to",
+      "properties": {
+        "detail": "Smartbadge communicates through the Vocera Collaboration Suite for voice routing and messaging"
+      },
+      "confidence": 0.75,
+      "_src": "prod_va_smartbadge",
+      "_tgt": "prod_vcs_vocera_collaboration_suite",
+      "source": "prod_va_smartbadge",
+      "target": "prod_vcs_vocera_collaboration_suite",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "connects_to",
+      "properties": {
+        "detail": "Sync Badge routes voice commands through the Vocera Voice Server / Collaboration Suite backend"
+      },
+      "confidence": 0.75,
+      "_src": "prod_va_sync_badge",
+      "_tgt": "prod_vcs_vocera_collaboration_suite",
+      "source": "prod_va_sync_badge",
+      "target": "prod_vcs_vocera_collaboration_suite",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "enables",
+      "properties": {
+        "detail": "Vocera Collaboration Suite is the primary software platform enabling the Clinical Communication pillar"
+      },
+      "confidence": 0.8,
+      "_src": "prod_vcs_vocera_collaboration_suite",
+      "_tgt": "prod_vcs_clinical_communication",
+      "source": "prod_vcs_vocera_collaboration_suite",
+      "target": "prod_vcs_clinical_communication",
+      "confidence_score": 1.0
+    },
+    {
+      "label": "branded_under",
+      "properties": {
+        "detail": "Collaboration Suite is part of the Vocera product line (now Stryker Smart Care)"
+      },
+      "confidence": 0.85,
+      "_src": "prod_vcs_vocera_collaboration_suite",
+      "_tgt": "prod_vcs_vocera",
+      "source": "prod_vcs_vocera_collaboration_suite",
+      "target": "prod_vcs_vocera",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "HAS_PILLAR",
+      "properties": {
+        "detail": "Workflow Engine is one of five marketing pillars of the SmartHospital Platform"
+      },
+      "confidence": 1.0,
+      "_src": "smart_hospital_platform",
+      "_tgt": "pillar_workflow_engine_workflow_engine",
+      "source": "pillar_workflow_engine_workflow_engine",
+      "target": "smart_hospital_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "INTEGRATES_WITH",
+      "properties": {
+        "detail": "Workflow Engine orchestrates automation and alerting using data from Connected Infrastructure IoT devices"
+      },
+      "confidence": 0.7,
+      "_src": "pillar_workflow_engine_workflow_engine",
+      "_tgt": "pillar_connected_infrastructure_connected_infrastructure",
+      "source": "pillar_workflow_engine_workflow_engine",
+      "target": "pillar_connected_infrastructure_connected_infrastructure",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "HAS_PRODUCT",
+      "properties": {
+        "detail": "Vocera Ease is a product under the Vocera brand"
+      },
+      "confidence": 1.0,
+      "_src": "vocera",
+      "_tgt": "product_vocera_ease_vocera_ease",
+      "source": "product_vocera_ease_vocera_ease",
+      "target": "vocera",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "INCLUDES_PRODUCT",
+      "properties": {
+        "detail": "Vocera Ease is listed in the SmartHospital Platform product grid"
+      },
+      "confidence": 1.0,
+      "_src": "smart_hospital_platform",
+      "_tgt": "product_vocera_ease_vocera_ease",
+      "source": "product_vocera_ease_vocera_ease",
+      "target": "smart_hospital_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "CONTAINS_PRODUCT",
+      "properties": {
+        "detail": "Vocera Ease patient messaging app falls under the Clinical Communication pillar"
+      },
+      "confidence": 0.8,
+      "_src": "pillar_clinical_communication",
+      "_tgt": "product_vocera_ease_vocera_ease",
+      "source": "product_vocera_ease_vocera_ease",
+      "target": "pillar_clinical_communication",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "COMPLEMENTS",
+      "properties": {
+        "detail": "Vocera Ease patient messaging complements Virtual Monitoring by adding a communication channel for families alongside surveillance"
+      },
+      "confidence": 0.6,
+      "_src": "product_vocera_ease_vocera_ease",
+      "_tgt": "product_virtual_monitoring_virtual_monitoring",
+      "source": "product_vocera_ease_vocera_ease",
+      "target": "product_virtual_monitoring_virtual_monitoring",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "HAS_PILLAR",
+      "properties": {
+        "detail": "Connected Infrastructure is one of five marketing pillars of the SmartHospital Platform"
+      },
+      "confidence": 1.0,
+      "_src": "smart_hospital_platform",
+      "_tgt": "pillar_connected_infrastructure_connected_infrastructure",
+      "source": "pillar_connected_infrastructure_connected_infrastructure",
+      "target": "smart_hospital_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "DEPENDS_ON",
+      "properties": {
+        "detail": "Virtual Monitoring relies on connected infrastructure for video/sensor feeds from patient rooms"
+      },
+      "confidence": 0.7,
+      "_src": "product_virtual_monitoring_virtual_monitoring",
+      "_tgt": "pillar_connected_infrastructure_connected_infrastructure",
+      "source": "pillar_connected_infrastructure_connected_infrastructure",
+      "target": "product_virtual_monitoring_virtual_monitoring",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "HAS_PILLAR",
+      "properties": {
+        "detail": "Virtual Care is one of five marketing pillars of the SmartHospital Platform"
+      },
+      "confidence": 1.0,
+      "_src": "smart_hospital_platform",
+      "_tgt": "pillar_virtual_care_virtual_care",
+      "source": "pillar_virtual_care_virtual_care",
+      "target": "smart_hospital_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "CONTAINS_PRODUCT",
+      "properties": {
+        "detail": "Virtual Monitoring falls under the Virtual Care pillar as a remote patient surveillance system"
+      },
+      "confidence": 0.85,
+      "_src": "pillar_virtual_care_virtual_care",
+      "_tgt": "product_virtual_monitoring_virtual_monitoring",
+      "source": "pillar_virtual_care_virtual_care",
+      "target": "product_virtual_monitoring_virtual_monitoring",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "CONTAINS_PRODUCT",
+      "properties": {
+        "detail": "Virtual Nursing falls under the Virtual Care pillar as a telehealth solution"
+      },
+      "confidence": 0.8,
+      "_src": "pillar_virtual_care_virtual_care",
+      "_tgt": "product_virtual_nursing",
+      "source": "pillar_virtual_care_virtual_care",
+      "target": "product_virtual_nursing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "INCLUDES_PRODUCT",
+      "properties": {
+        "detail": "Virtual Monitoring is listed in the SmartHospital Platform product grid"
+      },
+      "confidence": 1.0,
+      "_src": "smart_hospital_platform",
+      "_tgt": "product_virtual_monitoring_virtual_monitoring",
+      "source": "product_virtual_monitoring_virtual_monitoring",
+      "target": "smart_hospital_platform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "HAS_PILLAR",
+      "properties": {
+        "detail": "Clinical Communication is one of five marketing pillars of the SmartHospital Platform"
+      },
+      "confidence": 0.85,
+      "_src": "smart_hospital_platform",
+      "_tgt": "pillar_clinical_communication",
+      "source": "smart_hospital_platform",
+      "target": "pillar_clinical_communication",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "HAS_PILLAR",
+      "properties": {
+        "detail": "Ambient Intelligence is one of five marketing pillars of the SmartHospital Platform"
+      },
+      "confidence": 0.85,
+      "_src": "smart_hospital_platform",
+      "_tgt": "pillar_ambient_intelligence",
+      "source": "smart_hospital_platform",
+      "target": "pillar_ambient_intelligence",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "OWNS",
+      "properties": {
+        "detail": "Stryker owns and markets the SmartHospital Platform"
+      },
+      "confidence": 1.0,
+      "_src": "stryker",
+      "_tgt": "smart_hospital_platform",
+      "source": "smart_hospital_platform",
+      "target": "stryker",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "OWNS_BRAND",
+      "properties": {
+        "detail": "Vocera is a Stryker brand for clinical communication products"
+      },
+      "confidence": 1.0,
+      "_src": "stryker",
+      "_tgt": "vocera",
+      "source": "stryker",
+      "target": "vocera",
+      "confidence_score": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "vocera_voice_pipeline",
+      "label": "Vocera Voice Processing Pipeline",
+      "nodes": [
+        "wake_word_detection",
+        "stt_pipeline",
+        "nlu_intent_routing",
+        "condensedintentclassification_concept",
+        "intent_reconstruction_engine",
+        "vocera_voice_server"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95,
+      "source_file": "wiki/notes/stryker-sync-badge.md"
+    },
+    {
+      "id": "smarthospital_five_pillars",
+      "label": "SmartHospital Platform Five Pillars",
+      "nodes": [
+        "clinical_communication_pillar",
+        "workflow_engine_pillar",
+        "virtual_care_pillar",
+        "ambient_intelligence_pillar",
+        "connected_infrastructure_pillar"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "wiki/notes/stryker-smart-hospital-platform.md"
+    },
+    {
+      "id": "condensed_intent_model_evaluation",
+      "label": "Condensed Intent Model Evaluation Candidates",
+      "nodes": [
+        "gpt_4o",
+        "gpt_4o_mini",
+        "gpt_41_nano",
+        "condensedintentclassification_concept"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.9,
+      "source_file": "wiki/notes/vocera-condensed-intent-ner-system.md"
+    }
+  ]
+}

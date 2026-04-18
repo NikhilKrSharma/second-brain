@@ -15,4 +15,9 @@ venv/
 
 graph/.cache.json
 
-deleted/
+# deleted/
+# .graphifyignore
+vendor/
+node_modules/
+dist/
+*.generated.py

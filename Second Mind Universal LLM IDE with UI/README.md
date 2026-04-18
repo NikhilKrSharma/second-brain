@@ -55,7 +55,6 @@ Every `/wiki-*` workflow automatically refreshes `graph/graph.html` before it fi
   - [Tagging System](#tagging-system)
   - [Prompt Templates](#prompt-templates)
   - [Tool Scripts](#tool-scripts)
-    - [`tools/build_graph.py`](#toolsbuild_graphpy)
     - [`tools/extract.py`](#toolsextractpy)
     - [`tools/dedup.py`](#toolsdeduppy)
     - [`tools/style_lint.py`](#toolsstyle_lintpy)
@@ -155,8 +154,8 @@ docs/                     # Reference docs
   assets.md               # wiki/assets paths, media, video embed rules
 
 tools/                    # Utility scripts (agent calls these)
-  build_graph.py          # Knowledge graph builder (no deps)
-  serve_graph.py          # Serves repo root over HTTP (graph + wiki media)
+  build_graph.py          # Knowledge graph builder (called by start-graph.sh)
+  serve_graph.py          # Serves repo root over HTTP (called by start-graph.sh)
   extract.py              # PDF/DOCX/XLSX/PPTX -> structured markdown
   dedup.py                # Duplicate detection (no deps)
 
@@ -244,11 +243,22 @@ Offers to save the report to `wiki/lint-report.md`, then rebuilds `graph/graph.h
 
 ### `/wiki-graph`
 
-Runs `python tools/build_graph.py --open`.
+Builds and serves the interactive knowledge graph.
 
-Produces `graph/graph.html` — an interactive graph with pan, zoom, rotate, node search, connection highlighting. Nodes colored by type (source/entity/concept/synthesis). Opens in your browser automatically. This same graph refresh runs automatically after other `/wiki-*` workflows that update wiki state.
+> **Note:** Run `start-graph.sh` to build and see the graph.
 
-**Note:** `graph.html` loads **vis-network**, **marked**, **DOMPurify**, and **mermaid** from CDNs so `file://` works when local bundles are unavailable. You need network access for that path. **Local server (recommended for images in the panel):** `python tools/serve_graph.py` opens `http://127.0.0.1:8765/graph/graph.html` — the server roots at the **repo**, so `wiki/assets/...` loads in the reader pane. **Offline:** switch `<script>` / `<link>` in `graph/template.html` to local `./vis-network.min.js` (and siblings) and mirror the other libs if needed.
+```bash
+./start-graph.sh
+```
+
+This automatically:
+- Builds `graph/graph.html` — an interactive graph with pan, zoom, rotate, node search, connection highlighting. Nodes colored by type (source/entity/concept/synthesis).
+- Starts a local server at `http://127.0.0.1:8765/graph/graph.html`
+- Opens it in your browser automatically
+
+The graph supports **Preview/Raw/Edit** in the reader pane with optional **save-to-disk**, **theme** colors, **node color by** type/folder/tag, and **graph forces** sliders. Your preferences are stored in browser `localStorage`.
+
+**Note:** `graph.html` loads **vis-network**, **marked**, **DOMPurify**, and **mermaid** from CDNs so it works even when using `file://`. For better performance with images in the panel, use the local server (which is what `start-graph.sh` does).
 
 **Keyboard shortcuts in the graph:** `+`/`-` zoom · `F` fit · arrows pan · `R` rotate · `Esc` reset · `?` help
 
@@ -388,33 +398,6 @@ To change how a source type is extracted, edit the corresponding template file. 
 ## Tool Scripts
 
 Located in `tools/`. The agent calls these automatically — you rarely need to run them manually.
-
-### `tools/build_graph.py`
-
-Builds the knowledge graph. No dependencies.
-
-```bash
-python tools/build_graph.py          # build graph.json + graph.html
-python tools/build_graph.py --open   # build + open in browser
-```
-
-Parses all `[[wikilinks]]` across `wiki/`, rewrites local `![](...)` image paths so the reader pane resolves them from `graph/graph.html`, then writes `graph/graph.json` and `graph/graph.html`, appends to `wiki/log.md`.
-
-The interactive graph UI (edit `graph/template.html`, then rebuild) supports toggling labels, three label sizes, hover-only labels, an overview reset control, **Preview/Raw/Edit** in the reader pane with optional **save-to-disk** (see `serve_graph.py` below), reader **theme** colors, **node color by** type/folder/tag, **graph forces** sliders, and stores preferences in browser `localStorage` under **`wg-state-v4`** (older **`wg-state-v3`** is still read once for migration).
-
-### `tools/serve_graph.py`
-
-Serves the **repository root** on `http://127.0.0.1:8765/` by default so `graph/graph.html` can load `wiki/assets/...` images in the side panel. Use when **offline** (with local script bundles in `graph/`) or whenever `file://` media fails.
-
-**Editing notes from the graph:** open the graph via this server (not `file://`), then use **Edit** → **Save** in the Content panel. Saving requires **`--allow-write`**, which enables **`PUT`** only for paths under **`wiki/`** ending in **`.md`**. The server binds to **`127.0.0.1`** only; never expose **`--allow-write`** on an untrusted network. If `PUT` is disabled or fails, the UI falls back to **downloading** the file for you to replace manually. After saving, run **`python tools/build_graph.py`** to refresh embedded graph data.
-
-```bash
-python tools/serve_graph.py              # opens /graph/graph.html in browser
-python tools/serve_graph.py --no-open    # print URL only
-python tools/serve_graph.py --allow-write  # allow graph UI to save wiki/*.md via PUT
-```
-
----
 
 ### `tools/extract.py`
 

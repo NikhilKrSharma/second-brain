@@ -86,6 +86,12 @@ def main() -> None:
         def __init__(self, *a: Any, **kw: Any) -> None:
             super().__init__(*a, directory=str(REPO_ROOT), **kw)
 
+        def end_headers(self) -> None:  # type: ignore[override]
+            """Add no-cache headers so rebuilt files are always served fresh."""
+            self.send_header("Cache-Control", "no-store, no-cache, must-revalidate")
+            self.send_header("Pragma", "no-cache")
+            super().end_headers()
+
         def do_PUT(self) -> None:  # noqa: N802 — stdlib name
             """Write wiki markdown if ``--allow-write``; otherwise 403."""
             if not allow_write:

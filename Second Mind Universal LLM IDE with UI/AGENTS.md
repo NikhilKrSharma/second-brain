@@ -1,6 +1,6 @@
 # LLM Wiki Agent — Schema & Workflow Instructions
 
-This wiki is maintained entirely by your coding agent. Just open this folder in Cursor or VS Code with Copilot and talk to it. No API keys needed. The agent calls these utilities (pure stdlib unless you add extraction deps — see `requirements.txt`): `tools/extract.py` and `tools/dedup.py` for ingest/dedup; `tools/style_lint.py` and `tools/validate_frontmatter.py` during `/wiki-lint`. Graph rebuilds (`tools/build_graph.py`) are user-initiated via `/wiki-graph` — never run automatically.
+This wiki is maintained entirely by your coding agent. Just open this folder in Cursor or VS Code with Copilot and talk to it. No API keys needed. The agent calls these utilities (pure stdlib unless you add extraction deps — see `requirements.txt`): `tools/extract.py` and `tools/dedup.py` for ingest/dedup; `tools/style_lint.py` and `tools/validate_frontmatter.py` during `/wiki-lint`. Graph builds are user-initiated via `/wiki-graph` (which calls `start-graph.sh`) — never run automatically.
 
 **Orientation:** `AGENTS.md` is the single source of truth for all workflows. Cursor auto-loads `.cursor/rules/wiki-agent.mdc`; VS Code Copilot auto-loads `.github/copilot-instructions.md`. Human-facing documentation is in `README.md`.
 
@@ -86,8 +86,8 @@ docs/                   # Reference docs for agent and human
   PIPELINES.md          # Source routing table and pipeline details
   assets.md             # wiki/assets layout, paths, video embed rules
 tools/                  # Utility scripts (agent calls these)
-  build_graph.py        # Builds graph.json + graph.html (no deps)
-  serve_graph.py        # Optional: serve repo root over HTTP for graph + media
+  build_graph.py        # Builds graph.json + graph.html (no deps; called by start-graph.sh)
+  serve_graph.py        # Serves repo root over HTTP for graph + media (called by start-graph.sh)
   extract.py            # PDF/DOCX/XLSX/PPTX -> structured markdown
   dedup.py              # Duplicate detection (no deps)
   style_lint.py         # Instruction/prompt verbose-default scan (no deps)
@@ -249,12 +249,19 @@ Append to `wiki/log.md`: `## [YYYY-MM-DD] lint | Wiki health check`
 
 Triggered by: *"build graph"* or `/wiki-graph`
 
-Run:
-```
-python tools/build_graph.py --open
+> **Note:** Run `start-graph.sh` to build and see the graph.
+
+```bash
+./start-graph.sh
 ```
 
-The script (pure stdlib) parses all `[[wikilinks]]`, rewrites local markdown image paths for the reader pane, builds `graph/graph.json` and `graph/graph.html`, and appends to `wiki/log.md` automatically.
+This script automatically:
+- Parses all `[[wikilinks]]` across wiki pages
+- Rewrites local markdown image paths for the reader pane
+- Builds `graph/graph.json` and `graph/graph.html`
+- Starts a local server on `http://127.0.0.1:8765/graph/graph.html`
+- Appends to `wiki/log.md` automatically
+
 After it runs, summarize with fixed headings: `Outcome`, `Key Points`, `Next Step`.
 Keep `Key Points` to 3-5 bullets by default.
 `/wiki-graph` is user-initiated only — it is never run automatically by other workflows.

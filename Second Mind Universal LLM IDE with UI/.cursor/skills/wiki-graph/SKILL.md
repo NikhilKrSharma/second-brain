@@ -9,17 +9,20 @@ Build the LLM Wiki knowledge graph.
 
 Usage: /wiki-graph
 
-Run the script:
-```
-python tools/build_graph.py --open
+> **Note:** Run `start-graph.sh` to build and see the interactive graph.
+> It will automatically start the server and open the graph in your browser.
+
+```bash
+./start-graph.sh
 ```
 
-The script is pure Python stdlib (no dependencies). It will:
-1. Parse all [[wikilinks]] across wiki pages
-2. Build nodes (one per page) and edges (one per link), tagged EXTRACTED
-3. Write graph/graph.json with {nodes, edges, built: today}
-4. Write graph/graph.html as a self-contained vis.js visualization
-5. Append to wiki/log.md automatically
+This builds the knowledge graph by:
+1. Parsing all [[wikilinks]] across wiki pages
+2. Building nodes (one per page) and edges (one per link)
+3. Writing graph/graph.json with {nodes, edges, built: today}
+4. Writing graph/graph.html as a self-contained vis.js visualization
+5. Starting a local server on http://127.0.0.1:8765/graph/graph.html
+6. Appending to wiki/log.md automatically
 
 After the script completes, respond using fixed headings: `Outcome`, `Key Points`, `Next Step`.
 - Keep `Key Points` to 3-5 bullets by default.
