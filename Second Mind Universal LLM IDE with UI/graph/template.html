@@ -55,6 +55,10 @@
       /* ── Layout ──────────────────────────────────────────── */
       --panel-w: 440px;
       --left-panel-w: 290px;
+      /* Toolbar “single bar” rhythm (vertical rail + top-right util) */
+      --toolbar-bar-gap: 10px;
+      /* Uniform square controls in #toolbar + #graph-actions-rail */
+      --tb-btn-size: 44px;
       /* ── Radii (use these tokens throughout) ─────────────── */
       --radius-sm: 6px;
       --radius: 8px;
@@ -147,16 +151,63 @@
 
     /* ── Toolbar ──────────────────────────────────────────────────── */
     #toolbar {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      display: flex;
+      flex-direction: row;
       align-items: center;
       gap: 8px;
       padding: 5px 12px;
+      min-height: 46px;
+      box-sizing: border-box;
       background: linear-gradient(180deg, var(--bg1), var(--bg0));
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
       z-index: 20;
       backdrop-filter: blur(18px);
+    }
+    #toolbar > .toolbar-lane.left {
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+    #toolbar > .toolbar-lane-util {
+      flex: 0 1 auto;
+      min-width: 0;
+      justify-content: flex-end;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 12px;
+    }
+    /* Top-right util: always one row; scroll horizontally only if viewport is very tight */
+    #toolbar .toolbar-lane-util .toolbar-cluster.toolbar-bar--horizontal {
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+      align-items: center;
+      gap: var(--toolbar-bar-gap);
+      padding: 5px 8px;
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+    }
+    /* Stats moved from rail — rightmost in top bar */
+    #graph-actions-toolbar-foot {
+      flex: 0 1 min(280px, 34vw);
+      min-width: 0;
+      text-align: right;
+      padding: 2px 0 2px 12px;
+      margin-left: 0;
+      border-left: 1px solid var(--border);
+    }
+    #graph-actions-toolbar-foot #stats {
+      display: block;
+      font-size: 9px;
+      line-height: 1.25;
+      color: var(--t4);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.01em;
+      padding: 0;
     }
     .toolbar-lane {
       display: flex;
@@ -164,24 +215,66 @@
       gap: 6px;
       min-width: 0;
     }
-    .toolbar-lane.center { justify-content: center; }
-    .toolbar-lane.right { justify-content: flex-end; }
+    .toolbar-lane.left { min-width: 0; }
     .toolbar-cluster {
-      display: inline-flex;
+      display: flex;
       align-items: center;
       gap: 4px;
       min-height: 30px;
+      min-width: 0;
       padding: 4px;
       border-radius: var(--radius-xl);
-      border: 1px solid rgba(255,255,255,0.06);
-      background: rgba(12,16,22,0.52);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 8px 20px rgba(0,0,0,0.14);
+      border: 1px solid var(--border);
+      background: var(--glass);
+      box-shadow: inset 0 1px 0 var(--glass-border), 0 8px 24px rgba(0,0,0,0.18);
       backdrop-filter: blur(18px);
+      overflow: visible;
+    }
+    .toolbar-cluster--left {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    /* Single-bar tool strips: gap + direction (modifiers on .toolbar-cluster) */
+    .toolbar-cluster.toolbar-bar--vertical {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--toolbar-bar-gap);
+    }
+    .toolbar-cluster.toolbar-bar--horizontal {
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: var(--toolbar-bar-gap);
+    }
+    /* Horizontal strip: nowrap row inside a bounded-width scrollport */
+    .toolbar-scroll {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 4px;
+      flex: 1 1 auto;
+      min-width: 0;
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+      scroll-snap-type: x proximity;
+    }
+    .toolbar-scroll .toolbar-group,
+    .toolbar-scroll .toolbar-subgroup {
+      flex-shrink: 0;
+      scroll-snap-align: start;
+    }
+    .toolbar-scroll--search {
+      flex: 1 1 160px;
+      min-width: 0;
     }
     :root.light-mode .toolbar-cluster {
-      background: rgba(255,255,255,0.72);
-      border-color: rgba(15,23,42,0.07);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 8px 20px rgba(15,23,42,0.06);
+      background: var(--glass);
+      border-color: var(--border);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), 0 8px 20px rgba(15,23,42,0.06);
     }
     :root.light-mode #toolbar {
       background: linear-gradient(180deg, var(--bg1), var(--bg0));
@@ -237,12 +330,13 @@
       white-space: nowrap;
     }
 
-    /* search */
+    /* search — grow with left cluster; no fixed max so empty space does not sit right of the field */
     #search-wrap {
       position: relative;
-      flex: 1 1 260px;
-      min-width: 180px;
-      max-width: 360px;
+      flex: 1 1 auto;
+      min-width: 120px;
+      max-width: none;
+      width: 100%;
     }
     #search {
       width: 100%; padding: 7px 14px 7px 36px; border-radius: 999px;
@@ -321,41 +415,41 @@
     }
     .btn:hover  { background: var(--bg2); color: var(--t2); border-color: var(--border-strong); }
     .btn:active  { transform: scale(0.95); transition-duration: 60ms; }
-    .btn.active { background: var(--accent-soft); border-color: rgba(56,189,248,0.22); color: var(--accent); }
-    #toolbar .btn {
-      min-width: 36px;
-      height: 34px;
-      padding: 0 10px;
-      border: none;
+    .btn.active {
+      background: var(--accent-soft);
+      border-color: color-mix(in srgb, var(--accent) 28%, var(--border));
+      color: var(--accent);
+    }
+    .wg-toolbar-skin .btn {
+      box-sizing: border-box;
+      width: var(--tb-btn-size);
+      height: var(--tb-btn-size);
+      min-width: var(--tb-btn-size) !important;
+      min-height: var(--tb-btn-size) !important;
+      max-width: var(--tb-btn-size);
+      max-height: var(--tb-btn-size);
+      padding: 0 6px;
       border-radius: var(--radius-lg);
-      background: transparent;
-      color: var(--t4);
       font-size: 13px;
       font-weight: 500;
       letter-spacing: 0.01em;
       box-shadow: none;
-      transition: color var(--t-ui), background var(--t-ui), box-shadow var(--t-ui), transform var(--t-ui), filter var(--t-ui);
+      transition: color var(--t-ui), background var(--t-ui), border-color var(--t-ui), box-shadow var(--t-ui), transform var(--t-ui), filter var(--t-ui);
     }
-    #toolbar .btn:hover {
-      background: rgba(255,255,255,0.05);
-      color: var(--t2);
-      transform: translateY(-1px);
-    }
-    :root.light-mode #toolbar .btn:hover { background: rgba(15,23,42,0.05); }
-    #toolbar .btn:active {
+    .wg-toolbar-skin .btn:active {
       transform: scale(0.94);
-      background: rgba(56,189,248,0.10);
-      box-shadow: inset 0 1px 3px rgba(2,6,23,0.14);
+      background: color-mix(in srgb, var(--accent) 12%, var(--bg2));
+      box-shadow: inset 0 1px 3px color-mix(in srgb, var(--bg0) 55%, transparent);
       transition-duration: 60ms;
     }
-    #toolbar .btn.active,
-    #toolbar .btn.on {
+    .wg-toolbar-skin .btn.active,
+    .wg-toolbar-skin .btn.on {
       background: rgba(56,189,248,0.12);
       color: #93c5fd;
       box-shadow: inset 0 0 0 1px rgba(56,189,248,0.20);
     }
-    :root.light-mode #toolbar .btn.active,
-    :root.light-mode #toolbar .btn.on {
+    :root.light-mode .wg-toolbar-skin .btn.active,
+    :root.light-mode .wg-toolbar-skin .btn.on {
       color: #1d4ed8;
       background: rgba(37,99,235,0.08);
       box-shadow: inset 0 0 0 1px rgba(37,99,235,0.16);
@@ -364,6 +458,7 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      flex-shrink: 0;
       padding: 0;
       border: none;
       background: transparent;
@@ -373,6 +468,7 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      flex-shrink: 0;
       padding: 4px;
       border-radius: 14px;
       background: rgba(255,255,255,0.03);
@@ -389,7 +485,7 @@
       flex-shrink: 0;
     }
     :root.light-mode .toolbar-seg { background: rgba(15,23,42,0.04); }
-    #toolbar .toolbar-seg .btn {
+    .wg-toolbar-skin .toolbar-seg .btn {
       border-radius: var(--radius-sm);
       min-width: 30px;
       padding: 0 9px;
@@ -407,6 +503,7 @@
       padding: 0 4px;
     }
 
+    /* #stats: base rules when in toolbar foot (#graph-actions-toolbar-foot) */
     #stats {
       font-size: 10px;
       color: var(--t4);
@@ -455,22 +552,113 @@
       font-variant-numeric: tabular-nums;
     }
     @media (max-width: 1120px) {
-      #toolbar {
-        grid-template-columns: 1fr;
-      }
-      .toolbar-lane.center,
-      .toolbar-lane.right,
-      .toolbar-lane.left {
-        justify-content: flex-start;
-        flex-wrap: wrap;
+      .toolbar-lane.left .toolbar-cluster--left {
+        width: 100%;
+        max-width: 100%;
       }
       #search-wrap {
         max-width: none;
       }
     }
+    @media (max-width: 1024px) {
+      #toolbar {
+        padding: 5px 8px;
+        gap: 6px;
+      }
+    }
+    @media (max-width: 640px) {
+      :root {
+        --tb-btn-size: 40px;
+      }
+      #toolbar {
+        padding: 4px 6px;
+        gap: 4px;
+        min-height: 44px;
+      }
+      .wg-toolbar-skin .btn-lbl {
+        display: none;
+      }
+      .wg-toolbar-skin .btn.btn-labeled {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        padding: 0 4px !important;
+        gap: 0;
+      }
+      .wg-toolbar-skin .btn-labeled > span:first-child {
+        margin: 0;
+      }
+      .toolbar-kicker {
+        display: none;
+      }
+      #toolbar-brand {
+        font-size: 12px;
+      }
+      .toolbar-brand-lockup {
+        padding-right: 4px;
+      }
+      .toolbar-chip-label {
+        display: none;
+      }
+      .toolbar-chip {
+        padding: 0 8px;
+        gap: 4px;
+      }
+      #stats {
+        font-size: 9px;
+        padding: 0 4px;
+      }
+    }
 
     /* ── Main area ────────────────────────────────────────────────── */
     #main { flex: 1; display: flex; position: relative; overflow: hidden; min-height: 0; }
+    /* Vertical graph controls: transparent gutter; single floating .toolbar-cluster (no inner scroll shell) */
+    #graph-actions-rail {
+      flex: 0 0 auto;
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 0;
+      padding: 14px 10px 16px 8px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior-y: contain;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      z-index: 16;
+    }
+    :root.light-mode #graph-actions-rail {
+      background: transparent;
+    }
+    #graph-actions-rail > .toolbar-cluster.toolbar-bar--vertical {
+      flex: 0 0 auto;
+      align-self: center;
+      padding: 6px 4px;
+      box-sizing: border-box;
+      box-shadow:
+        inset 0 1px 0 var(--glass-border),
+        0 8px 24px rgba(0, 0, 0, 0.22),
+        0 20px 48px rgba(0, 0, 0, 0.18);
+    }
+    #graph-actions-rail .toolbar-cluster.toolbar-bar--vertical > .btn.btn-labeled {
+      align-self: center;
+      box-sizing: border-box;
+    }
+    #graph-actions-rail .tb-dropdown-wrap {
+      width: var(--tb-btn-size);
+      align-self: center;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    #graph-actions-rail #ui-theme-wrap,
+    #graph-actions-rail #node-fx-wrap {
+      width: var(--tb-btn-size);
+      align-self: center;
+    }
     #network-wrap { flex: 1; min-width: 0; min-height: 0; position: relative; }
     #network { position: absolute; inset: 0; width: auto; height: auto; }
 
@@ -733,7 +921,8 @@
     #btn-save-note:disabled { opacity: .3; cursor: not-allowed; }
     #btn-save-note:not(:disabled) { background: rgba(74,222,128,0.15); color: var(--green); border-color: rgba(74,222,128,0.3); }
     #btn-save-note:not(:disabled):hover { background: rgba(74,222,128,0.25); }
-    .toolbar-spacer { flex: 1; }
+    /* flex spacer only in reader content toolbar — not main graph toolbar (avoids huge mid-bar gap) */
+    #content-toolbar .toolbar-spacer { flex: 1; min-width: 0; }
     .btn-delete { color: var(--red) !important; border-color: rgba(248,113,113,0.3) !important; min-width: 54px; }
     .btn-delete:hover { background: rgba(248,113,113,.1); }
     .reader-banner {
@@ -864,6 +1053,134 @@
     #wg-toast.ok { border-color: rgba(74,222,128,0.3); color: var(--green); }
     #wg-toast.err { border-color: rgba(248,113,113,0.3); color: var(--red); }
 
+    /* Themed confirm dialog (replaces window.confirm) */
+    #wg-confirm-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+        max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      background: color-mix(in srgb, var(--bg0) 45%, rgba(0, 0, 0, 0.72));
+      backdrop-filter: blur(10px) saturate(140%);
+      -webkit-backdrop-filter: blur(10px) saturate(140%);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.2s ease, visibility 0.2s;
+    }
+    #wg-confirm-backdrop.show {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+    #wg-confirm-dialog {
+      width: min(440px, calc(100vw - 28px));
+      max-height: min(72vh, 520px);
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 18px 20px 16px;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      box-shadow: var(--shadow-lg), inset 0 1px 0 var(--glass-border);
+      transform: scale(0.96) translateY(10px);
+      transition: transform 0.22s cubic-bezier(.16, 1, .3, 1);
+    }
+    #wg-confirm-backdrop.show #wg-confirm-dialog {
+      transform: scale(1) translateY(0);
+    }
+    #wg-confirm-dialog::before {
+      content: '';
+      display: block;
+      height: 3px;
+      margin: -18px -20px 4px;
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 25%, transparent));
+    }
+    #wg-confirm-backdrop.wg-confirm-backdrop--danger #wg-confirm-dialog::before {
+      background: linear-gradient(90deg, var(--red), color-mix(in srgb, var(--red) 35%, transparent));
+    }
+    #wg-confirm-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+      color: var(--t1);
+      line-height: 1.25;
+    }
+    #wg-confirm-body { min-height: 0; }
+    .wg-confirm-para {
+      margin: 0 0 10px;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--t3);
+      white-space: pre-line;
+    }
+    .wg-confirm-para:last-child { margin-bottom: 0; }
+    .wg-confirm-actions {
+      display: flex;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 4px;
+      padding-top: 4px;
+      border-top: 1px solid var(--border);
+    }
+    .wg-confirm-btn {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      color: var(--t2);
+      min-width: 92px;
+      transition: color var(--t-ui), background var(--t-ui), border-color var(--t-ui), box-shadow var(--t-ui), transform var(--t-ui);
+    }
+    .wg-confirm-btn:hover {
+      background: var(--bg3);
+      color: var(--t1);
+      border-color: var(--border-strong);
+      box-shadow: 0 2px 12px color-mix(in srgb, var(--accent) 10%, transparent);
+    }
+    .wg-confirm-btn:active { transform: scale(0.98); }
+    .wg-confirm-btn--primary {
+      background: var(--accent-soft);
+      border-color: color-mix(in srgb, var(--accent) 38%, var(--border));
+      color: var(--accent);
+    }
+    .wg-confirm-btn--primary:hover {
+      background: color-mix(in srgb, var(--accent-soft) 85%, var(--accent) 15%);
+      border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+      color: var(--accent);
+      box-shadow: 0 2px 14px color-mix(in srgb, var(--accent) 22%, transparent);
+    }
+    .wg-confirm-btn--primary.wg-confirm-btn--danger {
+      background: rgba(248, 113, 113, 0.12);
+      border-color: color-mix(in srgb, var(--red) 45%, var(--border));
+      color: var(--red);
+    }
+    .wg-confirm-btn--primary.wg-confirm-btn--danger:hover {
+      background: rgba(248, 113, 113, 0.2);
+      border-color: color-mix(in srgb, var(--red) 55%, var(--border));
+      color: #fecaca;
+      box-shadow: 0 2px 14px rgba(248, 113, 113, 0.18);
+    }
+    :root.light-mode #wg-confirm-backdrop {
+      background: color-mix(in srgb, var(--bg1) 55%, rgba(15, 23, 42, 0.35));
+    }
+    :root.light-mode .wg-confirm-btn--primary.wg-confirm-btn--danger:hover {
+      color: #b91c1c;
+    }
+
     /* physics rows */
     .phys-row { display: flex; align-items: center; gap: 8px; padding: 5px 10px; font-size: 11px; color: var(--t3); }
     .phys-row input[type="range"] {
@@ -873,7 +1190,7 @@
     .phys-val { width: 36px; text-align: right; color: var(--t4); font-variant-numeric: tabular-nums; font-family: 'SF Mono', ui-monospace, monospace; font-size: 10px; }
 
     /* ── Toolbar dropdown panels ──────────────────────────────── */
-    .tb-dropdown-wrap { position: relative; }
+    .tb-dropdown-wrap { position: relative; flex-shrink: 0; }
     .tb-dropdown {
       display: none; position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%);
       min-width: 260px; padding: 10px 6px; z-index: 300;
@@ -882,6 +1199,20 @@
       box-shadow: var(--shadow-lg);
     }
     .tb-dropdown.show { display: block; }
+    /* Escape horizontal scroll clips (JS sets top/left while .tb-pop-fixed) */
+    .tb-dropdown.tb-pop-fixed,
+    #search-dropdown.tb-pop-fixed,
+    #ui-theme-pop.tb-pop-fixed,
+    #node-fx-pop.tb-pop-fixed {
+      position: fixed !important;
+      z-index: 800 !important;
+      transform: none !important;
+      left: auto;
+      right: auto;
+    }
+    #search-dropdown.tb-pop-fixed {
+      width: min(320px, calc(100vw - 16px));
+    }
     .tb-dropdown-title {
       font-size: 9px; font-weight: 700; color: var(--t4); text-transform: uppercase;
       letter-spacing: 0.06em; padding: 2px 10px 6px; border-bottom: 1px solid var(--border); margin-bottom: 4px;
@@ -1103,69 +1434,86 @@
       font-size: 10px; font-variant-numeric: tabular-nums;
       font-family: 'SF Mono', ui-monospace, monospace;
     }
-    /* ── Labeled toolbar buttons ──────────────────────────── */
-    .btn-labeled { flex-direction: column; height: auto !important; min-height: 30px !important; padding: 2px 6px !important; gap: 0; }
-    #toolbar .btn-labeled { min-height: 30px !important; min-width: 42px !important; padding: 3px 7px !important; }
-    .btn-lbl { font-size: 8px; letter-spacing: 0.03em; line-height: 1; white-space: nowrap; opacity: 0.75; margin-top: 3px; text-transform: uppercase; font-weight: 600; }
+    /* ── Labeled toolbar buttons (same outer size as icon-only .wg-toolbar-skin .btn) ── */
+    .btn-labeled { flex-direction: column; gap: 0; }
+    .wg-toolbar-skin .btn.btn-labeled {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: var(--tb-btn-size) !important;
+      height: var(--tb-btn-size) !important;
+      min-width: var(--tb-btn-size) !important;
+      min-height: var(--tb-btn-size) !important;
+      max-width: var(--tb-btn-size) !important;
+      max-height: var(--tb-btn-size) !important;
+      padding: 2px 4px !important;
+      box-sizing: border-box;
+    }
+    .btn-lbl {
+      font-size: 7px;
+      letter-spacing: 0.03em;
+      line-height: 1;
+      white-space: nowrap;
+      opacity: 0.75;
+      margin-top: 2px;
+      text-transform: uppercase;
+      font-weight: 600;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-    /* ── Toolbar button restyle: left-panel card aesthetic ── */
-    #toolbar .btn {
+    /* ── Toolbar button restyle: follows UI theme tokens (applyUITheme) ── */
+    .wg-toolbar-skin .btn {
       color: var(--t2);
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.07);
+      background: var(--bg2);
+      background: color-mix(in srgb, var(--bg2) 90%, var(--t1) 8%);
+      border: 1px solid var(--border);
       border-radius: var(--radius-md);
     }
-    #toolbar .btn:hover {
-      background: rgba(255,255,255,0.09);
+    .wg-toolbar-skin .btn:hover {
+      background: var(--bg3);
+      background: color-mix(in srgb, var(--bg3) 82%, var(--accent) 14%);
       color: var(--t1);
-      border-color: rgba(255,255,255,0.13);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      border-color: var(--border-strong);
+      box-shadow: 0 2px 10px color-mix(in srgb, var(--accent) 12%, transparent);
       transform: translateY(-1px);
     }
-    :root.light-mode #toolbar .btn {
-      color: var(--t3);
-      background: rgba(15,23,42,0.04);
-      border: 1px solid rgba(15,23,42,0.08);
+    .wg-toolbar-skin .btn.active, .wg-toolbar-skin .btn.on {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: color-mix(in srgb, var(--accent) 38%, var(--border));
+      box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--accent) 22%, transparent) inset,
+        0 2px 10px color-mix(in srgb, var(--accent) 12%, transparent);
     }
-    :root.light-mode #toolbar .btn:hover {
-      background: rgba(15,23,42,0.08);
-      color: var(--t1);
-      border-color: rgba(15,23,42,0.14);
-      box-shadow: 0 2px 8px rgba(15,23,42,0.10);
-    }
-    #toolbar .btn.active, #toolbar .btn.on {
-      background: rgba(56,189,248,0.13);
-      color: #7dd3fc;
-      border-color: rgba(56,189,248,0.28);
-      box-shadow: 0 0 0 1px rgba(56,189,248,0.18) inset, 0 2px 8px rgba(56,189,248,0.08);
-    }
-    :root.light-mode #toolbar .btn.active, :root.light-mode #toolbar .btn.on {
-      background: rgba(37,99,235,0.10);
-      color: #1d4ed8;
-      border-color: rgba(37,99,235,0.22);
+    /* Rail: keep hover glow/shadow but never translateY (global rule above would overlap stacked buttons) */
+    #graph-actions-rail.wg-toolbar-skin .btn:hover,
+    #graph-actions-rail.wg-toolbar-skin .btn:active {
+      transform: none;
     }
     .toolbar-seg {
       background: transparent;
       padding: 3px;
       gap: 2px;
       overflow: visible;
-      border: 1px solid rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+      box-shadow: inset 0 1px 0 var(--glass-border);
     }
     :root.light-mode .toolbar-seg {
       background: transparent;
-      border-color: rgba(15,23,42,0.07);
+      border-color: var(--border);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
     }
     .toolbar-subgroup {
-      border: 1px solid rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       background: transparent;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+      box-shadow: inset 0 1px 0 var(--glass-border);
     }
     :root.light-mode .toolbar-subgroup {
-      border-color: rgba(15,23,42,0.07);
+      border-color: var(--border);
     }
 
     /* ── Node hover tooltip ─────────────────────────────────── */
@@ -1236,7 +1584,7 @@
     }
 
     /* ── UI Theme popup ─────────────────────────────────────── */
-    #ui-theme-wrap { position: relative; display: inline-flex; align-items: center; }
+    #ui-theme-wrap { position: relative; display: inline-flex; align-items: center; flex-shrink: 0; }
     #ui-theme-pop {
       display: none; position: absolute; top: calc(100% + 8px); right: -16px;
       width: 340px; padding: 14px; background: var(--glass); backdrop-filter: blur(20px);
@@ -1260,25 +1608,23 @@
     .ui-tp-swatch-accent { position: absolute; bottom: 0; right: 0; width: 13px; height: 13px; border-radius: 2px 0 4px 0; }
     .ui-tp-label { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; color: var(--t2); }
 
-    /* ── Toolbar button colour groups ──────────────────────── */
-    /* Each functional group gets a custom icon colour via CSS var */
-    .tg-nav    { --btn-icon: #38bdf8; }   /* sky    — navigation   */
-    .tg-layout { --btn-icon: #a78bfa; }   /* violet — layout       */
-    .tg-labels { --btn-icon: #34d399; }   /* emerald— label ctrl   */
-    .tg-mode   { --btn-icon: #fb923c; }   /* amber  — appearance   */
-    /* Icon span picks up the group colour; label span stays muted */
-    #toolbar .btn > span:first-child { color: var(--btn-icon, var(--t2)); transition: color var(--t-ui); }
+    /* ── Toolbar icon tints (flat bar: use data-tg on each .btn) ── */
+    .wg-toolbar-skin .btn[data-tg="nav"] > span:first-child { color: var(--accent); transition: color var(--t-ui); }
+    .wg-toolbar-skin .btn[data-tg="layout"] > span:first-child { color: color-mix(in srgb, var(--accent) 68%, #c4b5fd 32%); transition: color var(--t-ui); }
+    .wg-toolbar-skin .btn[data-tg="labels"] > span:first-child { color: color-mix(in srgb, var(--accent) 42%, #86efac 58%); transition: color var(--t-ui); }
+    .wg-toolbar-skin .btn[data-tg="mode"] > span:first-child { color: color-mix(in srgb, var(--accent) 48%, #fcd34d 52%); transition: color var(--t-ui); }
+    .wg-toolbar-skin .btn:not([data-tg]) > span:first-child { color: var(--t2); transition: color var(--t-ui); }
     /* Overview/util buttons get a distinct slate tint */
     #btn-overview > span:first-child,
     #btn-reset    > span:first-child,
-    #btn-reload   > span:first-child { color: #94a3b8 !important; }
-    #btn-help > span:first-child     { color: #f472b6; }
+    #btn-reload   > span:first-child { color: var(--t3) !important; }
+    #btn-help > span:first-child     { color: color-mix(in srgb, var(--accent) 35%, #f472b6 65%); }
     /* Active state: let accent colour take over entirely */
-    #toolbar .btn.active > span:first-child,
-    #toolbar .btn.on     > span:first-child { color: inherit !important; }
+    .wg-toolbar-skin .btn.active > span:first-child,
+    .wg-toolbar-skin .btn.on     > span:first-child { color: inherit !important; }
 
     /* ── Node effect popup ──────────────────────────────────── */
-    #node-fx-wrap { position: relative; display: inline-flex; }
+    #node-fx-wrap { position: relative; display: inline-flex; flex-shrink: 0; }
     #node-fx-pop {
       display: none; position: absolute;
       top: calc(100% + 8px); right: 0;
@@ -1306,6 +1652,19 @@
     .fx-card.active { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 1px var(--accent); }
     .fx-icon  { font-size: 16px; line-height: 1; }
     .fx-label { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--t2); white-space: nowrap; }
+
+    /* Ambient animation type grid (same card pattern as node effects) */
+    .anim-type-section-label {
+      font-size: 9px; font-weight: 700; color: var(--t4);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 2px 10px 4px;
+    }
+    #dd-anim .anim-type-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      padding: 0 8px 8px;
+    }
+    #dd-anim .anim-type-grid .fx-card { min-height: 52px; }
   </style>
 </head>
 <body>
@@ -1313,10 +1672,10 @@
 <!-- ════════════════════════════════════════════════════════════════
      TOOLBAR
 ════════════════════════════════════════════════════════════════ -->
-<div id="toolbar">
+<div id="toolbar" class="wg-toolbar-skin">
   <div class="toolbar-lane left">
     <button class="btn" id="btn-sidebar" title="Toggle filter panel  [\\]">☰</button>
-    <div class="toolbar-cluster">
+    <div class="toolbar-cluster toolbar-cluster--left">
       <div class="toolbar-brand-lockup">
         <span class="toolbar-brand-mark">◌</span>
         <div class="toolbar-brand-copy">
@@ -1324,113 +1683,24 @@
           <span id="toolbar-brand">Wiki Graph</span>
         </div>
       </div>
-      <div id="search-wrap">
-        <span id="search-icon">⌕</span>
-        <input id="search" type="text" placeholder="/ — search notes…" autocomplete="off" spellcheck="false">
-        <div id="search-dropdown"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="toolbar-lane center">
-    <div class="toolbar-cluster">
-      <div class="toolbar-group tg-nav">
-        <div class="toolbar-seg" title="Zoom and fit graph">
-          <button class="btn btn-labeled" id="btn-zi" title="Zoom in  [+]"><span>＋</span><span class="btn-lbl">In</span></button>
-          <button class="btn btn-labeled" id="btn-zo" title="Zoom out  [−]"><span>－</span><span class="btn-lbl">Out</span></button>
-          <button class="btn btn-labeled" id="btn-fit" title="Fit graph  [F]"><span>◱</span><span class="btn-lbl">Fit</span></button>
-        </div>
-        <div class="toolbar-seg" title="Rotate graph">
-          <button class="btn btn-labeled" id="btn-rccw" title="Rotate CCW  [Shift+R]"><span>⟲</span><span class="btn-lbl">CCW</span></button>
-          <button class="btn btn-labeled" id="btn-rcw" title="Rotate CW  [R]"><span>⟳</span><span class="btn-lbl">CW</span></button>
-        </div>
-      </div>
-
-      <div class="toolbar-group tg-layout">
-        <div class="toolbar-seg" title="Layout controls">
-          <button class="btn btn-labeled" id="btn-freeze" title="Freeze layout  [Space]"><span>❄</span><span class="btn-lbl">Freeze</span></button>
-          <button class="btn btn-labeled" id="btn-hop2" title="2-hop mode  [N]"><span>⬡</span><span class="btn-lbl">2-hop</span></button>
-          <button class="btn btn-labeled" id="btn-anim" title="Toggle ambient animation  [A]"><span>∿</span><span class="btn-lbl">Anim</span></button>
-        </div>
-        <div class="toolbar-subgroup">
-          <div class="tb-dropdown-wrap">
-            <button class="btn btn-labeled" id="btn-forces-dd" title="Graph forces &amp; sizing"><span>⚙</span><span class="btn-lbl">Physics</span></button>
-            <div class="tb-dropdown" id="dd-forces">
-              <div class="tb-dropdown-title">⚙ Graph Forces</div>
-              <div class="phys-row"><span>Links</span><input type="range" id="phys-spring-len" min="80" max="400" step="5" value="220"><span class="phys-val" id="phys-spring-len-v">220</span></div>
-              <div class="phys-row"><span>Stiff</span><input type="range" id="phys-spring-k" min="15" max="120" step="1" value="55"><span class="phys-val" id="phys-spring-k-v">0.055</span></div>
-              <div class="phys-row"><span>Repel</span><input type="range" id="phys-grav" min="-120" max="-8" step="1" value="-38"><span class="phys-val" id="phys-grav-v">-38</span></div>
-              <div class="phys-row"><span>Center</span><input type="range" id="phys-central" min="5" max="80" step="1" value="15"><span class="phys-val" id="phys-central-v">0.015</span></div>
-              <div class="phys-row"><span>Nodes</span><input type="range" id="node-size-scale" min="40" max="200" step="5" value="100"><span class="phys-val" id="node-size-scale-v">1.0×</span></div>
-              <div class="phys-row"><span>Edge ⬤</span><input type="color" id="edge-color-pick" value="#00e5ff" style="flex:1;min-width:60px;height:24px;border-radius:6px;border:1px solid var(--border);background:var(--bg0);cursor:pointer;padding:1px;"><span class="phys-val" id="edge-color-pick-v" style="font-size:9px">#00e5ff</span></div>
-            </div>
-          </div>
-          <div class="tb-dropdown-wrap">
-            <button class="btn btn-labeled" id="btn-anim-dd" title="Animation settings"><span>✦</span><span class="btn-lbl">Anim.</span></button>
-            <div class="tb-dropdown" id="dd-anim">
-              <div class="tb-dropdown-title">✦ Animation</div>
-              <div class="phys-row"><span>Type</span>
-                <select id="anim-type" style="flex:1;font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg0);color:var(--t2);min-width:80px;">
-                  <option value="orbit" selected>Orbit</option>
-                  <option value="breathe">Breathe</option>
-                  <option value="wave">Wave</option>
-                  <option value="float">Float</option>
-                  <option value="pulse">Pulse</option>
-                  <option value="swirl">Swirl</option>
-                </select>
-              </div>
-              <div class="phys-row"><span>Speed</span><input type="range" id="anim-speed" min="10" max="500" step="5" value="100"><span class="phys-val" id="anim-speed-v">1.0×</span></div>
-              <div class="phys-row"><span>Intensity</span><input type="range" id="anim-amp" min="1" max="50" step="1" value="20"><span class="phys-val" id="anim-amp-v">20px</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="toolbar-seg" title="Overview and reset">
-          <button class="btn btn-labeled" id="btn-overview" title="Overview: clear selection, exit 2-hop, fit graph  [Home]"><span>⌂</span><span class="btn-lbl">Home</span></button>
-          <button class="btn btn-labeled" id="btn-reset" title="Reset all settings to default"><span>↻</span><span class="btn-lbl">Reset</span></button>
-          <button class="btn btn-labeled" id="btn-reload" title="Reload graph data from disk (picks up saved/edited notes without rebuilding)"><span>↺</span><span class="btn-lbl">Reload</span></button>
+      <div class="toolbar-scroll toolbar-scroll--search" data-toolbar-scroll>
+        <div id="search-wrap">
+          <span id="search-icon">⌕</span>
+          <input id="search" type="text" placeholder="/ — search notes…" autocomplete="off" spellcheck="false">
+          <div id="search-dropdown"></div>
         </div>
       </div>
     </div>
   </div>
-
-  <div class="toolbar-lane right">
-    <div class="toolbar-cluster">
-      <div class="toolbar-group tg-labels">
-        <div class="toolbar-seg" title="Label display">
-          <button class="btn btn-labeled" id="btn-labels" title="Show/hide node labels  [L]"><span>Aa</span><span class="btn-lbl">Labels</span></button>
-          <button class="btn btn-labeled" id="btn-label-hover" title="Show labels on hover / selected only"><span>⌖</span><span class="btn-lbl">Hover</span></button>
-        </div>
-      </div>
-
-      <div class="toolbar-group tg-mode">
-        <div class="toolbar-seg" title="View mode toggles">
-          <button class="btn btn-labeled" id="btn-arrows" title="Toggle edges on / off"><span>—</span><span class="btn-lbl">Edges</span></button>
-          <button class="btn btn-labeled" id="btn-mono" title="Monotone mode — uniform nodes, no arrows"><span>⬤</span><span class="btn-lbl">Mono</span></button>
-          <div id="ui-theme-wrap">
-            <button class="btn btn-labeled" id="btn-dark-light" title="Graph UI theme — 11 presets"><span>◐</span><span class="btn-lbl">Theme</span></button>
-            <div id="ui-theme-pop">
-              <div class="tp-section-label">Graph UI Theme</div>
-              <div id="ui-tp-grid"></div>
-            </div>
-          </div>
-          <button class="btn btn-labeled" id="btn-3d" title="Toggle 2D / 3D view (experimental)"><span>3D<span class="exp-badge">β</span></span><span class="btn-lbl">3D</span></button>
-          <div id="node-fx-wrap">
-            <button class="btn btn-labeled" id="btn-node-fx" title="Selected node visual effect"><span>✦</span><span class="btn-lbl">Effect</span></button>
-            <div id="node-fx-pop">
-              <div class="fp-title">Node Effect</div>
-              <div class="fx-grid" id="fx-grid"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="toolbar-subgroup">
-        <button class="btn btn-labeled" id="btn-help" title="Shortcuts  [?]"><span>?</span><span class="btn-lbl">Help</span></button>
-        <div class="toolbar-chip">
-          <span class="toolbar-chip-label">Graph</span>
-          <span id="stats">__N_NODES__ nodes · __N_EDGES__ edges · __BUILT__</span>
-        </div>
-      </div>
+  <div class="toolbar-lane toolbar-lane-util">
+    <div class="toolbar-cluster toolbar-bar--horizontal">
+      <button class="btn btn-labeled" id="btn-overview" title="Overview: clear selection, exit 2-hop, fit graph  [Home]"><span>⌂</span><span class="btn-lbl">Home</span></button>
+      <button class="btn btn-labeled" id="btn-reset" title="Reset all settings to default"><span>↻</span><span class="btn-lbl">Reset</span></button>
+      <button class="btn btn-labeled" id="btn-reload" title="Reload graph data from disk (picks up saved/edited notes without rebuilding)"><span>↺</span><span class="btn-lbl">Reload</span></button>
+      <button class="btn btn-labeled" id="btn-help" title="Shortcuts  [?]"><span>?</span><span class="btn-lbl">Help</span></button>
+    </div>
+    <div id="graph-actions-toolbar-foot" aria-label="Graph build stats">
+      <span id="stats">__N_NODES__ nodes · __N_EDGES__ edges · __BUILT__</span>
     </div>
   </div>
 </div>
@@ -1554,6 +1824,61 @@
     </div><!-- #left-panel-inner -->
   </div><!-- #left-panel -->
 
+  <!-- Vertical graph tools: floating cluster between filter panel and canvas -->
+  <aside id="graph-actions-rail" class="wg-toolbar-skin" aria-label="Graph controls">
+      <div class="toolbar-cluster toolbar-bar--vertical">
+              <button class="btn btn-labeled" id="btn-zi" data-tg="nav" title="Zoom in  [+]"><span>＋</span><span class="btn-lbl">In</span></button>
+              <button class="btn btn-labeled" id="btn-zo" data-tg="nav" title="Zoom out  [−]"><span>－</span><span class="btn-lbl">Out</span></button>
+              <button class="btn btn-labeled" id="btn-fit" data-tg="nav" title="Fit graph  [F]"><span>◱</span><span class="btn-lbl">Fit</span></button>
+              <button class="btn btn-labeled" id="btn-rccw" data-tg="nav" title="Rotate CCW  [Shift+R]"><span>⟲</span><span class="btn-lbl">CCW</span></button>
+              <button class="btn btn-labeled" id="btn-rcw" data-tg="nav" title="Rotate CW  [R]"><span>⟳</span><span class="btn-lbl">CW</span></button>
+              <button class="btn btn-labeled" id="btn-freeze" data-tg="layout" title="Freeze layout  [Space]"><span>❄</span><span class="btn-lbl">Freeze</span></button>
+              <button class="btn btn-labeled" id="btn-hop2" data-tg="layout" title="2-hop mode  [N]"><span>⬡</span><span class="btn-lbl">2-hop</span></button>
+              <button class="btn btn-labeled" id="btn-anim" data-tg="layout" title="Toggle ambient animation  [A]"><span>∿</span><span class="btn-lbl">Anim</span></button>
+              <div class="tb-dropdown-wrap">
+                <button class="btn btn-labeled" id="btn-forces-dd" data-tg="layout" title="Graph forces &amp; sizing"><span>⚙</span><span class="btn-lbl">Physics</span></button>
+                <div class="tb-dropdown" id="dd-forces">
+                  <div class="tb-dropdown-title">⚙ Graph Forces</div>
+                  <div class="phys-row"><span>Links</span><input type="range" id="phys-spring-len" min="80" max="400" step="5" value="220"><span class="phys-val" id="phys-spring-len-v">220</span></div>
+                  <div class="phys-row"><span>Stiff</span><input type="range" id="phys-spring-k" min="15" max="120" step="1" value="55"><span class="phys-val" id="phys-spring-k-v">0.055</span></div>
+                  <div class="phys-row"><span>Repel</span><input type="range" id="phys-grav" min="-120" max="-8" step="1" value="-38"><span class="phys-val" id="phys-grav-v">-38</span></div>
+                  <div class="phys-row"><span>Center</span><input type="range" id="phys-central" min="5" max="80" step="1" value="15"><span class="phys-val" id="phys-central-v">0.015</span></div>
+                  <div class="phys-row"><span>Nodes</span><input type="range" id="node-size-scale" min="40" max="200" step="5" value="100"><span class="phys-val" id="node-size-scale-v">1.0×</span></div>
+                  <div class="phys-row"><span>Edge ⬤</span><input type="color" id="edge-color-pick" value="#00e5ff" style="flex:1;min-width:60px;height:24px;border-radius:6px;border:1px solid var(--border);background:var(--bg0);cursor:pointer;padding:1px;"><span class="phys-val" id="edge-color-pick-v" style="font-size:9px">#00e5ff</span></div>
+                </div>
+              </div>
+              <div class="tb-dropdown-wrap">
+                <button class="btn btn-labeled" id="btn-anim-dd" data-tg="layout" title="Animation settings"><span>✦</span><span class="btn-lbl">Anim.</span></button>
+                <div class="tb-dropdown" id="dd-anim">
+                  <div class="tb-dropdown-title">✦ Animation</div>
+                  <div class="anim-type-section-label">Type</div>
+                  <div id="anim-type-grid" class="fx-grid anim-type-grid" role="group" aria-label="Animation type"></div>
+                  <div class="phys-row"><span>Speed</span><input type="range" id="anim-speed" min="10" max="500" step="5" value="100"><span class="phys-val" id="anim-speed-v">1.0×</span></div>
+                  <div class="phys-row"><span>Intensity</span><input type="range" id="anim-amp" min="1" max="50" step="1" value="20"><span class="phys-val" id="anim-amp-v">20px</span></div>
+                </div>
+              </div>
+              <button class="btn btn-labeled" id="btn-labels" data-tg="labels" title="Show/hide node labels  [L]"><span>Aa</span><span class="btn-lbl">Labels</span></button>
+              <button class="btn btn-labeled" id="btn-label-hover" data-tg="labels" title="Show labels on hover / selected only"><span>⌖</span><span class="btn-lbl">Hover</span></button>
+              <button class="btn btn-labeled" id="btn-arrows" data-tg="mode" title="Toggle edges on / off"><span>—</span><span class="btn-lbl">Edges</span></button>
+              <button class="btn btn-labeled" id="btn-mono" data-tg="mode" title="Monotone mode — uniform nodes, no arrows"><span>⬤</span><span class="btn-lbl">Mono</span></button>
+              <div id="ui-theme-wrap">
+                <button class="btn btn-labeled" id="btn-dark-light" data-tg="mode" title="Graph UI theme — 11 presets"><span>◐</span><span class="btn-lbl">Theme</span></button>
+                <div id="ui-theme-pop">
+                  <div class="tp-section-label">Graph UI Theme</div>
+                  <div id="ui-tp-grid"></div>
+                </div>
+              </div>
+              <button class="btn btn-labeled" id="btn-3d" data-tg="mode" title="Toggle 2D / 3D view (experimental)"><span>3D<span class="exp-badge">β</span></span><span class="btn-lbl">3D</span></button>
+              <div id="node-fx-wrap">
+                <button class="btn btn-labeled" id="btn-node-fx" data-tg="mode" title="Selected node visual effect"><span>✦</span><span class="btn-lbl">Effect</span></button>
+                <div id="node-fx-pop">
+                  <div class="fp-title">Node Effect</div>
+                  <div class="fx-grid" id="fx-grid"></div>
+                </div>
+              </div>
+      </div>
+  </aside>
+
   <!-- graph canvas -->
   <div id="network-wrap">
     <div id="network"></div>
@@ -1604,6 +1929,17 @@
     </div>
   </div>
   <div id="wg-toast" role="status" aria-live="polite"></div>
+
+  <div id="wg-confirm-backdrop" class="wg-confirm-backdrop" aria-hidden="true">
+    <div id="wg-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="wg-confirm-title">
+      <h2 id="wg-confirm-title"></h2>
+      <div id="wg-confirm-body"></div>
+      <div class="wg-confirm-actions">
+        <button type="button" class="wg-confirm-btn" id="wg-confirm-cancel">Cancel</button>
+        <button type="button" class="wg-confirm-btn wg-confirm-btn--primary" id="wg-confirm-ok">OK</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ── Side panel ────────────────────────────────────────────── -->
   <div id="panel">
@@ -2155,9 +2491,9 @@ function getNeighbours(nid, hops) {
   return { nodes: all, edges: allE };
 }
 
-function selectNode(nid) {
-  if (!nid) { clearSel(); return; }
-  if (nid !== activNid && !confirmDiscardIfDirty()) return;
+async function selectNode(nid) {
+  if (!nid) { await clearSel(); return; }
+  if (nid !== activNid && !(await confirmDiscardIfDirty())) return;
   const nb = getNeighbours(nid, hop2mode ? 2 : 1);
   hlActive = true; hlNodes = nb.nodes; hlEdges = nb.edges;
   if (!mode3d) {
@@ -2187,8 +2523,8 @@ function selectNode(nid) {
   openPanel(nid);
 }
 
-function clearSel() {
-  if (!confirmDiscardIfDirty()) return false;
+async function clearSel() {
+  if (!(await confirmDiscardIfDirty())) return false;
   hlActive = false; hlNodes.clear(); hlEdges.clear(); activNid = null;
   stopNodeFx();
   applyVis();
@@ -2231,10 +2567,10 @@ function resetDateFilter() {
 /* ═══════════════════════════════════════════════════════════════
    NETWORK EVENTS
 ═══════════════════════════════════════════════════════════════ */
-network.on('click', p => {
-  if (!p.nodes.length) { clearSel(); return; }
+network.on('click', async (p) => {
+  if (!p.nodes.length) { await clearSel(); return; }
   navPush(p.nodes[0]);
-  selectNode(p.nodes[0]);
+  await selectNode(p.nodes[0]);
 });
 
 /* ── Strip vis-network inline styles from tooltip so our CSS vars take effect ── */
@@ -2366,15 +2702,15 @@ network.on('blurNode', () => {
    NODE EFFECTS
 ═══════════════════════════════════════════════════════════════ */
 const NODE_EFFECTS = [
-  { id: 'none',    icon: '○',  label: 'None'    },
-  { id: 'glow',    icon: '☀',  label: 'Glow'    },
-  { id: 'pulse',   icon: '◎',  label: 'Pulse'   },
-  { id: 'wave',    icon: '〰',  label: 'Wave'    },
+  { id: 'none',    icon: '⚪', label: 'None'    },
+  { id: 'glow',    icon: '🔆', label: 'Glow'    },
+  { id: 'pulse',   icon: '💓', label: 'Pulse'   },
+  { id: 'wave',    icon: '🌊', label: 'Wave'    },
   { id: 'fire',    icon: '🔥', label: 'Fire'    },
   { id: 'shimmer', icon: '✨', label: 'Shimmer' },
-  { id: 'orbit',   icon: '⊙',  label: 'Orbit'   },
-  { id: 'vibrate', icon: '〜',  label: 'Vibrate' },
-  { id: 'halo',    icon: '◌',  label: 'Halo'    },
+  { id: 'orbit',   icon: '🛰️', label: 'Orbit'   },
+  { id: 'vibrate', icon: '📳', label: 'Vibrate' },
+  { id: 'halo',    icon: '💫', label: 'Halo'    },
   { id: 'sparks',  icon: '⚡', label: 'Sparks'  },
 ];
 const _FX_ANIMATED = new Set(['pulse','wave','fire','shimmer','orbit','vibrate','sparks']);
@@ -2414,7 +2750,9 @@ function setNodeEffect(id, skipSave) {
     c.innerHTML = '<span class="fx-icon">' + fx.icon + '</span><span class="fx-label">' + fx.label + '</span>';
     c.addEventListener('click', () => {
       setNodeEffect(fx.id);
-      document.getElementById('node-fx-pop').classList.remove('show');
+      const nfp = document.getElementById('node-fx-pop');
+      clearToolbarPopFixed(nfp);
+      nfp.classList.remove('show');
     });
     grid.appendChild(c);
   });
@@ -2422,9 +2760,22 @@ function setNodeEffect(id, skipSave) {
 
 document.getElementById('btn-node-fx').addEventListener('click', e => {
   e.stopPropagation();
-  document.getElementById('node-fx-pop').classList.toggle('show');
+  const nodeFxPop = document.getElementById('node-fx-pop');
+  const btnFx = document.getElementById('btn-node-fx');
+  if (nodeFxPop.classList.contains('show')) {
+    clearToolbarPopFixed(nodeFxPop);
+    nodeFxPop.classList.remove('show');
+  } else {
+    nodeFxPop.classList.add('show');
+    requestAnimationFrame(() => layoutToolbarPopFixed(nodeFxPop, btnFx, { align: 'left', gap: 8 }));
+  }
 });
-document.addEventListener('click', () => document.getElementById('node-fx-pop').classList.remove('show'));
+document.addEventListener('click', (e) => {
+  if (e.target.closest('#node-fx-wrap') || e.target.closest('#node-fx-pop')) return;
+  const nodeFxPop = document.getElementById('node-fx-pop');
+  clearToolbarPopFixed(nodeFxPop);
+  nodeFxPop.classList.remove('show');
+});
 
 /* ── canvas afterDrawing ── */
 network.on('afterDrawing', ctx => {
@@ -2596,11 +2947,11 @@ function syncNavBtns() {
   document.getElementById('pnav-fwd').disabled  = navIdx >= navStack.length - 1;
 }
 
-document.getElementById('pnav-back').addEventListener('click', () => {
-  if (navIdx > 0) { navIdx--; selectNode(navStack[navIdx]); syncNavBtns(); }
+document.getElementById('pnav-back').addEventListener('click', async () => {
+  if (navIdx > 0) { navIdx--; await selectNode(navStack[navIdx]); syncNavBtns(); }
 });
-document.getElementById('pnav-fwd').addEventListener('click', () => {
-  if (navIdx < navStack.length - 1) { navIdx++; selectNode(navStack[navIdx]); syncNavBtns(); }
+document.getElementById('pnav-fwd').addEventListener('click', async () => {
+  if (navIdx < navStack.length - 1) { navIdx++; await selectNode(navStack[navIdx]); syncNavBtns(); }
 });
 
 /* ═══════════════════════════════════════════════════════════════
@@ -2677,6 +3028,93 @@ function showToast(msg, kind, duration) {
   el.className = kind === 'err' ? 'show err' : kind === 'ok' ? 'show ok' : 'show';
   clearTimeout(showToast._t);
   showToast._t = setTimeout(() => { el.classList.remove('show', 'ok', 'err'); }, duration || 5000);
+}
+
+/**
+ * Theme-styled async confirmation (replaces window.confirm).
+ * @param {{ title: string, message: string, confirmText?: string, cancelText?: string, danger?: boolean }} opts
+ * @returns {Promise<boolean>}
+ */
+function showAppConfirm(opts) {
+  const title = opts.title || 'Confirm';
+  const message = opts.message || '';
+  const confirmText = opts.confirmText || 'OK';
+  const cancelText = opts.cancelText || 'Cancel';
+  const danger = !!opts.danger;
+
+  return new Promise((resolve) => {
+    const backdrop = document.getElementById('wg-confirm-backdrop');
+    const titleEl = document.getElementById('wg-confirm-title');
+    const bodyEl = document.getElementById('wg-confirm-body');
+    const btnOk = document.getElementById('wg-confirm-ok');
+    const btnCancel = document.getElementById('wg-confirm-cancel');
+
+    titleEl.textContent = title;
+    bodyEl.replaceChildren();
+    const chunks = message.split(/\n\n+/).map((c) => c.trim()).filter(Boolean);
+    (chunks.length ? chunks : [message]).forEach((chunk) => {
+      const p = document.createElement('p');
+      p.className = 'wg-confirm-para';
+      p.textContent = chunk;
+      bodyEl.appendChild(p);
+    });
+
+    btnOk.textContent = confirmText;
+    btnCancel.textContent = cancelText;
+    backdrop.classList.toggle('wg-confirm-backdrop--danger', danger);
+    btnOk.classList.toggle('wg-confirm-btn--danger', danger);
+
+    const prevActive = document.activeElement;
+
+    const cleanup = () => {
+      backdrop.classList.remove('show', 'wg-confirm-backdrop--danger');
+      backdrop.setAttribute('aria-hidden', 'true');
+      btnOk.classList.remove('wg-confirm-btn--danger');
+      document.removeEventListener('keydown', onKeyCap, true);
+      btnOk.removeEventListener('click', onOk);
+      btnCancel.removeEventListener('click', onCancel);
+      backdrop.removeEventListener('click', onBackdropClick);
+      if (prevActive && typeof prevActive.focus === 'function') {
+        try { prevActive.focus(); } catch (_) { /* ignore */ }
+      }
+    };
+
+    const finish = (ok) => {
+      cleanup();
+      resolve(ok);
+    };
+
+    function onKeyCap(ev) {
+      if (ev.key === 'Escape') {
+        ev.preventDefault();
+        ev.stopPropagation();
+        finish(false);
+      }
+    }
+
+    function onOk(ev) {
+      ev.preventDefault();
+      finish(true);
+    }
+    function onCancel(ev) {
+      ev.preventDefault();
+      finish(false);
+    }
+    function onBackdropClick(ev) {
+      if (ev.target === backdrop) finish(false);
+    }
+
+    document.addEventListener('keydown', onKeyCap, true);
+    btnOk.addEventListener('click', onOk);
+    btnCancel.addEventListener('click', onCancel);
+    backdrop.addEventListener('click', onBackdropClick);
+
+    backdrop.setAttribute('aria-hidden', 'false');
+    backdrop.classList.add('show');
+    try {
+      (danger ? btnCancel : btnOk).focus();
+    } catch (_) { /* ignore */ }
+  });
 }
 
 function wikiRelPath(nid) {
@@ -2800,9 +3238,15 @@ function tryLoadFullNote(nid) {
     });
 }
 
-function confirmDiscardIfDirty() {
+async function confirmDiscardIfDirty() {
   if (!noteDirty) return true;
-  return window.confirm('Discard unsaved edits to this note?');
+  return showAppConfirm({
+    title: 'Discard unsaved changes?',
+    message: 'You have edits that were not saved. Leave without saving?',
+    confirmText: 'Discard',
+    cancelText: 'Keep editing',
+    danger: true,
+  });
 }
 
 function downloadNoteFallback(nid, text, reason) {
@@ -2874,7 +3318,7 @@ function saveCurrentNote() {
     });
 }
 
-function deleteCurrentNode() {
+async function deleteCurrentNode() {
   if (!activNid) return;
   const page = PAGES[activNid];
   const label = page ? page.label : activNid;
@@ -2882,10 +3326,18 @@ function deleteCurrentNode() {
     showToast('Delete requires serve_graph.py --allow-write (file:// not supported).', 'err', 5000);
     return;
   }
-  if (!confirm('Delete "' + label + '"?\n\nThe file will be moved to deleted/ and removed from the graph.\n\nRebuild the graph to persist this change.')) return;
+  const okDel = await showAppConfirm({
+    title: 'Delete this page?',
+    message:
+      'Delete "' + label + '"?\n\nThe file will be moved to deleted/ and removed from the graph.\n\nRebuild the graph to persist this change.',
+    confirmText: 'Delete',
+    cancelText: 'Cancel',
+    danger: true,
+  });
+  if (!okDel) return;
   const nid = activNid;
   fetch(wikiFileUrl(nid), { method: 'DELETE' })
-    .then(r => {
+    .then(async (r) => {
       if (r.status === 403) {
         showToast('Server running without --allow-write. Restart with: python tools/serve_graph.py --allow-write', 'err', 6000);
         return;
@@ -2898,7 +3350,7 @@ function deleteCurrentNode() {
       const stem = nid.replace(/\.md$/, '').split('/').pop().toLowerCase();
       if (slugMap[stem] === nid) delete slugMap[stem];
       if (label && slugMap[label.toLowerCase()] === nid) delete slugMap[label.toLowerCase()];
-      clearSel();
+      await clearSel();
       showToast('Deleted "' + label + '" → moved to deleted/ and removed from the graph. \nRebuild graph to persist.', 'ok', 5000);
     })
     .catch(err => {
@@ -3055,11 +3507,16 @@ document.getElementById('p-close').addEventListener('click', clearSel);
 
 /* click delegation: wikilinks + link items → navigate */
 [paneMdPreview, paneLinks].forEach(el => {
-  el.addEventListener('click', e => {
+  el.addEventListener('click', async (e) => {
     const wl   = e.target.closest('.wl[data-nid]');
     const item = e.target.closest('.litem[data-nid]');
     const nid  = (wl || item) ? (wl || item).dataset.nid : null;
-    if (nid) { e.preventDefault(); if (!confirmDiscardIfDirty()) return; navPush(nid); selectNode(nid); }
+    if (nid) {
+      e.preventDefault();
+      if (!(await confirmDiscardIfDirty())) return;
+      navPush(nid);
+      await selectNode(nid);
+    }
   });
 });
 
@@ -3397,6 +3854,80 @@ syncLabelToolbar();
 applyVis();
 
 /* ═══════════════════════════════════════════════════════════════
+   TOOLBAR POPOVER POSITIONING  (fixed — escapes overflow-x scroll)
+═══════════════════════════════════════════════════════════════ */
+/** Move floating panels to body so ancestor backdrop-filter / overflow do not clip or retarget position:fixed. */
+function wgReparentFloatingToolbarPops() {
+  ['dd-forces', 'dd-anim', 'ui-theme-pop', 'node-fx-pop', 'search-dropdown'].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el && el.parentElement !== document.body) document.body.appendChild(el);
+  });
+}
+wgReparentFloatingToolbarPops();
+
+function clearToolbarPopFixed(panel) {
+  if (!panel) return;
+  panel.classList.remove('tb-pop-fixed');
+  ['top', 'left', 'right', 'bottom', 'width'].forEach(p => { panel.style[p] = ''; });
+}
+
+/** @param {HTMLElement} panel @param {HTMLElement} anchorEl @param {{align?: string, gap?: number}} [opt] */
+function layoutToolbarPopFixed(panel, anchorEl, opt) {
+  if (!panel || !anchorEl) return;
+  const gap = (opt && opt.gap != null) ? opt.gap : 8;
+  const align = (opt && opt.align) || 'left';
+  const inRail = anchorEl.closest && anchorEl.closest('#graph-actions-rail');
+  panel.classList.add('tb-pop-fixed');
+  const r = anchorEl.getBoundingClientRect();
+
+  if (inRail) {
+    function placeRail() {
+      void panel.offsetWidth;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      let pw = panel.offsetWidth || panel.getBoundingClientRect().width;
+      if (pw < 4) pw = 280;
+      let left = r.right + gap;
+      left = Math.min(left, vw - pw - 8);
+      left = Math.max(8, left);
+      panel.style.left = left + 'px';
+      panel.style.right = 'auto';
+      let ph = panel.offsetHeight || panel.getBoundingClientRect().height;
+      if (ph < 4) ph = 200;
+      let top = r.top;
+      if (top + ph > vh - 8) top = Math.max(8, vh - ph - 8);
+      panel.style.top = top + 'px';
+    }
+    panel.style.top = r.top + 'px';
+    panel.style.left = (r.right + gap) + 'px';
+    requestAnimationFrame(() => {
+      placeRail();
+      requestAnimationFrame(placeRail);
+    });
+    return;
+  }
+
+  panel.style.top = (r.bottom + gap) + 'px';
+  function place() {
+    void panel.offsetWidth;
+    let pw = panel.offsetWidth || panel.getBoundingClientRect().width;
+    if (pw < 4) pw = (align === 'left') ? 300 : 260;
+    let left;
+    if (align === 'right') left = r.right - pw;
+    else if (align === 'center') left = r.left + r.width / 2 - pw / 2;
+    else left = r.left;
+    const vw = window.innerWidth;
+    left = Math.max(8, Math.min(left, vw - pw - 8));
+    panel.style.left = left + 'px';
+    panel.style.right = 'auto';
+  }
+  requestAnimationFrame(() => {
+    place();
+    requestAnimationFrame(place);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
    SEARCH WITH DROPDOWN
 ═══════════════════════════════════════════════════════════════ */
 const searchEl  = document.getElementById('search');
@@ -3404,11 +3935,11 @@ const dropEl    = document.getElementById('search-dropdown');
 let srIdx = -1;
 
 function renderDropdown(q) {
-  if (!q) { dropEl.classList.remove('show'); return; }
+  if (!q) { clearToolbarPopFixed(dropEl); dropEl.classList.remove('show'); return; }
   const hits = RAW_NODES
     .filter(n => n.label.toLowerCase().includes(q) || n.id.toLowerCase().includes(q))
     .slice(0, 12);
-  if (!hits.length) { dropEl.classList.remove('show'); return; }
+  if (!hits.length) { clearToolbarPopFixed(dropEl); dropEl.classList.remove('show'); return; }
   dropEl.innerHTML = hits.map(n =>
     `<div class="sr-item" data-nid="${n.id}">
       <span class="sr-dot" style="background:${pickNodeColor(n.id, n.type)}"></span>
@@ -3418,6 +3949,7 @@ function renderDropdown(q) {
   ).join('');
   srIdx = -1;
   dropEl.classList.add('show');
+  requestAnimationFrame(() => layoutToolbarPopFixed(dropEl, searchEl, { align: 'left', gap: 6 }));
 }
 
 searchEl.addEventListener('input', e => renderDropdown(e.target.value.trim().toLowerCase()));
@@ -3435,7 +3967,7 @@ searchEl.addEventListener('keydown', e => {
     const t = srIdx >= 0 ? items[srIdx] : items[0];
     if (t) jumpTo(t.dataset.nid);
   } else if (e.key === 'Escape') {
-    dropEl.classList.remove('show'); searchEl.blur();
+    clearToolbarPopFixed(dropEl); dropEl.classList.remove('show'); searchEl.blur();
   }
 });
 dropEl.addEventListener('mousedown', e => {
@@ -3443,14 +3975,17 @@ dropEl.addEventListener('mousedown', e => {
   if (item) { e.preventDefault(); jumpTo(item.dataset.nid); }
 });
 document.addEventListener('click', e => {
-  if (!e.target.closest('#search-wrap')) dropEl.classList.remove('show');
+  if (!e.target.closest('#search-wrap') && !e.target.closest('#search-dropdown')) {
+    clearToolbarPopFixed(dropEl); dropEl.classList.remove('show');
+  }
 });
 
-function jumpTo(nid) {
+async function jumpTo(nid) {
   searchEl.value = '';
+  clearToolbarPopFixed(dropEl);
   dropEl.classList.remove('show');
   navPush(nid);
-  selectNode(nid);
+  await selectNode(nid);
   pulseNode(nid);
 }
 
@@ -3577,7 +4112,10 @@ function buildQuickLists() {
     });
   });
   document.querySelectorAll('.qcard-item').forEach(el => {
-    el.addEventListener('click', () => { navPush(el.dataset.nid); selectNode(el.dataset.nid); });
+    el.addEventListener('click', async () => {
+      navPush(el.dataset.nid);
+      await selectNode(el.dataset.nid);
+    });
   });
 }
 buildQuickLists();
@@ -3633,14 +4171,19 @@ function pan(dx, dy) {
    TOOLBAR WIRING  (2D and 3D aware)
 ═══════════════════════════════════════════════════════════════ */
 /* ── Button press bounce (delegated) ───────────────────────────── */
-document.getElementById('toolbar').addEventListener('click', e => {
-  const btn = e.target.closest('.btn');
-  if (!btn) return;
-  btn.classList.remove('btn-pressed');
-  void btn.offsetWidth; // reflow to replay animation
-  btn.classList.add('btn-pressed');
-  btn.addEventListener('animationend', () => btn.classList.remove('btn-pressed'), { once: true });
-});
+function wireWgToolbarBtnPress(root) {
+  if (!root) return;
+  root.addEventListener('click', e => {
+    const btn = e.target.closest('.btn');
+    if (!btn) return;
+    btn.classList.remove('btn-pressed');
+    void btn.offsetWidth;
+    btn.classList.add('btn-pressed');
+    btn.addEventListener('animationend', () => btn.classList.remove('btn-pressed'), { once: true });
+  });
+}
+wireWgToolbarBtnPress(document.getElementById('toolbar'));
+wireWgToolbarBtnPress(document.getElementById('graph-actions-rail'));
 
 document.getElementById('btn-zi').addEventListener('click', () => {
   if (mode3d && graph3d) {
@@ -3681,10 +4224,10 @@ document.getElementById('btn-freeze').addEventListener('click', () => {
   saveState();
 });
 
-document.getElementById('btn-hop2').addEventListener('click', () => {
+document.getElementById('btn-hop2').addEventListener('click', async () => {
   hop2mode = !hop2mode;
   document.getElementById('btn-hop2').classList.toggle('active', hop2mode);
-  if (activNid) selectNode(activNid);
+  if (activNid) await selectNode(activNid);
   saveState();
 });
 
@@ -3710,11 +4253,11 @@ document.getElementById('btn-label-hover').addEventListener('click', () => {
   applyVis();
 });
 
-document.getElementById('btn-overview').addEventListener('click', () => {
+document.getElementById('btn-overview').addEventListener('click', async () => {
   hop2mode = false;
   document.getElementById('btn-hop2').classList.remove('active');
   rot = 0; if (rotBadge) rotBadge.textContent = '0°';
-  clearSel();
+  await clearSel();
   if (mode3d && graph3d) { graph3d.zoomToFit(400); }
   else { network.fit({ animation: { duration: 300, easingFunction: 'easeInOutQuad' } }); }
   saveState();
@@ -3730,6 +4273,8 @@ document.getElementById('btn-overview').addEventListener('click', () => {
   const btnAnim   = document.getElementById('btn-anim-dd');
 
   function closeAllDropdowns() {
+    clearToolbarPopFixed(ddForces);
+    clearToolbarPopFixed(ddAnim);
     ddForces.classList.remove('show');
     ddAnim.classList.remove('show');
     btnForces.classList.remove('active');
@@ -3740,24 +4285,36 @@ document.getElementById('btn-overview').addEventListener('click', () => {
     e.stopPropagation();
     const wasOpen = ddForces.classList.contains('show');
     closeAllDropdowns();
-    if (!wasOpen) { ddForces.classList.add('show'); btnForces.classList.add('active'); }
+    if (!wasOpen) {
+      ddForces.classList.add('show');
+      btnForces.classList.add('active');
+      requestAnimationFrame(() => layoutToolbarPopFixed(ddForces, btnForces, { align: 'left', gap: 8 }));
+    }
   });
 
   btnAnim.addEventListener('click', (e) => {
     e.stopPropagation();
     const wasOpen = ddAnim.classList.contains('show');
     closeAllDropdowns();
-    if (!wasOpen) { ddAnim.classList.add('show'); btnAnim.classList.add('active'); }
+    if (!wasOpen) {
+      ddAnim.classList.add('show');
+      btnAnim.classList.add('active');
+      requestAnimationFrame(() => layoutToolbarPopFixed(ddAnim, btnAnim, { align: 'left', gap: 8 }));
+    }
   });
 
-  /* Close on click outside */
+  /* Close on click outside (panels may live under body after wgReparentFloatingToolbarPops) */
   document.addEventListener('click', (e) => {
-    if (!e.target.closest('.tb-dropdown-wrap')) closeAllDropdowns();
+    if (e.target.closest('.tb-dropdown-wrap')) return;
+    if (e.target.closest('#dd-forces') || e.target.closest('#dd-anim')) return;
+    closeAllDropdowns();
   });
 
   /* Prevent dropdown clicks from closing it */
   ddForces.addEventListener('click', (e) => e.stopPropagation());
   ddAnim.addEventListener('click', (e) => e.stopPropagation());
+
+  window._wgCloseForcesAnimDropdowns = closeAllDropdowns;
 })();
 
 /* ═══════════════════════════════════════════════════════════════
@@ -3769,7 +4326,16 @@ function hideHelp() { window._wgHideHelp(); }
 /* ═══════════════════════════════════════════════════════════════
    RESET ALL SETTINGS
 ═══════════════════════════════════════════════════════════════ */
-document.getElementById('btn-reset').addEventListener('click', () => {  if (!window.confirm('Reset all graph settings to defaults?\n\nThis will clear saved view, filters, physics, reader theme, and panel state.')) return;
+document.getElementById('btn-reset').addEventListener('click', async () => {
+  const okReset = await showAppConfirm({
+    title: 'Reset all settings?',
+    message:
+      'Reset all graph settings to defaults?\n\nThis will clear saved view, filters, physics, reader theme, and panel state.',
+    confirmText: 'Reset',
+    cancelText: 'Cancel',
+    danger: true,
+  });
+  if (!okReset) return;
   try {
     localStorage.removeItem(LS_KEY);
     localStorage.removeItem(LS_KEY_V5);
@@ -3934,9 +4500,40 @@ function setLightMode(on, skipSave) {
 }
 
 const uiThemePop = document.getElementById('ui-theme-pop');
-dlBtn.addEventListener('click', (e) => { e.stopPropagation(); uiThemePop.classList.toggle('show'); });
-document.addEventListener('click', () => uiThemePop.classList.remove('show'));
+dlBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (uiThemePop.classList.contains('show')) {
+    clearToolbarPopFixed(uiThemePop);
+    uiThemePop.classList.remove('show');
+  } else {
+    uiThemePop.classList.add('show');
+    requestAnimationFrame(() => layoutToolbarPopFixed(uiThemePop, dlBtn, { align: 'left', gap: 8 }));
+  }
+});
+document.addEventListener('click', (e) => {
+  if (e.target.closest('#ui-theme-wrap') || e.target.closest('#ui-theme-pop')) return;
+  clearToolbarPopFixed(uiThemePop);
+  uiThemePop.classList.remove('show');
+});
 uiThemePop.addEventListener('click', (e) => e.stopPropagation());
+
+function wgCloseAllToolbarPopovers() {
+  const sd = document.getElementById('search-dropdown');
+  if (sd) { clearToolbarPopFixed(sd); sd.classList.remove('show'); }
+  if (typeof window._wgCloseForcesAnimDropdowns === 'function') window._wgCloseForcesAnimDropdowns();
+  const ut = document.getElementById('ui-theme-pop');
+  if (ut) { clearToolbarPopFixed(ut); ut.classList.remove('show'); }
+  const nf = document.getElementById('node-fx-pop');
+  if (nf) { clearToolbarPopFixed(nf); nf.classList.remove('show'); }
+}
+
+/* No scroll→close on .toolbar-scroll: position:fixed dropdowns shrink the flex row and can emit a
+   scroll event, which previously called wgCloseAllToolbarPopovers and caused instant close (flicker). */
+let _wgToolbarResizeTimer = 0;
+window.addEventListener('resize', () => {
+  clearTimeout(_wgToolbarResizeTimer);
+  _wgToolbarResizeTimer = setTimeout(() => { wgCloseAllToolbarPopovers(); }, 200);
+});
 
 /* ═══════════════════════════════════════════════════════════════
    MONOTONE MODE TOGGLE
@@ -3993,13 +4590,13 @@ function build3dGraph() {
     .linkDirectionalArrowRelPos(1)
     .backgroundColor(isLight ? '#f8fafc' : '#000000')
     .showNavInfo(false)
-    .onNodeClick(node => {
+    .onNodeClick(async (node) => {
       if (node && node.id) {
         navPush(node.id);
-        selectNode(node.id);
+        await selectNode(node.id);
       }
     })
-    .onBackgroundClick(() => { clearSel(); })
+    .onBackgroundClick(async () => { await clearSel(); })
     .onNodeHover(node => {
       /* Show/hide our custom tooltip for 3D hover */
       let tip = document.getElementById('tip-3d');
@@ -4229,6 +4826,16 @@ const ANIM_TYPES = {
   },
 };
 
+/** Ambient graph animation presets (ids must match ANIM_TYPES keys). */
+const AMBIENT_ANIM_OPTIONS = [
+  { id: 'orbit',   icon: '🛰️', label: 'Orbit'   },
+  { id: 'breathe', icon: '💨', label: 'Breathe' },
+  { id: 'wave',    icon: '🌊', label: 'Wave'    },
+  { id: 'float',   icon: '☁️', label: 'Float'   },
+  { id: 'pulse',   icon: '💓', label: 'Pulse'   },
+  { id: 'swirl',   icon: '🌀', label: 'Swirl'   },
+];
+
 function computeGraphCenter() {
   let sx = 0, sy = 0, n = 0;
   for (const nid of animNodeIds) {
@@ -4332,12 +4939,36 @@ function toggleAnim() {
 animBtn.addEventListener('click', toggleAnim);
 
 /* ── Animation control wiring ──────────────────────────────── */
-document.getElementById('anim-type').addEventListener('change', (e) => {
-  animType = e.target.value;
-  /* Restart if running so the new type takes effect immediately */
+function syncAnimTypeGrid() {
+  const grid = document.getElementById('anim-type-grid');
+  if (!grid) return;
+  grid.querySelectorAll('.fx-card').forEach(c => {
+    c.classList.toggle('active', c.dataset.animType === animType);
+  });
+}
+
+function setAnimType(id, skipSave) {
+  if (!ANIM_TYPES[id]) return;
+  animType = id;
+  syncAnimTypeGrid();
   if (animActive) { stopAmbientAnim(); startAmbientAnim(); }
-  saveState();
-});
+  if (!skipSave) saveState();
+}
+
+(function buildAnimTypeGrid() {
+  const grid = document.getElementById('anim-type-grid');
+  if (!grid) return;
+  AMBIENT_ANIM_OPTIONS.forEach(opt => {
+    const c = document.createElement('button');
+    c.type = 'button';
+    c.className = 'fx-card' + (opt.id === animType ? ' active' : '');
+    c.dataset.animType = opt.id;
+    c.title = opt.label;
+    c.innerHTML = '<span class="fx-icon">' + opt.icon + '</span><span class="fx-label">' + opt.label + '</span>';
+    c.addEventListener('click', () => setAnimType(opt.id));
+    grid.appendChild(c);
+  });
+})();
 
 document.getElementById('anim-speed').addEventListener('input', (e) => {
   animSpeed = +e.target.value / 100;
@@ -4355,7 +4986,8 @@ document.getElementById('anim-amp').addEventListener('input', (e) => {
 /* ═══════════════════════════════════════════════════════════════
    KEYBOARD
 ═══════════════════════════════════════════════════════════════ */
-document.addEventListener('keydown', e => {
+document.addEventListener('keydown', async (e) => {
+  if (document.getElementById('wg-confirm-backdrop').classList.contains('show')) return;
   if (e.target.tagName === 'TEXTAREA' && e.target.id === 'pane-md-editor') {
     if ((e.metaKey || e.ctrlKey) && e.key === 's') {
       e.preventDefault();
@@ -4368,10 +5000,12 @@ document.addEventListener('keydown', e => {
     return;
   }
   if (e.altKey) {
-    if (e.key === 'ArrowLeft'  && navIdx > 0)
-      { e.preventDefault(); navIdx--; selectNode(navStack[navIdx]); syncNavBtns(); }
-    if (e.key === 'ArrowRight' && navIdx < navStack.length - 1)
-      { e.preventDefault(); navIdx++; selectNode(navStack[navIdx]); syncNavBtns(); }
+    if (e.key === 'ArrowLeft'  && navIdx > 0) {
+      e.preventDefault(); navIdx--; await selectNode(navStack[navIdx]); syncNavBtns();
+    }
+    if (e.key === 'ArrowRight' && navIdx < navStack.length - 1) {
+      e.preventDefault(); navIdx++; await selectNode(navStack[navIdx]); syncNavBtns();
+    }
     return;
   }
   switch (e.key) {
@@ -4406,7 +5040,7 @@ document.addEventListener('keydown', e => {
     case 'n': case 'N':
       hop2mode = !hop2mode;
       document.getElementById('btn-hop2').classList.toggle('active', hop2mode);
-      if (activNid) selectNode(activNid);
+      if (activNid) await selectNode(activNid);
       saveState();
       break;
     case 'l': case 'L':
@@ -4421,14 +5055,14 @@ document.addEventListener('keydown', e => {
       hop2mode = false;
       document.getElementById('btn-hop2').classList.remove('active');
       rot = 0; if (rotBadge) rotBadge.textContent = '0°';
-      clearSel();
+      await clearSel();
       network.fit({ animation: { duration: 300, easingFunction: 'easeInOutQuad' } });
       saveState();
       break;
     case '/': e.preventDefault(); searchEl.focus(); searchEl.select(); break;
     case 'Escape':
       hideHelp(); dropEl.classList.remove('show');
-      if (!clearSel()) break;
+      if (!(await clearSel())) break;
       rot = 0; if (rotBadge) rotBadge.textContent = '0°';
       network.fit({ animation: { duration: 300, easingFunction: 'easeInOutQuad' } });
       break;
@@ -4469,6 +5103,8 @@ function saveState() {
       mode3d,
       dateIdxFrom,
       dateIdxTo,
+      dateFrom: dateAllSorted[dateIdxFrom] || null,
+      dateTo: dateAllSorted[dateIdxTo] || null,
       physLen: +document.getElementById('phys-spring-len').value,
       physK: +document.getElementById('phys-spring-k').value,
       physGrav: +document.getElementById('phys-grav').value,
@@ -4514,7 +5150,7 @@ function readMergedState() {
   }
 }
 
-function restoreState() {
+async function restoreState() {
   wgRestoring = true;
   try {
     const s = readMergedState();
@@ -4608,8 +5244,7 @@ function restoreState() {
     /* Restore animation */
     if (s && typeof s.animType === 'string' && ANIM_TYPES[s.animType]) {
       animType = s.animType;
-      const sel = document.getElementById('anim-type');
-      if (sel) sel.value = animType;
+      syncAnimTypeGrid();
     }
     if (s && isFiniteNum(s.animSpeed)) {
       animSpeed = Math.max(0.1, Math.min(5, s.animSpeed / 100));
@@ -4666,8 +5301,28 @@ function restoreState() {
     /* Restore date filter */
     if (s && dateAllSorted.length > 1) {
       const maxIdx = dateAllSorted.length - 1;
-      if (isFiniteNum(s.dateIdxFrom) && s.dateIdxFrom >= 0 && s.dateIdxFrom <= maxIdx) dateIdxFrom = s.dateIdxFrom;
-      if (isFiniteNum(s.dateIdxTo) && s.dateIdxTo >= 0 && s.dateIdxTo <= maxIdx) dateIdxTo = s.dateIdxTo;
+      let restoredFromByDate = false;
+      let restoredToByDate = false;
+
+      // Prefer restoring by concrete date values so newly added dates do not shift the saved range.
+      if (typeof s.dateFrom === 'string') {
+        const fromIdx = dateAllSorted.indexOf(s.dateFrom);
+        if (fromIdx >= 0) {
+          dateIdxFrom = fromIdx;
+          restoredFromByDate = true;
+        }
+      }
+      if (typeof s.dateTo === 'string') {
+        const toIdx = dateAllSorted.indexOf(s.dateTo);
+        if (toIdx >= 0) {
+          dateIdxTo = toIdx;
+          restoredToByDate = true;
+        }
+      }
+
+      // Backward compatibility for old saved state that only stored indices.
+      if (!restoredFromByDate && isFiniteNum(s.dateIdxFrom) && s.dateIdxFrom >= 0 && s.dateIdxFrom <= maxIdx) dateIdxFrom = s.dateIdxFrom;
+      if (!restoredToByDate && isFiniteNum(s.dateIdxTo) && s.dateIdxTo >= 0 && s.dateIdxTo <= maxIdx) dateIdxTo = s.dateIdxTo;
       if (dateIdxFrom > dateIdxTo) dateIdxFrom = dateIdxTo;
       const slFrom = document.getElementById('date-range-from');
       const slTo   = document.getElementById('date-range-to');
@@ -4684,7 +5339,7 @@ function restoreState() {
 
     if (s && s.activNid) {
       navPush(s.activNid);
-      selectNode(s.activNid);
+      await selectNode(s.activNid);
     } else {
       applyVis();
     }
@@ -4697,7 +5352,7 @@ function restoreState() {
   }
 }
 
-network.once('stabilized', restoreState);
+network.once('stabilized', () => { void restoreState(); });
 
 let wgResizeTimer = null;
 window.addEventListener('resize', () => {
